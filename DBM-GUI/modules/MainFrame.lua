@@ -215,7 +215,7 @@ frameWebsite:SetText(L.Website)
 local frameWebsiteButtonA = CreateFrame("Button", nil, frame)
 frameWebsiteButtonA:SetAllPoints(frameWebsite)
 frameWebsiteButtonA:SetScript("OnMouseUp", function()
-	DBM:ShowUpdateReminder(nil, nil, CL.COPY_URL_DIALOG, "https://discord.gg/CyVWDWS")
+	DBM:ShowUpdateReminder(nil, nil, CL.COPY_URL_DIALOG, "https://github.com/5Buttons/DBM-Chromiecraft")
 end)
 
 local frameWebsiteButton = CreateFrame("Button", "$parentWebsiteButton", frame, "UIPanelButtonTemplate")
