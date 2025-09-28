@@ -3,9 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250324123456 ")
 mod:SetCreatureID(24882)
-mod.statTypes = "normal25, mythic"
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
-
 mod:RegisterCombat("yell", L.Pull)
 mod.disableHealthCombat = true
 
@@ -55,9 +53,9 @@ function mod:OnCombatStart(delay)
 	timerStompCD:Start(-delay)
 	berserkTimer:Start(-delay)
 	timerMeteorCD:Start(11-delay) -- new CC start timer
---	if self.Options.RangeFrame and self.Options.RangeFrameActivation == "AlwaysOn" then
+	if self.Options.RangeFrame and self.Options.RangeFrameActivation == "AlwaysOn" then
 		DBM.RangeCheck:Show(6) --change rangeframe to 6y instead of 4y 20250319
---	end
+	end
 end
 
 function mod:OnCombatEnd()
@@ -86,7 +84,6 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnBurn:Play("targetyou")
 			yellBurn:Yell()
 		end
---[[		
 		if self.Options.RangeFrame and self.Options.RangeFrameActivation == "OnDebuff" then
 			if DBM:UnitDebuff("player", debuffName) then--You have debuff, show everyone || the args.spellName did not have proper reference?
 				DBM.RangeCheck:Show(6, nil) --change rangeframe to 6y instead of 4y 20250319
@@ -94,7 +91,6 @@ function mod:SPELL_AURA_APPLIED(args)
 				DBM.RangeCheck:Show(6, DebuffFilter) --change rangeframe to 6y instead of 4y 20250319
 			end
 		end
-]]-- this may be redundant as you want the range frame to be available at all times, also the person with burn is already marked with raidicon
 	elseif args.spellId == 45185 then --Stomp
 		if args:IsPlayer() then
 			specwarnStompYou:Show()

@@ -4,7 +4,6 @@ local L		= mod:GetLocalizedStrings()
 mod:SetRevision("20250921103545")
 mod:SetCreatureID(25315, 25588)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
-mod.statTypes = "normal25, mythic"
 mod:RegisterCombat("combat")
 mod:SetWipeTime(15)
 
@@ -60,10 +59,10 @@ local timerBlueOrb		= mod:NewTimer(38, "TimerBlueOrb", 45109, nil, nil, 5) --AC:
 
 local timerKilCombatStart = mod:NewCombatTimer(11)
 
-mod:AddRangeFrameOption("11") --10 yards was sometimes not enough
 mod:AddSetIconOption("BloomIcon", 45641, true, false, {4, 5, 6, 7, 8})
 mod:AddInfoFrameOption(45641, false) -- Add InfoFrame option for Fire Bloom - disabled by default
 mod:AddMiscLine(DBM_CORE_L.OPTION_CATEGORY_DROPDOWNS)
+mod:AddRangeFrameOption(11, 45641)
 mod:AddDropdownOption("RangeFrameActivation", {"AlwaysOn", "OnDebuff"}, "OnDebuff", "misc")
 
 local warnBloomTargets = {}
@@ -113,18 +112,15 @@ function mod:OnCombatStart(delay)
     table.wipe(bloomDebuffs)
     self.vb.bloomIcon = 8
     self.vb.handsKilled = 0
-    if self.Options.RangeFrame then
-        if self.Options.RangeFrameActivation == "AlwaysOn" then
-            DBM.RangeCheck:Show(11)
-        else -- OnDebuff
-            DBM.RangeCheck:Show(11, DebuffFilter)
-        end
+    if self.Options.RangeFrame and self.Options.RangeFrameActivation == "AlwaysOn" then
+        DBM.RangeCheck:Show(11)
     end
     if self.Options.InfoFrame then
         DBM.InfoFrame:SetHeader("Fire Bloom Debuffs")
         DBM.InfoFrame:Show(5, "table", {}, 1)
     end
 end
+
 
 function mod:OnCombatEnd()
     if self.Options.RangeFrame then
@@ -155,7 +151,6 @@ function mod:SPELL_AURA_APPLIED(args)
             self:SetIcon(args.destName, self.vb.bloomIcon)
             self.vb.bloomIcon = self.vb.bloomIcon - 1
         end
-        -- Add player to bloomDebuffs without duration
         bloomDebuffs[args.destName] = true
         updateBloomInfoFrame(self)
         if #warnBloomTargets >= 5 then
@@ -164,34 +159,27 @@ function mod:SPELL_AURA_APPLIED(args)
             self:Unschedule(showBloomTargets)
             self:Schedule(0.3, showBloomTargets, self)
         end
-
-        -- Check if the debuff is applied to the player
         if args:IsPlayer() then
-            -- These will always trigger if the player gets Bloom
             yellBloom:Yell()
-            specWarnBloom:Show() 
-
-            -- Additionally, show range frame if options are set
-            if self.Options.RangeFrame and self.Options.RangeFrameActivation == "OnDebuff" then
+            specWarnBloom:Show()
+        end
+        if self.Options.RangeFrame and self.Options.RangeFrameActivation == "OnDebuff" then
+            if DBM:UnitDebuff("player", debuffName) then -- You have debuff, show everyone
                 DBM.RangeCheck:Show(11, nil)
+            else -- You do not have debuff, only show players who do
+                DBM.RangeCheck:Show(11, DebuffFilter)
             end
         end
     end
 end
 
--- Add the SPELL_AURA_REMOVED event to handle Bloom removal
 function mod:SPELL_AURA_REMOVED(args)
     if args.spellId == 45641 then -- Bloom
         if self.Options.BloomIcon then
             self:SetIcon(args.destName, 0)
         end
-        -- Remove player from bloomDebuffs
         bloomDebuffs[args.destName] = nil
         updateBloomInfoFrame(self)
-        -- Update range frame if player loses debuff and option is set to OnDebuff
-        if args:IsPlayer() and self.Options.RangeFrame and self.Options.RangeFrameActivation == "OnDebuff" then
-            DBM.RangeCheck:Show(10, DebuffFilter) -- Only show others with debuff
-        end
     end
 end
 

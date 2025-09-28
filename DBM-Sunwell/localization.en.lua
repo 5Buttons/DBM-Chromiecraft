@@ -179,7 +179,10 @@ L:SetOptionLocalization({
 	SpecWarnBlueOrb		= "Show special warning for Dragon Orbs",
 	TimerBlueOrb		= "Show timer form Dragon Orbs activate",
 	WarnHandDied		= "Show a warning for number of Hands killed",
-	WarnAllHandsDead	= "Show a warning when all Hands are dead"
+	WarnAllHandsDead	= "Show a warning when all Hands are dead",
+	RangeFrameActivation	= "Range frame activation",
+	AlwaysOn		= "On encounter start. Ignores filter",
+	OnDebuff		= "On debuff. Applies debuff filter"
 })
 
 L:SetMiscLocalization({
