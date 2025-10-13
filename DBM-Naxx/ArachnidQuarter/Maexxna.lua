@@ -4,6 +4,7 @@ local L		= mod:GetLocalizedStrings()
 mod:SetRevision("20220627034419")
 mod:SetCreatureID(15952)
 mod:RegisterCombat("combat")
+mod:SetEncounterID(1116)
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 28622",

@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20190516165414")
 mod:SetCreatureID(15936)
-
+mod:SetEncounterID(1112)
 mod:RegisterCombat("combat_yell", L.Pull)
 
 local warnTeleportSoon			= mod:NewAnnounce("WarningTeleportSoon", 2, 46573)

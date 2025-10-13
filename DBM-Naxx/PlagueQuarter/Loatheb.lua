@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20221022102923")
 mod:SetCreatureID(16011)
-
+mod:SetEncounterID(1115)
 mod:RegisterCombat("combat")--Maybe change to a yell later so pull detection works if you chain pull him from tash gauntlet
 
 mod:RegisterEventsInCombat(

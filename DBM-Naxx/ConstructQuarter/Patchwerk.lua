@@ -3,8 +3,9 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20190417005949")
 mod:SetCreatureID(16028)
-
+mod:SetEncounterID(1107)
 mod:RegisterCombat("combat_yell", L.yell1, L.yell2)
+mod:SetEncounterID(1118)
 
 mod:RegisterEventsInCombat(
 	"SPELL_DAMAGE 28308 41926 59192",

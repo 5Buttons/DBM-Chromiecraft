@@ -10,7 +10,7 @@ mod:SetCreatureID(15990)
 mod:SetModelID("creature/lich/lich.m2")
 mod:SetMinCombatTime(60)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
-
+mod:SetEncounterID(1114)
 mod:RegisterCombat("combat_yell", L.Yell)
 
 mod:RegisterEventsInCombat(
