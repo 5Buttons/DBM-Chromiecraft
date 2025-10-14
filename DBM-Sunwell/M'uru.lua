@@ -3,6 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250511094200") --based on 20220518110528_cafe20250418v24_public
 mod:SetCreatureID(25741, 25840)--25741 Muru, 25840 Entropius
+mod:SetEncounterID(728)
 mod:RegisterCombat("combat")
 mod:SetUsedIcons(7, 8)
 

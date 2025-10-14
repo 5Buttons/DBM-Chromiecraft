@@ -4,6 +4,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250915182700") --based on cafe&yars_20250329v12
 mod:SetCreatureID(24850)
+mod:SetEncounterID(724)
 mod:RegisterCombat("combat")
 
 mod:RegisterEvents(

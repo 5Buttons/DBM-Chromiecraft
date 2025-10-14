@@ -4,7 +4,7 @@ local L		= mod:GetLocalizedStrings()
 mod:SetRevision("20250608142317") --based on cafe20250416v19
 mod:SetCreatureID(25165, 25166)
 mod:SetUsedIcons(6, 8)
-
+mod:SetEncounterID(727)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
@@ -57,19 +57,16 @@ local function shouldShowRangeFrame(self)
 	if not self.Options.RangeFrame then
 		return false
 	end
-	
 	-- Always show if AlwaysOn is selected
 	if self.Options.RangeFrameActivation == "AlwaysOn" then
 		return true
 	end
-	
 	-- Only show when someone has conflagration icon if OnDebuff is selected
 	if self.Options.RangeFrameActivation == "OnDebuff" then
 		-- Check if player has conflagration icon
 		if conflagIconPlayers[UnitName("player")] then
 			return true
 		end
-		
 		-- Check if any player in range has conflagration icon
 		for playerName, _ in pairs(conflagIconPlayers) do
 			if playerName ~= UnitName("player") then
@@ -77,7 +74,6 @@ local function shouldShowRangeFrame(self)
 			end
 		end
 	end
-	
 	return false
 end
 
@@ -161,7 +157,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 		target = DBM:GetUnitFullName(target)
 		if self.Options.NovaIcon then
 			self:SetIcon(target, 6, 5) -- changed to square for easier visualization 250331
-		end		
+		end
 		if self:GetStage() == 2 then
 			timerNovaCD:Start("v20-26")
 		else
@@ -179,23 +175,20 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 		timerConflagCD:Start()
 		target = DBM:GetUnitFullName(target)
 		-- Handle server bug: unresolved placeholders and nil targets --sometimes when Alythess dies a placeholder emote is fired: 20:39:34 Alythess directs Conflagration at $n.
-    	if not target or target:match("%$%w") then  -- Catches $n, $r, $c, etc.
+		if not target or target:match("%$%w") then  -- Catches $n, $r, $c, etc.
         return
-   		end
+		end
 		-- Track player with conflagration icon and show range frame
 		conflagIconPlayers[target] = true
 		updateRangeFrame(self)
-		
 		if self.Options.ConflagIcon then
 			self:SetIcon(target, 8, 5)
 		end
-		
 		-- Schedule removal of icon tracking after cast time + buffer
 		self:Schedule(6, function() -- 3.5s cast + 2.5s buffer
 			conflagIconPlayers[target] = nil
 			updateRangeFrame(self)
 		end)
-		
 		if target == UnitName("player") then
 			specWarnConflag:Show()
 			specWarnConflag:Play("targetyou")
