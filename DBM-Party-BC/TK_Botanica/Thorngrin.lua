@@ -1,7 +1,7 @@
 local mod = DBM:NewMod(560, "DBM-Party-BC", 14, 257)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20251017120000")
 mod:SetCreatureID(17978)
 
 mod:SetModelID(14416)
@@ -9,7 +9,9 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 34661 34670",
-	"SPELL_AURA_REMOVED 34661 34670"
+	"SPELL_AURA_REMOVED 34661 34670",
+	"SPELL_DAMAGE 34660",
+	"SPELL_MISSED 34660"
 )
 
 local warnSacrifice		= mod:NewTargetNoFilterAnnounce(34661, 2)
@@ -40,7 +42,6 @@ end
 
 do
 	local player = UnitGUID("player")
-
 	function mod:SPELL_DAMAGE(_, _, _, destGUID, _, _, spellId, spellName)
 		if spellId == 34660 and destGUID == player and self:AntiSpam(4, 1) then--Hellfire
 			specWarnGTFO:Show(spellName)
