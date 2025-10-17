@@ -503,6 +503,21 @@ L:SetGeneralLocalization({
 	name		= "Mechano-Lord Capacitus"
 })
 
+L:SetWarningLocalization({
+	WarnPolarity			= "Polarity Shift!",
+	WarningChargeChanged	= "Polarity Changed: %s",
+	WarningChargeNotChanged	= "Polarity Not Changed - Don't Move",
+	Charge1					= "Negative Charge",
+	Charge2					= "Positive Charge"
+})
+
+L:SetOptionLocalization({
+	WarnPolarity			= "Show warning for Polarity Shift",
+	WarningChargeChanged	= "Show special warning when your polarity changed",
+	WarningChargeNotChanged	= "Show special warning when your polarity did not change",
+})
+
+
 ------------------------------
 --  Nethermancer Sepethrea  --
 ------------------------------
