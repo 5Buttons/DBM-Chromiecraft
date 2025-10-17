@@ -1,9 +1,9 @@
 local mod	= DBM:NewMod(569, "DBM-Party-BC", 3, 259)
 local L		= mod:GetLocalizedStrings()
 
-mod.statTypes = "normal,heroic,mythic"
+mod.statTypes = "normal,heroic"
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20251017110528")
 mod:SetCreatureID(16808)
 
 mod:SetModelID(19799)
@@ -16,7 +16,7 @@ mod:RegisterEventsInCombat(
 
 local orcHeadIcon = "Interface\\Icons\\inv_misc_head_orc_01"
 
---Some Random Orc Icon. Could not find red fel orc icon. Only green orcs or brown orcs. Brown closer to red than green is.
+--Some Random Orc Icon. Could not find red fel orc icon. Green it is
 local warnHeathenGuard			= mod:NewAnnounce("warnHeathen", 2, orcHeadIcon)
 local warnReaverGuard			= mod:NewAnnounce("warnReaver", 2, orcHeadIcon)
 local warnSharpShooterGuard		= mod:NewAnnounce("warnSharpShooter", 2, orcHeadIcon)

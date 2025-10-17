@@ -103,9 +103,9 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	timerHeathen		= "Heathen Guard: %s",
-	timerReaver			= "Reaver Guard: %s",
-	timerSharpShooter	= "Sharpshooter Guard: %s"
+	timerHeathen		= "Heathen Guard",
+	timerReaver			= "Reaver Guard",
+	timerSharpShooter	= "Sharpshooter Guard"
 })
 
 L:SetOptionLocalization({
