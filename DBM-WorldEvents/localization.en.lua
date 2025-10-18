@@ -92,7 +92,7 @@ L:SetGeneralLocalization({
 L:SetWarningLocalization({
 	WarnPhase				= "Phase %d",
 	warnHorsemanSoldiers	= "Pulsing Pumpkins spawning",
-	warnHorsemanHead		= "Head of the Horseman Active"
+	specWarnHorsemanHead	= "Head spawned - attack it!"
 })
 
 L:SetOptionLocalization({
@@ -106,5 +106,6 @@ L:SetMiscLocalization({
 	HorsemanSummon		= "Horseman rise...", -- 22695
 	HorsemanHead		= "Get over here, you idiot!", -- 22415
 	HorsemanSoldiers	= "Soldiers arise, stand and fight! Bring victory at last to this fallen knight!", -- 23861
+	HorsemanRejoined	= "Here's my body, fit and pure!  Now, your blackened souls I'll cure!", --after you kill head and he becomes active again
 	SayCombatEnd		= "This end have I reached before.  What new adventure lies in store?" -- 23455
 })

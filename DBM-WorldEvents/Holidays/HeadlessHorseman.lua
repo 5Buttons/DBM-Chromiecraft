@@ -1,12 +1,12 @@
 local mod	= DBM:NewMod("HeadlessHorseman", "DBM-WorldEvents")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20241122155852")
+mod:SetRevision("20251018163045")
 mod:SetCreatureID(23682, 23775)
 
 mod:SetReCombatTime(10)
 mod:RegisterCombat("combat")
---mod:RegisterKill("say", L.SayCombatEnd)
+mod:RegisterKill("yell", L.SayCombatEnd)
 
 mod:RegisterEvents(
 	"CHAT_MSG_SAY"
@@ -16,19 +16,16 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 42380 42514",
 	"UNIT_SPELLCAST_SUCCEEDED",
 	"CHAT_MSG_MONSTER_SAY",
-	"PARTY_KILL",
-	"UNIT_DIED"
+	"CHAT_MSG_MONSTER_YELL",
+	"NAME_PLATE_UNIT_ADDED"
 )
 
 local warnConflag				= mod:NewTargetAnnounce(42380, 3)
 local warnSquashSoul			= mod:NewTargetAnnounce(42514, 2, nil, false, 2)
-local warnPhase					= mod:NewAnnounce("WarnPhase", 2, "136116")
 local warnHorsemanSoldiers		= mod:NewAnnounce("warnHorsemanSoldiers")
-local warnHorsemanHead			= mod:NewAnnounce("warnHorsemanHead", 3)
-
 local specWarnHorsemanHead		= mod:NewSpecialWarning("specWarnHorsemanHead")
 
-local timerCombatStart			= mod:NewCombatTimer(21.7)--roleplay for first pull
+local timerCombatStart			= mod:NewCombatTimer(15)--roleplay for first pull
 local timerConflag				= mod:NewTargetTimer(4, 42380)
 local timerSquashSoul			= mod:NewTargetTimer(15, 42514)
 
@@ -43,7 +40,22 @@ function mod:SPELL_AURA_APPLIED(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
+function mod:NAME_PLATE_UNIT_ADDED(unitID)
+	local cid = self:GetCIDFromGUID(UnitGUID(unitID))
+	if cid == 23775 then  -- Head of the Horseman
+		self:SendSync("HeadRepositions")
+	end
+end
+
+function mod:OnSync(event)
+	if event == "HeadRepositions" then
+		if self:AntiSpam(10, "HeadRepositions") then
+			specWarnHorsemanHead:Show()
+		end
+	end
+end
+-- doesnt work at all on Chromiecraft
+--[[function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 --	"<48.6> Headless Horseman:Possible Target<Omegal>:target:Headless Horseman Climax - Command, Head Repositions::0:42410", -- [35]
 	if spellName == GetSpellInfo(42410) then
 		self:SendSync("HeadRepositions")
@@ -57,11 +69,11 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	elseif spellName == GetSpellInfo(42549) then
 		self:SendSync("BodyStage3")
 	end
-end
+end]]
 
 --Use syncing since these unit events require "target" or "focus" to detect.
 --At least someone in group should be targeting this stuff and sync it to those that aren't (like a healer)
-function mod:OnSync(event)
+--[[function mod:OnSync(event)
 	if event == "HeadRepositions" then
 		warnHorsemanHead:Show()
 	elseif event == "BodyStage1" then
@@ -71,13 +83,23 @@ function mod:OnSync(event)
 	elseif event == "BodyStage3" then
 		warnPhase:Show(3)
 	end
+end]]
+
+function mod:CHAT_MSG_MONSTER_YELL(msg)
+	if msg == L.HorsemanSoldiers and self:AntiSpam(5, 1) then
+		warnHorsemanSoldiers:Show()
+	end
+end
+
+function mod:CHAT_MSG_MONSTER_EMOTE(msg)
+    if msg == "%s laughs." or msg == L.HeadLaugh then
+	self:SendSync("HeadRepositions")
+    end
 end
 
 function mod:CHAT_MSG_MONSTER_SAY(msg)
 	if msg == L.HorsemanHead then											-- No combatlog event for head spawning, Emote works iffy(head doesn't emote First time, only 2nd and forward)
-		specWarnHorsemanHead:Show()
-	elseif msg == L.HorsemanSoldiers and self:AntiSpam(5, 1) then	-- Warning for adds spawning. No CLEU or UNIT event for it.
-		warnHorsemanSoldiers:Show()
+		self:SendSync("HeadRepositions")
 	end
 end
 
@@ -87,10 +109,10 @@ function mod:CHAT_MSG_SAY(msg)
 	end
 end
 
-function mod:UNIT_DIED(args) -- 2024/10/22: found one log where only PARTY_KILL was fired, no UNIT_DIED
+--[[function mod:UNIT_DIED(args) -- 2024/10/22: found one log where only PARTY_KILL was fired, no UNIT_DIED
 	if not self:IsInCombat() then return end
 	if self:GetCIDFromGUID(args.destGUID) == 23775 then
 		DBM:EndCombat(self)
 	end
 end
-mod.PARTY_KILL = mod.UNIT_DIED
+mod.PARTY_KILL = mod.UNIT_DIED]]
