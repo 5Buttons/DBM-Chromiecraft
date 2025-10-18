@@ -10,8 +10,8 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 34661 34670",
 	"SPELL_AURA_REMOVED 34661 34670",
-	"SPELL_DAMAGE 34660",
-	"SPELL_MISSED 34660"
+	"SPELL_DAMAGE 34660 39132",
+	"SPELL_MISSED 34660 39132"
 )
 
 local warnSacrifice		= mod:NewTargetNoFilterAnnounce(34661, 2)
@@ -43,7 +43,7 @@ end
 do
 	local player = UnitGUID("player")
 	function mod:SPELL_DAMAGE(_, _, _, destGUID, _, _, spellId, spellName)
-		if spellId == 34660 and destGUID == player and self:AntiSpam(4, 1) then--Hellfire
+		if (spellId == 34660 or spellId == 39132) and destGUID == player and self:AntiSpam(4, 1) then --Hellfire
 			specWarnGTFO:Show(spellName)
 			specWarnGTFO:Play("watchfeet")
 		end
