@@ -3,6 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20220518110528")
 mod:SetCreatureID(15687, 19873, 19876, 17007, 19872, 19874, 19875)--Moroes
+mod:SetEncounterID(653)
 
 mod:SetModelID(16540)
 mod:RegisterCombat("combat")

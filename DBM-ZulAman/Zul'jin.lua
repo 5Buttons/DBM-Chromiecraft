@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250105182900")
 mod:SetCreatureID(23863)
-
+mod:SetEncounterID(1194)
 mod:SetZone()
 
 mod:RegisterCombat("combat_yell", L.YellPull) -- //on Trinity Core I think the yell is swapped with intro yell

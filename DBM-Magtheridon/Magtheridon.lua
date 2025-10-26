@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250120150020")
 mod:SetCreatureID(17257)
-
+mod:SetEncounterID(651)
 mod:SetModelID(18527)
 mod:RegisterCombat("emote", L.DBM_MAG_EMOTE_PULL)
 

@@ -3,6 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20220518110528")
 mod:SetCreatureID(17767)
+mod:SetEncounterID(618)
 mod:SetModelID("creature/lich/lich.m2")
 mod:SetUsedIcons(8)
 

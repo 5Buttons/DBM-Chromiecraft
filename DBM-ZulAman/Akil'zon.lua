@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250105230600")
 mod:SetCreatureID(23574)
-
+mod:SetEncounterID(1189)
 mod:SetZone()
 mod:SetUsedIcons(1)
 

@@ -5,6 +5,7 @@ mod:SetRevision("20250806215207")
 mod:SetCreatureID(18168, 17535)
 --
 mod:SetModelID(17550)
+mod:SetEncounterID(655) -- Opera Hall
 mod:RegisterCombat("yell", L.DBM_OZ_YELL_DOROTHEE)
 mod:SetMinCombatTime(25)
 mod:SetWipeTime(30)
