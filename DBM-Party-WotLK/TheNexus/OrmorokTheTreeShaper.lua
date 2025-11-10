@@ -27,8 +27,8 @@ local timerReflectionCD		= mod:NewCDTimer(30, 47981, nil, "SpellCaster", 2, 5, n
 local timerSpikesCD			= mod:NewCDTimer(12.1, 47958, nil, nil, nil, 3)--Health based or CD?
 
 function mod:OnCombatStart(delay)
-	timerSpikesCD:Start(10-delay)
-	timerReflectionCD:Start(20-delay)
+	timerSpikesCD:Start(12-delay)
+	timerReflectionCD:Start(30-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
