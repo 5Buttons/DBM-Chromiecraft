@@ -9,7 +9,7 @@ mod:SetMinSyncRevision(2861)
 mod:RegisterCombat("yell", L.Pull)
 mod:RegisterKill("yell", L.Kill)
 mod:SetMinCombatTime(50)
-mod:SetWipeTime(25)
+mod:SetWipeTime(35)
 
 mod:RegisterEventsInCombat(
 	"CHAT_MSG_MONSTER_YELL"
