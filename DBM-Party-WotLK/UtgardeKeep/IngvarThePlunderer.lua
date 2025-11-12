@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IngvarThePlunderer", "DBM-Party-WotLK", 10)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20251112220131")
 mod:SetCreatureID(23980, 23954)
 mod:SetEncounterID(575)
 mod:SetUsedIcons(8)
@@ -24,7 +24,7 @@ local specWarnSpelllock	= mod:NewSpecialWarningCast(42729, "SpellCaster", nil, 2
 local specWarnSmash		= mod:NewSpecialWarningDodge(42723, "Tank", nil, nil, 1, 2)
 
 local timerSmash		= mod:NewCastTimer(3, 42723)
-local timerSmashCD		= mod:NewCDTimer(13, 42723, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
+local timerSmashCD		= mod:NewCDTimer(9, 42723, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 local timerWoeStrike	= mod:NewTargetTimer(10, 42723, nil, "RemoveCurse", nil, 5, nil, DBM_COMMON_L.CURSE_ICON)
 
 mod:AddSetIconOption("WoeStrikeIcon", 42730, true, false, {8})
