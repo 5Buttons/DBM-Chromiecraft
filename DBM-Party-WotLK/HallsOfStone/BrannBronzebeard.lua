@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("BrannBronzebeard", "DBM-Party-WotLK", 7)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251112220131")
+mod:SetRevision("20251114220131")
 mod:SetCreatureID(28070)
 mod:SetEncounterID(567)
 mod:SetMinSyncRevision(2861)
@@ -9,7 +9,7 @@ mod:SetMinSyncRevision(2861)
 mod:RegisterCombat("yell", L.Pull)
 mod:RegisterKill("yell", L.Kill)
 mod:SetMinCombatTime(50)
-mod:SetWipeTime(35)
+mod:SetWipeTime(60)
 
 mod:RegisterEventsInCombat(
 	"CHAT_MSG_MONSTER_YELL"
