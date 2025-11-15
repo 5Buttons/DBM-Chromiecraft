@@ -394,7 +394,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Pull	= "Now keep an eye out! I'll have this licked in two shakes of a--",
 	Phase1	= "Security breach in progress. Analysis of historical archives transferred to lower-priority queue. Countermeasures engaged.",
-	Phase2	= "Threat index threshold exceeded.  Celestial archive aborted. Security level heightened.",
+	Phase2	= "Threat index threshold exceeded. Celestial archive aborted. Security level heightened.",
 	Phase3	= "Critical threat index. Void analysis diverted. Initiating sanitization protocol.",
 	Kill	= "Alert: security fail-safes deactivated. Beginning memory purge and... "
 })
