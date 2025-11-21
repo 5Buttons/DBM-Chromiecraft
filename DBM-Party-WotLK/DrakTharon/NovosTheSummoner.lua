@@ -24,14 +24,14 @@ local warnCurseTarget			= mod:NewTargetAnnounce(59856)
 local specwarnCurse				= mod:NewSpecialWarningDispel(59856, "RemoveCurse")
 local specwarnSnow				= mod:NewSpecialWarningMove(59854)
 
-local timerCrystalHandler		= mod:NewNextTimer(20, 49179, nil, nil, nil, 1, 59910, DBM_COMMON_L.DAMAGE_ICON)
+local timerCrystalHandler		= mod:NewNextTimer(16, 49179, nil, nil, nil, 1, 59910, DBM_COMMON_L.DAMAGE_ICON)
 local timerNextCurse			= mod:NewCDTimer(20, 59856)
 
 mod.vb.CrystalHandlers = 4
 
 function mod:OnCombatStart(delay)
 	self:SetStage(1)
-	timerCrystalHandler:Start(25.5-delay)
+	timerCrystalHandler:Start(16-delay)
 	self.vb.CrystalHandlers = 4
 end
 
