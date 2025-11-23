@@ -16,7 +16,9 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED 48294 59301"
 )
 
-local warningBane		= mod:NewSpecialWarningSoon(48294, 3)
+local warningBane		= mod:NewSpecialWarningSoon(48294, "Dps", nil, nil, 1, 2)
+local specWarnBaneDispell	= mod:NewSpecialWarningDispel(48294, "MagicDispeller", nil, nil, 1, 2)
+
 local warningScreams	= mod:NewSpellAnnounce(51750, 2)
 
 local timerBane			= mod:NewBuffActiveTimer(5, 48294, nil, nil, nil, 5, nil, DBM_COMMON_L.MAGIC_ICON)
@@ -25,6 +27,7 @@ local timerScreams		= mod:NewBuffActiveTimer(8, 51750, nil, nil, nil, 2)
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(48294, 59301) then
 		warningBane:Show()
+		warningBane:Play("stopattack")
 	end
 end
 
@@ -38,6 +41,8 @@ end
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(48294, 59301) then
 		timerBane:Start()
+		specWarnBaneDispell:Show()
+		specWarnBaneDispell:Play("dispelboss")
 	end
 end
 
