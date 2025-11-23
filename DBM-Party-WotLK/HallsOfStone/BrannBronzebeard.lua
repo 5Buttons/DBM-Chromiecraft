@@ -36,14 +36,15 @@ end
 
 function mod:UNIT_DIED(args) --serves as a wipe detection function since SetMinCombatTime is set to 300s in order to keep the timer alive
 	-- If Brann Bronzebeard (28070) dies, the event has failed.
-	if self:GetCIDFromGUID(args.destGUID) == 28070 then
-		self:EndCombat(true)
+	local cid = self:GetCIDFromGUID(args.destGUID)
+	if cid == 28070 then
+		DBM:EndCombat(self)
 		self:SendSync("BrannDied") --add sync for ppl who release on a wipe before brann dies
 	end
 end
 
 function mod:OnSync(msg)
 	if msg == "BrannDied" then
-		self:EndCombat(true)
+		DBM:EndCombat(self)
 	end
 end
