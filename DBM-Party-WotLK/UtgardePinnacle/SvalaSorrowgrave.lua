@@ -14,7 +14,7 @@ mod:RegisterEvents(
 )
 
 mod:RegisterEventsInCombat(
-	"SPELL_AURA_APPLIED 48278",
+	"SPELL_AURA_APPLIED 48278 48276",
 	"SPELL_AURA_REMOVED 48278"
 )
 
