@@ -569,7 +569,6 @@ L = DBM:GetModLocalization("SkadiTheRuthless")
 L:SetGeneralLocalization({
 	name = "Skadi the Ruthless"
 })
-
 L:SetMiscLocalization({
 	CombatStart		= "What mongrels dare intrude here? Look alive, my brothers!  A feast for the one that brings me their heads!",
 	Phase2			= "You motherless knaves! Your corpses will make fine morsels for my new drake!"
