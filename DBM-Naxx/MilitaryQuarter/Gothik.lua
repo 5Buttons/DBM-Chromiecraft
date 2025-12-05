@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Gothik", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250914210600")
+mod:SetRevision("20251204210600")
 mod:SetCreatureID(16060)
 mod:SetEncounterID(1109)
 mod:RegisterCombat("combat")
@@ -16,11 +16,12 @@ local warnWaveNow		= mod:NewAnnounce("WarningWaveSpawned", 3, nil, false)
 local warnWaveSoon		= mod:NewAnnounce("WarningWaveSoon", 2)
 local warnRiderDown		= mod:NewAnnounce("WarningRiderDown", 4)
 local warnKnightDown	= mod:NewAnnounce("WarningKnightDown", 2)
+local warnGateOpen		= mod:NewSpellAnnounce(3366, 2)
 local warnPhase2		= mod:NewPhaseAnnounce(2, 3)
 
 local timerPhase2		= mod:NewTimer(269, "TimerPhase2", 27082, nil, nil, 6)
 local timerWave			= mod:NewTimer(20, "TimerWave", 5502, nil, nil, 1)
-local timerGate			= mod:NewTimer(155, "Gate Opens", 9484)
+local timerGate			= mod:NewTimer(120, "Gate Opens", 9484)
 
 mod.vb.wave = 0
 local wavesNormal = {
@@ -78,6 +79,7 @@ local waves = wavesNormal
 
 local function StartPhase2(self)
 	self:SetStage(2)
+	warnPhase2:Show()
 end
 
 local function getWaveString(wave)
@@ -127,6 +129,23 @@ function mod:OnTimerRecovery()
 		waves = wavesHeroic
 	else
 		waves = wavesNormal
+	end
+	-- Cap wave number at 23 (max waves that exist)
+	if self.vb.wave > 23 then
+		self.vb.wave = 23
+	end
+end
+
+function mod:CHAT_MSG_MONSTER_YELL(msg)
+	if msg == L.GothikPhase2Yell or msg:find(L.GothikPhase2Yell) then
+		StartPhase2(self)
+	end
+end
+
+function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
+	if msg == L.GothikDoorEmote or msg:find(L.GothikDoorEmote) then
+		DBM:AddSpecialEventToTranscriptorLog("Gothik Door Opened")
+		warnGateOpen:Show()
 	end
 end
 

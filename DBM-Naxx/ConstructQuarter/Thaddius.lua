@@ -2,7 +2,7 @@
 local mod	= DBM:NewMod("Thaddius", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250914210600")
+mod:SetRevision("20251204210600")
 mod:SetCreatureID(15928)
 mod:SetEncounterID(1120)
 
@@ -24,7 +24,7 @@ local warnChargeNotChanged	= mod:NewSpecialWarning("WarningChargeNotChanged", fa
 local yellShift				= mod:NewShortPosYell(28089, DBM_CORE_L.AUTO_YELL_CUSTOM_POSITION)
 
 local enrageTimer			= mod:NewBerserkTimer(360)
-local timerNextShift		= mod:NewNextTimer(30, 28089, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
+local timerNextShift		= mod:NewNextTimer(21.8, 28089, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerShiftCast		= mod:NewCastTimer(3, 28089, nil, nil, nil, 2)
 local timerThrow			= mod:NewNextTimer(20, 28338, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 
@@ -68,7 +68,7 @@ do
 			timerNextShift:Start()
 			timerShiftCast:Start()
 			warnShiftCasting:Show()
-			warnShiftSoon:Schedule(25)
+			warnShiftSoon:Schedule(16.8)
 			lastShift = GetTime()
 		end
 	end
