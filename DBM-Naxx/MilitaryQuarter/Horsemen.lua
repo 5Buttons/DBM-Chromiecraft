@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Horsemen", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250914210600")
+mod:SetRevision("20251208210600")
 mod:SetCreatureID(16063, 16064, 16065, 30549)
 mod:SetEncounterID(1121)
 
@@ -32,9 +32,9 @@ local timerLadyMark				= mod:NewNextTimer(15, 28833, nil, nil, nil, 3)
 local timerZeliekMark			= mod:NewNextTimer(15, 28835, nil, nil, nil, 3)
 local timerBaronMark			= mod:NewNextTimer(12, 28834, nil, nil, nil, 3)
 local timerThaneMark			= mod:NewNextTimer(12, 28832, nil, nil, nil, 3)
-local timerMeteorCD				= mod:NewCDTimer(11.1, 57467, nil, nil, nil, 3, nil, nil, true) -- REVIEW! ~10s variance? Added "keep" arg (25man Lordaeron 2022/10/16 wipe || 25man Lordaeron 2022/10/16 kill) - 17.8, 17.7, 17.8, 17.7, 15.5 || 17.7, 15.5, 17.8, 17.9, 11.1, 17.7, 13.4, 20.0, 13.3, 20.0
+local timerMeteorCD				= mod:NewCDTimer(15, 57467, nil, nil, nil, 3, nil, nil, true)
 --local timerVoidZoneCD			= mod:NewCDTimer(12.9, 28863, nil, nil, nil, 3)-- 12.9-16
-local timerHolyWrathCD			= mod:NewCDTimer(13, 28883, nil, nil, nil, 3)
+local timerHolyWrathCD			= mod:NewCDTimer(15, 28883, nil, nil, nil, 3)
 local timerBoneBarrier			= mod:NewTargetTimer(20, 29061, nil, nil, nil, 5)
 
 mod:AddRangeFrameOption("12")
@@ -57,13 +57,13 @@ end]]
 
 function mod:OnCombatStart()
 	self.vb.markCount = 0
-	timerLadyMark:Start()
-	timerZeliekMark:Start()
-	timerBaronMark:Start()
-	timerThaneMark:Start()
+	timerLadyMark:Start(24)
+	timerZeliekMark:Start(24)
+	timerBaronMark:Start(24)
+	timerThaneMark:Start(24)
 	warnMarkSoon:Schedule(12)
-	timerMeteorCD:Start()
-	timerHolyWrathCD:Start(10.1) -- REVIEW! ~2s variance? (25man Lordaeron 2022/10/16 wipe || 25man Lordaeron 2022/10/16 kill) - 12.3 || 10.1
+	timerMeteorCD:Start("v10-15")
+	timerHolyWrathCD:Start(15) -- REVIEW! ~2s variance? (25man Lordaeron 2022/10/16 wipe || 25man Lordaeron 2022/10/16 kill) - 12.3 || 10.1
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(12)
 	end

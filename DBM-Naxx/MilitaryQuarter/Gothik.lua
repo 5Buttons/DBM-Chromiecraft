@@ -47,7 +47,7 @@ local wavesNormal = {
 	{1, L.Rider, timer = 0},        -- Wave 20: 0s (simultaneous)
 	{1, L.Knight, timer = 0},       -- Wave 21: 0s (simultaneous)
 	{2, L.Trainee, timer = 15},     -- Wave 22: 15s
-	{2, L.Trainee, timer = 29},     -- Wave 23: 29s (final wave)
+	{2, L.Trainee, timer = nil},     -- Wave 23: 29s (final wave)
 }
 local wavesHeroic = {
 	{3, L.Trainee, timer = 20},     -- Wave 1: 20s (3 instead of 2)
@@ -72,7 +72,7 @@ local wavesHeroic = {
 	{1, L.Rider, timer = 0},        -- Wave 20: 0s (simultaneous)
 	{2, L.Knight, timer = 0},       -- Wave 21: 0s (simultaneous, 2 instead of 1)
 	{3, L.Trainee, timer = 15},     -- Wave 22: 15s
-	{3, L.Trainee, timer = 29},     -- Wave 23: 29s (final wave)
+	{3, L.Trainee, timer = nil},     -- Wave 23: 29s (final wave)
 }
 
 local waves = wavesNormal
@@ -129,10 +129,6 @@ function mod:OnTimerRecovery()
 		waves = wavesHeroic
 	else
 		waves = wavesNormal
-	end
-	-- Cap wave number at 23 (max waves that exist)
-	if self.vb.wave > 23 then
-		self.vb.wave = 23
 	end
 end
 
