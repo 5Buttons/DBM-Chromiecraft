@@ -113,7 +113,7 @@ function mod:OnCombatStart()
 	warnPhase2:Schedule(270)
 	timerWave:Start(30, self.vb.wave + 1)
 	warnWaveSoon:Schedule(27, self.vb.wave + 1, getWaveString(self.vb.wave + 1))
---	self:Schedule(30, NextWave, self) --whats the purpose? //FB
+	self:Schedule(30, NextWave, self)
 --	self:Schedule(270, StartPhase2, self)
 end
 
