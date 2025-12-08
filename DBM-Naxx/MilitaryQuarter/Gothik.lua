@@ -7,6 +7,8 @@ mod:SetEncounterID(1109)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
+	"CHAT_MSG_MONSTER_YELL",
+	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_DIED"
 )
 
@@ -19,60 +21,51 @@ local warnKnightDown	= mod:NewAnnounce("WarningKnightDown", 2)
 local warnGateOpen		= mod:NewSpellAnnounce(3366, 2)
 local warnPhase2		= mod:NewPhaseAnnounce(2, 3)
 
-local timerPhase2		= mod:NewTimer(269, "TimerPhase2", 27082, nil, nil, 6)
+local timerPhase2		= mod:NewTimer(270, "TimerPhase2", 27082, nil, nil, 6)
 local timerWave			= mod:NewTimer(20, "TimerWave", 5502, nil, nil, 1)
 local timerGate			= mod:NewTimer(120, "Gate Opens", 9484)
 
 mod.vb.wave = 0
 local wavesNormal = {
 	{2, L.Trainee, timer = 20},     -- Wave 1: 20s
-	{2, L.Trainee, timer = 20},     -- Wave 2: 20s  
+	{2, L.Trainee, timer = 20},     -- Wave 2: 20s
 	{2, L.Trainee, timer = 10},     -- Wave 3: 10s
 	{1, L.Knight, timer = 10},      -- Wave 4: 10s
 	{2, L.Trainee, timer = 15},     -- Wave 5: 15s
 	{1, L.Knight, timer = 10},      -- Wave 6: 10s
 	{2, L.Trainee, timer = 15},     -- Wave 7: 15s
-	{2, L.Trainee, timer = 0},      -- Wave 8: 0s (simultaneous)
-	{1, L.Knight, timer = 10},      -- Wave 9: 10s
+	{1, L.Knight, 2, L.Trainee, timer = 10},
 	{1, L.Rider, timer = 10},       -- Wave 10: 10s
 	{2, L.Trainee, timer = 5},      -- Wave 11: 5s
 	{1, L.Knight, timer = 15},      -- Wave 12: 15s
-	{1, L.Rider, timer = 0},        -- Wave 13: 0s (simultaneous)
-	{2, L.Trainee, timer = 10},     -- Wave 14: 10s
+	{2, L.Trainee, 1, L.Rider, timer = 10},
 	{1, L.Knight, timer = 10},      -- Wave 15: 10s
 	{2, L.Trainee, timer = 10},     -- Wave 16: 10s
 	{1, L.Rider, timer = 5},        -- Wave 17: 5s
 	{1, L.Knight, timer = 5},       -- Wave 18: 5s
 	{2, L.Trainee, timer = 20},     -- Wave 19: 20s
-	{1, L.Rider, timer = 0},        -- Wave 20: 0s (simultaneous)
-	{1, L.Knight, timer = 0},       -- Wave 21: 0s (simultaneous)
-	{2, L.Trainee, timer = 15},     -- Wave 22: 15s
-	{2, L.Trainee, timer = nil},     -- Wave 23: 29s (final wave)
+	{1, L.Rider, 1, L.Knight, 2, L.Trainee, timer = 15},
+	{2, L.Trainee},     -- Wave 23: 29s (final wave)
 }
 local wavesHeroic = {
-	{3, L.Trainee, timer = 20},     -- Wave 1: 20s (3 instead of 2)
-	{3, L.Trainee, timer = 20},     -- Wave 2: 20s
-	{3, L.Trainee, timer = 10},     -- Wave 3: 10s
-	{2, L.Knight, timer = 10},      -- Wave 4: 10s (2 instead of 1)
-	{3, L.Trainee, timer = 15},     -- Wave 5: 15s
-	{2, L.Knight, timer = 10},      -- Wave 6: 10s (2 instead of 1)
-	{3, L.Trainee, timer = 15},     -- Wave 7: 15s
-	{3, L.Trainee, timer = 0},      -- Wave 8: 0s (simultaneous)
-	{2, L.Knight, timer = 10},      -- Wave 9: 10s (2 instead of 1)
-	{1, L.Rider, timer = 10},       -- Wave 10: 10s
-	{3, L.Trainee, timer = 5},      -- Wave 11: 5s
-	{2, L.Knight, timer = 15},      -- Wave 12: 15s (2 instead of 1)
-	{1, L.Rider, timer = 0},        -- Wave 13: 0s (simultaneous)
-	{3, L.Trainee, timer = 10},     -- Wave 14: 10s
-	{2, L.Knight, timer = 10},      -- Wave 15: 10s (2 instead of 1)
-	{3, L.Trainee, timer = 10},     -- Wave 16: 10s
-	{1, L.Rider, timer = 5},        -- Wave 17: 5s
-	{2, L.Knight, timer = 5},       -- Wave 18: 5s (2 instead of 1)
-	{3, L.Trainee, timer = 20},     -- Wave 19: 20s
-	{1, L.Rider, timer = 0},        -- Wave 20: 0s (simultaneous)
-	{2, L.Knight, timer = 0},       -- Wave 21: 0s (simultaneous, 2 instead of 1)
-	{3, L.Trainee, timer = 15},     -- Wave 22: 15s
-	{3, L.Trainee, timer = nil},     -- Wave 23: 29s (final wave)
+	{3, L.Trainee, timer = 20},
+	{3, L.Trainee, timer = 20},
+	{3, L.Trainee, timer = 10},
+	{2, L.Knight, timer = 10},
+	{3, L.Trainee, timer = 15},
+	{2, L.Knight, timer = 5},
+	{3, L.Trainee, timer = 20},
+	{3, L.Trainee, 2, L.Knight, timer = 10},
+	{3, L.Trainee, timer = 10},
+	{1, L.Rider, timer = 5},
+	{3, L.Trainee, timer = 15},
+	{1, L.Rider, timer = 10},
+	{2, L.Knight, timer = 10},
+	{1, L.Rider, timer = 10},
+	{1, L.Rider, 3, L.Trainee, timer = 5},
+	{1, L.Knight, 3, L.Trainee, timer = 5},
+	{1, L.Rider, 3, L.Trainee, timer = 20},
+	{1, L.Rider, 2, L.Knight, 3, L.Trainee},
 }
 
 local waves = wavesNormal
@@ -117,11 +110,11 @@ function mod:OnCombatStart()
 	self.vb.wave = 0
 	timerGate:Start()
 	timerPhase2:Start()
-	warnPhase2:Schedule(269)
+	warnPhase2:Schedule(270)
 	timerWave:Start(30, self.vb.wave + 1)
 	warnWaveSoon:Schedule(27, self.vb.wave + 1, getWaveString(self.vb.wave + 1))
-	self:Schedule(30, NextWave, self)
-	self:Schedule(269, StartPhase2, self)
+--	self:Schedule(30, NextWave, self) --whats the purpose? //FB
+--	self:Schedule(270, StartPhase2, self)
 end
 
 function mod:OnTimerRecovery()
