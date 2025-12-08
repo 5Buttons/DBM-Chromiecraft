@@ -114,7 +114,7 @@ function mod:OnCombatStart()
 	timerWave:Start(30, self.vb.wave + 1)
 	warnWaveSoon:Schedule(27, self.vb.wave + 1, getWaveString(self.vb.wave + 1))
 	self:Schedule(30, NextWave, self)
---	self:Schedule(270, StartPhase2, self)
+	self:Schedule(270, StartPhase2, self)
 end
 
 function mod:OnTimerRecovery()
@@ -125,11 +125,11 @@ function mod:OnTimerRecovery()
 	end
 end
 
-function mod:CHAT_MSG_MONSTER_YELL(msg)
+--[[function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.GothikPhase2Yell or msg:find(L.GothikPhase2Yell) then
 		StartPhase2(self)
 	end
-end
+end]]
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 	if msg == L.GothikDoorEmote or msg:find(L.GothikDoorEmote) then
