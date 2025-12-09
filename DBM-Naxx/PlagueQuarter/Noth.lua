@@ -26,7 +26,7 @@ local specWarnAdds		= mod:NewSpecialWarningAdds(29247, "-Healer", nil, nil, 1, 2
 local timerTeleport		= mod:NewTimer(110, "TimerTeleport", 46573, nil, nil, 6, nil, nil, nil, nil, nil, nil, nil, 29216)
 local timerTeleportBack	= mod:NewTimer(70, "TimerTeleportBack", 46573, nil, nil, 6, nil, nil, nil, nil, nil, nil, nil, 29231)
 local timerCurseCD		= mod:NewCDTimer(25, 29213, nil, nil, nil, 5, nil, DBM_COMMON_L.CURSE_ICON)
-local timerAddsCD		= mod:NewAddsTimer(30, 29247, nil, "-Healer")
+local timerAddsCD 		= mod:NewTimer(30, "TimerAdds", "Interface\\Icons\\achievement_character_undead_male", nil, nil, 1)
 local timerBlink		= mod:NewNextTimer(30, 29208)
 
 mod:GroupSpells(29216, 29231) -- Teleport, Teleport Return
@@ -81,18 +81,18 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 		warnBlinkSoon:Cancel()
 		timerTeleportBack:Start()
 		warnTeleportSoon:Schedule(60)
-		timerAddsCD:Start(4)
-	elseif spellName == teleportBackName then -- Teleport Return to Ground
+		-- timerAddsCD:Start(4)
+	elseif spellName == teleportBackName then
 		self.vb.isOnBalcony = false
 		warnTeleportNow:Show()
 		timerAddsCD:Stop()
 		timerTeleport:Start()
 		warnTeleportSoon:Schedule(100)
-		timerAddsCD:Start(10)
+		-- timerAddsCD:Start(10)
 		timerCurseCD:Start(15)
 		if self:IsHeroic() then
-		timerBlink:Start(26)
-		warnBlinkSoon:Schedule(21)
+			timerBlink:Start(26)
+			warnBlinkSoon:Schedule(21)
 		end
 	end
 end
@@ -102,6 +102,7 @@ function mod:OnSync(msg)
 	if msg == "Adds" or msg == "AddsTwo" then
 		specWarnAdds:Show()
 		specWarnAdds:Play("killmob")
+		timerAddsCD:Stop()
 		timerAddsCD:Start(30)
 	end
 end

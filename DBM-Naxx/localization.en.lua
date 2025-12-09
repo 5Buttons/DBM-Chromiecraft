@@ -84,7 +84,8 @@ L:SetWarningLocalization({
 
 L:SetTimerLocalization({
 	TimerTeleport		= "Teleport",
-	TimerTeleportBack	= "Teleport back"
+	TimerTeleportBack	= "Teleport back",
+	TimerAdds			= "Incoming Adds"
 })
 
 L:SetOptionLocalization({
