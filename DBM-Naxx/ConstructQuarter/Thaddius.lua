@@ -24,7 +24,7 @@ local warnChargeNotChanged	= mod:NewSpecialWarning("WarningChargeNotChanged", fa
 local yellShift				= mod:NewShortPosYell(28089, DBM_CORE_L.AUTO_YELL_CUSTOM_POSITION)
 
 local enrageTimer			= mod:NewBerserkTimer(360)
-local timerNextShift		= mod:NewNextTimer(21.8, 28089, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
+local timerNextShift		= mod:NewNextTimer(30, 28089, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerShiftCast		= mod:NewCastTimer(3, 28089, nil, nil, nil, 2)
 local timerThrow			= mod:NewNextTimer(20, 28338, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 
@@ -125,8 +125,8 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 			warnThrowSoon:Cancel()
 			DBM.BossHealth:Hide()
 			enrageTimer:Start()
-			timerNextShift:Start(30)  -- First polarity shift in 30s
-            warnShiftSoon:Schedule(25)  -- Warn at 25s (5s before)
+			timerNextShift:Start(21.8)  -- First polarity shift in 30s
+            warnShiftSoon:Schedule(16.8)  -- Warn at 25s (5s before)
 		end
 	end
 end
