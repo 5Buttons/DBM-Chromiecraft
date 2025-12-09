@@ -13,7 +13,8 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED 29185 29194 29196 29198",-- 29184 29195 29197 29199
 	"SPELL_DAMAGE",
 	"SWING_DAMAGE",
-	"UNIT_DIED"
+	"UNIT_DIED",
+	"SPELL_SUMMON 29234"
 )
 
 --TODO, verify infoframe and spellIds ported from Classic as accurate, they didn't have to be accurate in classic since it just matched name, but here it does
@@ -103,14 +104,18 @@ function mod:OnCombatEnd()
 	end
 end
 
-function mod:SPELL_CAST_SUCCESS(args)
-	local spellId = args.spellId
+function mod:SPELL_SUMMON(args)
+local spellId = args.spellId
 	if spellId == 29234 then  -- Summon Spore
 		self.vb.sporeCounter = self.vb.sporeCounter + 1
 		timerSpore:Start(35, self.vb.sporeCounter + 1)
 		warnSporeNow:Show(self.vb.sporeCounter)
 		warnSporeSoon:Schedule(30)
-	elseif args:IsSpellID(29204, 55052) then  -- Inevitable Doom
+	end
+end
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpellID(29204, 55052) then  -- Inevitable Doom
 		self.vb.doomCounter = self.vb.doomCounter + 1
 		warnDoomNow:Show(self.vb.doomCounter)
 		local timer = (self.vb.doomCounter < 6) and 30 or 15
