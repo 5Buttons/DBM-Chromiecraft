@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Loatheb", "DBM-Naxx", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251205220131")
+mod:SetRevision("20251209220131")
 mod:SetCreatureID(16011)
 mod:SetEncounterID(1115)
 
