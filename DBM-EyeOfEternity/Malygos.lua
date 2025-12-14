@@ -13,7 +13,7 @@ mod:RegisterEvents(
 )
 
 mod:RegisterEventsInCombat(
-	"SPELL_AURA_APPLIED 60936 57407 56263",
+	"SPELL_AURA_APPLIED 60936 57407 56263 57429",
 	"SPELL_CAST_START 56505",
 	"SPELL_CAST_SUCCESS 56105 57430",
 	"CHAT_MSG_RAID_BOSS_EMOTE"
@@ -56,7 +56,7 @@ local specWarnStaticField		= mod:NewSpecialWarningYou(57430, nil, nil, nil, 1, 2
 local specWarnStaticFieldNear	= mod:NewSpecialWarningClose(57430, nil, nil, nil, 1, 2)
 local yellStaticField			= mod:NewYellMe(57430)
 
-local timerStaticFieldCD		= mod:NewCDTimer(12, 57430, nil, nil, nil, 3, nil, nil, true) --REVIEW! ~10s variance? Added "keep" arg (10man Lordaeron 2022/09/27 || 25man Lordaeron 2022/09/27) - 10.0, 16.2, 11.6, 10.2, 10.4 || 15.1, 20.1, 13.8, 19.5, 19.6, 11.4, 18.5
+local timerStaticFieldCD		= mod:NewCDTimer(12, 57430, nil, nil, nil, 3, nil, nil, true)
 --local timerAttackable			= mod:NewTimer(24, "Malygos Wipes Debuffs") -- Not enough info nor locales on the code from previous contributor to know what this is intended for. Disabled for now
 
 local tableBuild = false
@@ -104,14 +104,20 @@ end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(60936, 57407) then
-		DBM:Debug("SURGE" .. guids[args.destGUID], 2)
-		local target = guids[args.destGUID or 0]
+		DBM:Debug("SURGE on: " .. (guids[args.destGUID] or "Unknown"), 2)
+		local target = guids[args.destGUID]
+		timerSurgeCD:Start()
 		if target then
 			warnSurge:CombinedShow(0.5, target)
 			if target == UnitName("player") then
 				specWarnSurge:Show()
 				specWarnSurge:Play("defensive")
 			end
+		end
+	elseif args:IsSpellID(57429) then
+		if self:AntiSpam(3, "StaticField") then
+			self:StaticFieldTarget(args.destGUID)
+			timerStaticFieldCD:Start()
 		end
 	end
 end
@@ -177,7 +183,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	elseif msg == L.EnoughScream then
 		timerBreathCD:Stop()
 --		timerAttackable:Start()
-		timerStaticFieldCD:Start(6)
+--		timerStaticFieldCD:Start(6)
 	end
 end
 
@@ -217,7 +223,7 @@ function mod:OnSync(event, arg)
 		warnPhase3:Show()
 		self:Schedule(6, buildGuidTable)
 		timerBreathCD:Cancel()
-		timerStaticFieldCD:Start(20.2) -- REVIEW! ~4s variance? (10man Lordaeron 2022/09/27 || 25man Lordaeron 2022/09/27) - Stage 3/24.5 || Stage 3/20.2
+--		timerStaticFieldCD:Start(20.2) -- REVIEW! ~4s variance? (10man Lordaeron 2022/09/27 || 25man Lordaeron 2022/09/27) - Stage 3/24.5 || Stage 3/20.2
 	elseif event == "MalygosSurge" then
 		warnSurge:CombinedShow(0.2, arg)
 		if arg == UnitName("player") then

@@ -1,15 +1,15 @@
 local mod	= DBM:NewMod("Maexxna", "DBM-Naxx", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251208034419")
+mod:SetRevision("20251213034419")
 mod:SetCreatureID(15952)
 mod:RegisterCombat("combat")
 mod:SetEncounterID(1116)
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 28622",
-	"SPELL_CAST_SUCCESS 29484 54125"
---	"CHAT_MSG_RAID_BOSS_EMOTE" could be used for	if msg:find("cocoon") then  -- "%s spins her web into a cocoon!"
+	"SPELL_CAST_SUCCESS 29484 54125",
+	"CHAT_MSG_RAID_BOSS_EMOTE"
 )
 
 local warnWebWrap		= mod:NewTargetNoFilterAnnounce(28622, 2)
@@ -36,7 +36,7 @@ end
 function mod:OnCombatStart(delay)
 	warnWebSpraySoon:Schedule(35 - delay)
 	timerWebSpray:Start(40 - delay)
-	timerWebWrap:Start(20 - delay)--20.095-21.096
+	timerWebWrap:Start(20 - delay)
 	warnSpidersSoon:Schedule(25 - delay)
 	warnSpidersNow:Schedule(30 - delay)
 	timerSpider:Start(30 - delay)
@@ -66,10 +66,21 @@ function mod:SPELL_AURA_APPLIED(args)
 	end
 end
 
-function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(29484, 54125) then -- Web Spray
+function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
+	if msg:find(L.EmoteWebWrap) then
+		timerWebWrap:Start()
+	elseif msg:find(L.EmoteWebSpray) then
 		warnWebSprayNow:Show()
 		warnWebSpraySoon:Schedule(35)
 		timerWebSpray:Start()
 	end
 end
+
+-- no SPELL_CAST_SUCCESS event on AC
+--[[GetLocalizedStringsfunction mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpellID(29484, 54125) then -- Web Spray
+		warnWebSprayNow:Show()
+		warnWebSpraySoon:Schedule(35)
+		timerWebSpray:Start()
+	end
+end]]

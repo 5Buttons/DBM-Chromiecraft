@@ -68,13 +68,13 @@ local function Landing(self)
 	warnDrainLifeSoon:Schedule(5)
 	timerDrainLife:Start(10.5)
 	warnAirPhaseSoon:Schedule(50)
+	timerAirPhase:Cancel()  -- cancel any existing timer
 	timerAirPhase:Start()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 		self:Schedule(59, DBM.RangeCheck.Show, DBM.RangeCheck, 12)
 	end
 end
-
 function mod:OnCombatStart(delay)
 --	noTargetTime = 0
 	warned_lowhp = false

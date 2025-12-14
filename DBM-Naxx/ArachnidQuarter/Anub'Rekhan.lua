@@ -19,7 +19,7 @@ local warningLocustFaded	= mod:NewFadesAnnounce(28785, 1)
 local warnImpale			= mod:NewTargetNoFilterAnnounce(28783, 3, nil, false)
 
 local specialWarningLocust	= mod:NewSpecialWarningSpell(28785, nil, nil, nil, 2, 2)
-local yellImpale 			= mod:NewYell(28783, nil, true)
+local yellImpale 			= mod:NewYell(28783, nil, false)
 
 local timerLocustIn			= mod:NewCDTimer(90, 28785, nil, nil, nil, 6)
 local timerLocustFade		= mod:NewBuffActiveTimer(23, 28785, nil, nil, nil, 6)

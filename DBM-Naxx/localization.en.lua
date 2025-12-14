@@ -65,9 +65,10 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	ArachnophobiaTimer	= "Arachnophobia"
+	ArachnophobiaTimer	= "Arachnophobia",
+	EmoteWebWrap		= "spins her web into a cocoon",
+	EmoteWebSpray		= "sprays strands of web everywhere"
 })
-
 ------------------------------
 --  Noth the Plaguebringer  --
 ------------------------------
