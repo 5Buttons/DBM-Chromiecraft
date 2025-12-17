@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Sapphiron", "DBM-Naxx", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250916195544")
+mod:SetRevision("20251209195544")
 mod:SetCreatureID(15989)
 mod:SetEncounterID(1119)
 mod:SetHotfixNoticeRev(20250916000000)
@@ -37,7 +37,7 @@ local specWarnBlizzard	= mod:NewSpecialWarningGTFO(28547, nil, nil, nil, 1, 8)
 
 local timerDrainLife	= mod:NewCDTimer(24, 28542, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON) -- (25man Lordaeron 2022/09/02) - 24.0
 local timerAirPhase		= mod:NewTimer(60, "TimerAir", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", nil, nil, 6)
-local timerBlizzard		= mod:NewNextTimer(7, 28560, nil, nil, nil, 3)
+local timerBlizzard		= mod:NewNextTimer(6.5, 28560, nil, nil, nil, 3)
 local timerTailSweep	= mod:NewNextTimer(9, 55696, nil, nil, nil, 2)
 
 -- Stage Two (Air Phase)
@@ -48,7 +48,7 @@ local warnIceBlock		= mod:NewTargetAnnounce(28522, 2)
 local specWarnDeepBreath= mod:NewSpecialWarningSpell(28524, nil, nil, nil, 1, 2)
 local yellIceBlock		= mod:NewYell(28522)
 
-local timerLanding		= mod:NewTimer(24.2, "TimerLanding", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp", nil, nil, 6)
+local timerLanding		= mod:NewTimer(20.1, "TimerLanding", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp", nil, nil, 6)
 local timerIceBlast		= mod:NewCastTimer(8, 28524, nil, nil, nil, 2, DBM_COMMON_L.DEADLY_ICON)
 
 mod:AddRangeFrameOption("12")
@@ -68,13 +68,13 @@ local function Landing(self)
 	warnDrainLifeSoon:Schedule(5)
 	timerDrainLife:Start(10.5)
 	warnAirPhaseSoon:Schedule(50)
+	timerAirPhase:Cancel()  -- cancel any existing timer
 	timerAirPhase:Start()
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 		self:Schedule(59, DBM.RangeCheck.Show, DBM.RangeCheck, 12)
 	end
 end
-
 function mod:OnCombatStart(delay)
 --	noTargetTime = 0
 	warned_lowhp = false
@@ -82,10 +82,10 @@ function mod:OnCombatStart(delay)
 	self.vb.isFlying = false
 	warnDrainLifeSoon:Schedule(6.5-delay)
 	timerDrainLife:Start(12-delay) -- (25man Lordaeron 2022/09/02) - 12.0
-	timerBlizzard:Start(6.1-delay) -- REVIEW! ~3s variance? (25man Lordaeron 2022/09/02 || 25man Lordaeron 2022/10/16) - 8.8 || 6.1
+	timerBlizzard:Start(17-delay)
 	timerTailSweep:Start(-delay)
 	warnAirPhaseSoon:Schedule(38.4-delay)
-	timerAirPhase:Start(48.4-delay) -- REVIEW! ~0.1s variance? (25man Lordaeron 2022/09/02) - 48.4
+	timerAirPhase:Start(45.77-delay) -- REVIEW! ~0.1s variance? (25man Lordaeron 2022/09/02) - 48.4
 	berserkTimer:Start(-delay)
 	if self.Options.RangeFrame then
 		self:Schedule(46-delay, DBM.RangeCheck.Show, DBM.RangeCheck, 12)
@@ -157,7 +157,11 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerDrainLife:Start()
 	elseif spellId == 28560 then
 		warnBlizzard:Show()
-		timerBlizzard:Start()
+		if self:IsHeroic() then
+			timerBlizzard:Start(6.5) -- 25-man
+		else
+			timerBlizzard:Start(8) -- 10-man
+		end
 	elseif spellId == 55696 then
 		timerTailSweep:Start()
 	end

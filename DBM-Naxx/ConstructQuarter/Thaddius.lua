@@ -2,7 +2,7 @@
 local mod	= DBM:NewMod("Thaddius", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250914210600")
+mod:SetRevision("20251204210600")
 mod:SetCreatureID(15928)
 mod:SetEncounterID(1120)
 
@@ -68,7 +68,7 @@ do
 			timerNextShift:Start()
 			timerShiftCast:Start()
 			warnShiftCasting:Show()
-			warnShiftSoon:Schedule(25)
+			warnShiftSoon:Schedule(16.8)
 			lastShift = GetTime()
 		end
 	end
@@ -125,8 +125,8 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 			warnThrowSoon:Cancel()
 			DBM.BossHealth:Hide()
 			enrageTimer:Start()
-			timerNextShift:Start(30)  -- First polarity shift in 30s
-            warnShiftSoon:Schedule(25)  -- Warn at 25s (5s before)
+			timerNextShift:Start(21.8)  -- First polarity shift in 30s
+            warnShiftSoon:Schedule(16.8)  -- Warn at 25s (5s before)
 		end
 	end
 end

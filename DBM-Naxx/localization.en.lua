@@ -65,9 +65,10 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	ArachnophobiaTimer	= "Arachnophobia"
+	ArachnophobiaTimer	= "Arachnophobia",
+	EmoteWebWrap		= "spins her web into a cocoon",
+	EmoteWebSpray		= "sprays strands of web everywhere"
 })
-
 ------------------------------
 --  Noth the Plaguebringer  --
 ------------------------------
@@ -84,7 +85,8 @@ L:SetWarningLocalization({
 
 L:SetTimerLocalization({
 	TimerTeleport		= "Teleport",
-	TimerTeleportBack	= "Teleport back"
+	TimerTeleportBack	= "Teleport back",
+	TimerAdds			= "Incoming Adds"
 })
 
 L:SetOptionLocalization({
@@ -283,7 +285,9 @@ L:SetMiscLocalization({
 	WarningWave3	= "%d %s, %d %s and %d %s",
 	Trainee			= "Trainees",
 	Knight			= "Knights",
-	Rider			= "Riders"
+	Rider			= "Riders",
+	GothikDoorEmote	= "The central gate opens!", -- 32307
+	GothikPhase2Yell= "I have waited long enough. Now you face the harvester of souls." -- 13028
 })
 
 ---------------------

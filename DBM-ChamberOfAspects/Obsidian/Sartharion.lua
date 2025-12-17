@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,normal25"
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20251210220131")
 mod:SetCreatureID(28860)
 mod:SetEncounterID(742)
 
@@ -57,8 +57,8 @@ local specWarnTenebronPortal	= mod:NewSpecialWarning("WarningTenebronPortal", fa
 local specWarnShadronPortal		= mod:NewSpecialWarning("WarningShadronPortal", false, nil, nil, 1, 7)
 
 local timerShadowFissure		= mod:NewCastTimer(5, 59128, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON) --Cast timer until Void Blast. it's what happens when shadow fissure explodes.
-local timerBreath				= mod:NewCDTimer(10, 58956, nil, "Tank|Healer", nil, 5) -- REVIEW! ~1s variance? (25N Lordaeron 2022/09/23) - 10.4, 11.4, 10.4, 10.1
-local timerWall					= mod:NewNextTimer(30, 43113, nil, nil, nil, 2) -- (25N Lordaeron 2022/09/23) - pull:30.0, 30.0
+local timerBreath				= mod:NewCDTimer(20, 58956, nil, "Tank|Healer", nil, 5) -- REVIEW! ~1s variance? (25N Lordaeron 2022/09/23) - 10.4, 11.4, 10.4, 10.1
+local timerWall					= mod:NewNextTimer(25, 43113, nil, nil, nil, 2) -- (25N Lordaeron 2022/09/23) - pull:30.0, 30.0
 local timerTenebron				= mod:NewTimer(30, "TimerTenebron", 61248, nil, nil, 1)
 local timerShadron				= mod:NewTimer(80, "TimerShadron", 58105, nil, nil, 1)
 local timerVesperon				= mod:NewTimer(120, "TimerVesperon", 61251, nil, nil, 1)
@@ -132,9 +132,9 @@ end
 function mod:OnCombatStart(delay)
 	--Cache spellnames so a solo player check doesn't fail in CheckDrakes in 8.0+
 	self:Schedule(5, CheckDrakes, self, delay)
-	timerWall:Start(-delay)
-	warnBreathSoon:Schedule(5-delay)
-	timerBreath:Start(-delay) -- REVIEW! variance? (25N Lordaeron 2022/09/23) - pull:11.0
+	timerWall:Start(20-delay)
+	warnBreathSoon:Schedule(10-delay)
+	timerBreath:Start(15-delay) -- REVIEW! variance? (25N Lordaeron 2022/09/23) - pull:11.0
 
 	twipe(lastvoids)
 	twipe(lastfire)
@@ -168,7 +168,7 @@ end
 
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(56908, 58956) then -- Flame breath
-		warnBreathSoon:Schedule(5)
+		warnBreathSoon:Schedule(15)
 		timerBreath:Start()
 	end
 end
