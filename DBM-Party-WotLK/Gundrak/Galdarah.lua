@@ -58,7 +58,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 			timerPhase2:Start()
 			timerStomp:Cancel()
 			timerCharge:Cancel()
-			timerSlash:Start()
+			timerSlash:Start("v11-19")
 		end
 	end
 end
