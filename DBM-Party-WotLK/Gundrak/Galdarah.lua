@@ -73,8 +73,8 @@ function mod:CHAT_MSG_MONSTER_YELL(msg) --currently doesnt work on AC https://gi
 			timerSlash:Cancel()
 			timerStomp:Cancel()
 			timerCharge:Cancel()
-			timerStomp:Start(25)
-			timerCharge:Start(21)
+			timerStomp:Start()
+			timerCharge:Start("v8-11")
 		elseif self.vb.phase == 2 then
 			self:SetStage(1)
 			timerPhase1:Cancel()
@@ -83,7 +83,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg) --currently doesnt work on AC https://gi
 			timerSlash:Cancel()
 			timerStomp:Cancel()
 			timerCharge:Cancel()
-			timerSlash:Start()
+			timerSlash:Start("v11-19")
 		end
 	end
 end
