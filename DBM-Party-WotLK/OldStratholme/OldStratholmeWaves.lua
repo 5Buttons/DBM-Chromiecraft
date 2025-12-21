@@ -12,7 +12,7 @@ mod.noStatistics = true
 
 local warningWaveNow	= mod:NewAnnounce("WarningWaveNow", 3)
 
-local timerWaveIn		= mod:NewTimer(20, "TimerWaveIn", 57687, nil, nil, 1)
+--local timerWaveIn		= mod:NewTimer(20, "TimerWaveIn", 57687, nil, nil, 1)
 local timerRoleplay		= mod:NewTimer(162, "TimerRoleplay")
 
 local devouring = L.Devouring
@@ -89,14 +89,14 @@ function mod:UPDATE_WORLD_STATES()
 	end
 end
 
-function mod:UNIT_DIED(args)
+--[[function mod:UNIT_DIED(args) --not needed currently there is not time inbetween waves on AC
 	if bit.band(args.destGUID:sub(0, 5), 0x00F) == 3 then
 		local cid = self:GetCIDFromGUID(args.destGUID)
 		if cid == 26529 then
 			timerWaveIn:Start()
 		end
 	end
-end
+end]]
 
 function mod:CHAT_MSG_MONSTER_SAY(msg)
 	if msg == L.Roleplay or msg:find(L.Roleplay) then

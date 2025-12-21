@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ChronoLordEpoch", "DBM-Party-WotLK", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20251221220131")
 mod:SetCreatureID(26532)
 mod:SetEncounterID(295)
 
@@ -17,12 +17,16 @@ local warningTime	= mod:NewSpellAnnounce(58848, 3)
 local warningCurse	= mod:NewTargetNoFilterAnnounce(52772, 2, nil, "RemoveCurse", 2)
 
 local timerCurse	= mod:NewTargetTimer(10, 52772, nil, "RemoveCurse", nil, 5, nil, DBM_COMMON_L.CURSE_ICON)
-local timerTimeCD	= mod:NewCDTimer(25, 58848, nil, nil, nil, 2)
+local timerTimeWarpCD = mod:NewCDTimer(25, 52766, nil, nil, nil, 2) --normal
+local timerTimeStopCD = mod:NewCDTimer(20, 58848, nil, nil, nil, 2) --heroic
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(58848, 52766)  then
+	if args:IsSpellID(58848) then
 		warningTime:Show()
-		timerTimeCD:Start()
+		timerTimeStopCD:Start()
+	elseif args:IsSpellID(52766) then
+		warningTime:Show()
+		timerTimeWarpCD:Start()
 	end
 end
 
