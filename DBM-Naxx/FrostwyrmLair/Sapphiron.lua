@@ -38,7 +38,7 @@ local specWarnBlizzard	= mod:NewSpecialWarningGTFO(28547, nil, nil, nil, 1, 8)
 local timerDrainLife	= mod:NewCDTimer(24, 28542, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON) -- (25man Lordaeron 2022/09/02) - 24.0
 local timerAirPhase		= mod:NewTimer(60, "TimerAir", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", nil, nil, 6)
 local timerBlizzard		= mod:NewNextTimer(6.5, 28560, nil, nil, nil, 3)
-local timerTailSweep	= mod:NewNextTimer(9, 55696, nil, nil, nil, 2)
+local timerTailSweep	= mod:NewNextTimer(10, 55696, nil, nil, nil, 2)
 
 -- Stage Two (Air Phase)
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2))
