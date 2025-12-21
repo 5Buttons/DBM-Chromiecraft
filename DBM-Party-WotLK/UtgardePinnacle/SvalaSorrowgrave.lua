@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20251115220131")
+mod:SetRevision("20251221220131")
 mod:SetCreatureID(29281)
 mod:SetEncounterID(577)
 
@@ -25,7 +25,9 @@ local timerRoleplay		= mod:NewTimer(67, "timerRoleplay", "Interface\\Icons\\Spel
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 48278 then
-		warningSacrifice:Show(args.destName)
+		if self:AntiSpam(3, 1) then
+			warningSacrifice:Show(args.destName)
+		end
 	elseif args.spellId == 48276 then
 		timerSacrifice:Start()
 	end
