@@ -3,14 +3,14 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20251221220131")
 mod:SetCreatureID(29306)
 mod:SetEncounterID(390)
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 59824 59829",
+	"SPELL_CAST_SUCCESS 59824 59827 59829",
 	"CHAT_MSG_MONSTER_YELL"
 )
 
@@ -28,13 +28,15 @@ local timerPhase2		= mod:NewTimer(32, "TimerPhase2", 72262)
 function mod:OnCombatStart()
 	self:SetStage(1)
 	timerSlash:Start()
-	timerPhase2:Start(52)
+	timerPhase2:Start()
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 59824 then
 		timerSlash:Start()
 		specWarnSlash:Show()
+	elseif args.spellId == 59827 then
+		timerCharge:Start()
 	elseif args.spellId == 59829 then
 		timerStomp:Start()
 	end
@@ -46,7 +48,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 			self:SetStage(2)
 			timerPhase2:Cancel()
 			warnPhase2:Show()
-			timerPhase1:Start(52)
+			timerPhase1:Start()
 			timerSlash:Cancel()
 			timerStomp:Cancel()
 			timerCharge:Cancel()
@@ -56,7 +58,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 			self:SetStage(1)
 			timerPhase1:Cancel()
 			warnPhase1:Show()
-			timerPhase2:Start(52)
+			timerPhase2:Start()
 			timerSlash:Cancel()
 			timerStomp:Cancel()
 			timerCharge:Cancel()
