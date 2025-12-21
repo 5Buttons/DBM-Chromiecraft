@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20251114220131")
+mod:SetRevision("20251221220131")
 mod:SetCreatureID(26723)
 mod:SetEncounterID(526)
 
@@ -26,13 +26,17 @@ local specWarnIntenseCold	= mod:NewSpecialWarningStack(48095, nil, 4, nil, nil, 
 local timerChains		= mod:NewTargetTimer(10, 50997, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON..DBM_COMMON_L.MAGIC_ICON)
 local timerChainsCD		= mod:NewCDTimer(20, 50997, nil, nil, nil, 3)
 local timerNova			= mod:NewBuffActiveTimer(10, 48179)
-local timerNovaCD		= mod:NewCDTimer(25, 48179, nil, nil, nil, 2)
+local timerNovaCD		= mod:NewCDTimer(11, 48179, nil, nil, nil, 2)
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 50997 then
 		warningChains:Show(args.destName)
 		timerChains:Start(args.destName)
-		timerChainsCD:Start()
+		if mod:IsHeroic() then
+			timerChainsCD:Start(11)
+		else
+			timerChainsCD:Start(20)
+		end
 	elseif args.spellId == 8599 and args.sourceGUID == 26723 then
 		warningEnrage:Show()
 	elseif args.spellId == 48179 then
