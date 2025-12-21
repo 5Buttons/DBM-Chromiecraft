@@ -63,9 +63,9 @@ local timerTenebron				= mod:NewTimer(30, "TimerTenebron", 61248, nil, nil, 1)
 local timerShadron				= mod:NewTimer(80, "TimerShadron", 58105, nil, nil, 1)
 local timerVesperon				= mod:NewTimer(120, "TimerVesperon", 61251, nil, nil, 1)
 local timerTenebronWhelps		= mod:NewTimer(60, "TimerTenebronWhelps", 1022)
-local timerShadronPortal		= mod:NewTimer(94, "TimerShadronPortal", 11420)
-local timerVesperonPortal		= mod:NewTimer(139, "TimerVesperonPortal", 57988)
-local timerVesperonPortal2		= mod:NewTimer(199, "TimerVesperonPortal2", 57988) -- what's the purpose of this?
+local timerShadronPortal		= mod:NewTimer(105, "TimerShadronPortal", 11420)
+local timerVesperonPortal		= mod:NewTimer(175, "TimerVesperonPortal", 57988)
+--local timerVesperonPortal2		= mod:NewTimer(199, "TimerVesperonPortal2", 57988) -- what's the purpose of this?
 
 mod:AddBoolOption("AnnounceFails", true, "announce")
 
@@ -93,7 +93,7 @@ local function CheckDrakes(self, delay)
 	if isunitdebuffed(DBM:GetSpellInfo(61248)) then	-- Power of Tenebron
 		timerTenebron:Start(26 - delay) -- 30
 		warnTenebron:Schedule(21 - delay) -- 25
-		timerTenebronWhelps:Start(- delay)
+		timerTenebronWhelps:Start(51- delay)
 		warnTenebronWhelpsSoon:Schedule(55 - delay)
 		if self.Options.HealthFrame then
 			DBM.BossHealth:AddBoss(30452, "Tenebron")
@@ -112,9 +112,9 @@ local function CheckDrakes(self, delay)
 		timerVesperon:Start(119 - delay) -- 120
 		warnVesperon:Schedule(114 - delay) -- 115
 		timerVesperonPortal:Start(- delay)
-		timerVesperonPortal2:Start(- delay)
+--		timerVesperonPortal2:Start(- delay)
 		warnVesperonPortalSoon:Schedule(134 - delay)
-		warnVesperonPortalSoon:Schedule(194 - delay)
+--		warnVesperonPortalSoon:Schedule(194 - delay)
 		if self.Options.HealthFrame then
 			DBM.BossHealth:AddBoss(30449, "Vesperon")
 		end
