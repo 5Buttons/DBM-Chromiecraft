@@ -35,7 +35,7 @@ function mod:OnCombatStart()
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(42723, 42669, 59706) then
+	if args:IsSpellID(42669, 42723, 59706, 59709) then
 		specWarnSmash:Show()
 		specWarnSmash:Play("shockwave")
 		timerSmash:Start()
@@ -77,11 +77,13 @@ end
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.YellIngvarPhase2 or msg:find(L.YellIngvarPhase2) then
 		self:SetStage(2)
+		timerSmashCD:Cancel()
+		timerSmashCD:Start(5)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
+--[[function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName) --doesnt work on AC
 	if spellName == GetSpellInfo(42863) then -- Scourge Resurrection
 		self:SetStage(2)
 	end
-end
+end]]
