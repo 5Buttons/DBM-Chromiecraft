@@ -5,7 +5,7 @@ local select, tContains = select, tContains
 local PickupInventoryItem, PutItemInBackpack, UseEquipmentSet, CancelUnitBuff = PickupInventoryItem, PutItemInBackpack, UseEquipmentSet, CancelUnitBuff
 local UnitClass = UnitClass
 
-mod:SetRevision("20250716154330")
+mod:SetRevision("20251222154330")
 mod:SetCreatureID(15990)
 mod:SetModelID("creature/lich/lich.m2")
 mod:SetMinCombatTime(60)
@@ -44,14 +44,16 @@ local specWarnAddsGuardians	= mod:NewSpecialWarningAdds(29897, "-Healer", nil, n
 
 local blastTimer			= mod:NewBuffActiveTimer(4, 27808, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
 local timerManaBomb			= mod:NewCDTimer(30, 27819, nil, nil, nil, 3)
-local timerFrostBlast		= mod:NewCDTimer(45, 27808, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)--40-46 (retail 40.1)
+local timerFrostBlast		= mod:NewCDTimer(45, 27808, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
+local specWarnFrostBlastSoon = mod:NewSpecialWarningSoon(27808, nil, nil, nil, 2, 2)
+
 local timerFissure			= mod:NewTargetTimer(5, 27810, nil, nil, 2, 3)
 local timerFissureCD 		= mod:NewCDTimer(25, 27810, nil, nil, nil, 3, nil, nil, true) 
 local timerMC				= mod:NewBuffActiveTimer(20, 28410, nil, nil, nil, 3)
 local timerMCCD				= mod:NewCDTimer(90, 28410, nil, nil, nil, 3)--actually 60 second cdish but its easier to do it this way for the first one.
-local timerPhase2			= mod:NewTimer(228, "TimerPhase2", nil, nil, nil, 6) -- P2 script starts on Yell or Emote, and IEEU fires 0.55s after. (25m Lordaeron 2022/10/16) - 228.0
+local timerPhase2			= mod:NewTimer(228, "TimerPhase2", nil, nil, nil, 6)
 
-mod:AddRangeFrameOption(12, 27819)
+mod:AddRangeFrameOption(12)
 mod:AddSetIconOption("SetIconOnMC", 28410, true, false, {1, 2, 3})
 mod:AddSetIconOption("SetIconOnManaBomb", 27819, false, false, {8})
 mod:AddSetIconOption("SetIconOnFrostTomb", 27808, true, false, {1, 2, 3, 4, 5, 6, 7, 8})
@@ -248,6 +250,9 @@ local function StartPhase2(self)
 		self:SetStage(2)
 		warnPhase2:Show()
 		warnPhase2:Play("ptwo")
+		timerFrostBlast:Start()
+		specWarnFrostBlastSoon:Schedule(38)
+		specWarnFrostBlastSoon:ScheduleVoice(38, "scatter")
 		if self:IsDifficulty("normal25") then
 			timerMCCD:Start(30)
 			warnMindControlSoon:Schedule(25)
@@ -322,6 +327,8 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerManaBomb:Start()
 	elseif spellId == 27808 then
 		timerFrostBlast:Start()
+		specWarnFrostBlastSoon:Schedule(38)
+		specWarnFrostBlastSoon:ScheduleVoice(38, "scatter")
 	end
 end
 
@@ -389,6 +396,16 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	elseif msg == L.YellPhase3 or msg:find(L.YellPhase3) then
 		self:SetStage(3)
 		warnPhase3:Show()
+		timerFrostBlast:AddTime(5.5) --all events delayed by 5.5 seconds on AC
+		timerFissureCD:AddTime(5.5)
+		timerManaBomb:AddTime(5.5)
+		self:Unschedule(specWarnFrostBlastSoon.Show, specWarnFrostBlastSoon)
+		self:Unschedule(specWarnFrostBlastSoon.ScheduleVoice, specWarnFrostBlastSoon)
+		specWarnFrostBlastSoon:Schedule(timerFrostBlast:GetRemaining() - 7)  -- 10s before blast
+		specWarnFrostBlastSoon:ScheduleVoice(timerFrostBlast:GetRemaining() - 7, "scatter")
+	if self:IsDifficulty("normal25") then
+		timerMCCD:AddTime(5.5)
+	end
 	elseif msg == L.YellGuardians or msg:find(L.YellGuardians) then
 		specWarnAddsGuardians:Show()
 	end
