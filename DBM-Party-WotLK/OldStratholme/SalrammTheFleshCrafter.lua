@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("SalrammTheFleshcrafter", "DBM-Party-WotLK", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20251221220131")
 mod:SetCreatureID(26530)
 mod:SetEncounterID(294)
 
@@ -17,8 +17,12 @@ local warningCurse	= mod:NewTargetNoFilterAnnounce(58845, 2, nil, "RemoveCurse",
 local warningSteal	= mod:NewTargetNoFilterAnnounce(52709, 2)
 local warningGhoul	= mod:NewSpellAnnounce(52451, 3)
 
-local timerGhoulCD	= mod:NewCDTimer(20, 52451, nil, nil, nil, 1)
+local timerGhoulCD	= mod:NewCDTimer(10, 52451, nil, nil, nil, 1)
 local timerCurse	= mod:NewTargetTimer(30, 58845, nil, "RemoveCurse", nil, 5, nil, DBM_COMMON_L.CURSE_ICON)
+
+function mod:OnCombatStart(delay)
+	timerGhoulCD:Start(16-delay)
+end
 
 function mod:SPELL_SUMMON(args)
 	if args.spellId == 52451 then

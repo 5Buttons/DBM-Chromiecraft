@@ -32,7 +32,6 @@ do
 			DBM:GetModByName("PvPGeneral"):StopTrackHealth()
 		end
 	end
-
 	function mod:ZONE_CHANGED_NEW_AREA()
 		Init()
 	end

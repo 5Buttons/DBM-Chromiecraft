@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Meathook", "DBM-Party-WotLK", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20251221220131")
 mod:SetCreatureID(26529)
 mod:SetEncounterID(293)
 
@@ -14,7 +14,11 @@ mod:RegisterEventsInCombat(
 local warningChains		= mod:NewTargetNoFilterAnnounce(52696, 4)
 
 local timerChains		= mod:NewTargetTimer(5, 52696, nil, nil, nil, 3)
-local timerChainsCD		= mod:NewCDTimer(15, 52696, nil, nil, nil, 3)
+local timerChainsCD		= mod:NewCDTimer(14, 52696, nil, nil, nil, 3)
+
+function mod:OnCombatStart(delay)
+	timerChainsCD:Start(15 - delay)
+end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(52696, 58823) then
