@@ -97,9 +97,12 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull				= "Die, trespasser!",
-	Adds				= "summons forth Skeletal Warriors!",
-	AddsTwo				= "raises more skeletons!"
+	Pull			= "Die, trespasser!",
+	Adds			= "summons forth Skeletal Warriors!",
+	AddsTwo			= "raises more skeletons!",
+	Blink			= "blinks away!",
+	TeleportBalcony	= "teleports to the balcony above!",
+	TeleportBack	= "teleports back into the battle!"
 })
 
 --------------------------
