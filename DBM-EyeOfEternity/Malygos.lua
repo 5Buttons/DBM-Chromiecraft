@@ -61,6 +61,7 @@ local timerStaticFieldCD		= mod:NewCDTimer(12, 57430, nil, nil, nil, 3, nil, nil
 
 local tableBuild = false
 local guids = {}
+local startedPhase1 = false
 
 local function buildGuidTable()
 	table.wipe(guids)
@@ -93,31 +94,46 @@ function mod:StaticFieldTarget()
 end
 
 function mod:OnCombatStart(delay)
-    tableBuild = false
-    self:SetStage(1)
-    enrageTimer:Start(-delay)
-    timerAchieve:Start(-delay)
-    timerVortexCD:Start(35-delay)
-    timerSummonPowerSpark:Start("v16-28")
-    table.wipe(guids)
+	tableBuild = false
+	enrageTimer:Start(-delay)
+	timerAchieve:Start(-delay)
+	startedPhase1 = false
+	table.wipe(guids)
+	self:RegisterShortTermEvents(
+		"SWING_DAMAGE",
+		"SWING_MISSED"
+	)
 end
 
+function mod:StartPhase1()
+	if startedPhase1 then return end
+	startedPhase1 = true
+	self:SetStage(1)
+	self:UnregisterShortTermEvents()
+	timerVortexCD:Start(30)
+	timerSummonPowerSpark:Start(10)
+end
+
+function mod:SWING_DAMAGE(sourceGUID, sourceName)
+	if self:GetCIDFromGUID(sourceGUID) == 28859 then
+		self:StartPhase1()
+	end
+end
+
+mod.SWING_MISSED = mod.SWING_DAMAGE
+
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(60936, 57407) then
-		DBM:Debug("SURGE on: " .. (guids[args.destGUID] or "Unknown"), 2)
+	if args:IsSpellID(56263) then
+		timerVortex:Start()
+	elseif args:IsSpellID(60936, 57407) then
+		DBM:Debug("SURGE " .. (guids[args.destGUID] or "Unknown"), 2)
 		local target = guids[args.destGUID]
-		timerSurgeCD:Start()
 		if target then
 			warnSurge:CombinedShow(0.5, target)
 			if target == UnitName("player") then
 				specWarnSurge:Show()
 				specWarnSurge:Play("defensive")
 			end
-		end
-	elseif args:IsSpellID(57429) then
-		if self:AntiSpam(3, "StaticField") then
-			self:StaticFieldTarget(args.destGUID)
-			timerStaticFieldCD:Start()
 		end
 	end
 end
@@ -158,24 +174,23 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
-    --Secondary pull trigger
-    if (msg == L.YellPull or msg:find(L.YellPull)) and not self:IsInCombat() then
-        DBM:StartCombat(self, 0)
+	--Secondary pull trigger
+	if (msg == L.YellPull or msg:find(L.YellPull)) and not self:IsInCombat() then
+		DBM:StartCombat(self, 0)
 	elseif msg == L.YellVortex or msg:find(L.YellVortex) then
-		timerVortex:Start()
 		timerVortexCD:Start()
 		warnVortexSoon:Schedule(70)
 		warnVortex:Show()
-        local elapsed, total = timerSummonPowerSpark:GetTime()
-        if elapsed and total and total > 0 then
-            local remaining = total - elapsed
-            local newMax = remaining + 25
-            local newMin = newMax - 10
-            timerSummonPowerSpark:Stop()
-            timerSummonPowerSpark:Start(("v%.1f-%.1f"):format(newMin, newMax))
-        end
-    elseif msg:sub(0, L.YellPhase2:len()) == L.YellPhase2 then
-        self:SendSync("Phase2")
+		local elapsed, total = timerSummonPowerSpark:GetTime()
+		if elapsed and total and total > 0 then
+			local remaining = total - elapsed
+			local newMax = remaining + 25
+			local newMin = newMax - 10
+			timerSummonPowerSpark:Stop()
+			timerSummonPowerSpark:Start(("v%.1f-%.1f"):format(newMin, newMax))
+		end
+	elseif msg:sub(0, L.YellPhase2:len()) == L.YellPhase2 then
+		self:SendSync("Phase2")
 	elseif msg == L.YellBreath or msg:find(L.YellBreath) then
 		self:SendSync("BreathSoon")
 	elseif msg:sub(0, L.YellPhase3:len()) == L.YellPhase3 then

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Anub'Rekhan", "DBM-Naxx", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251208133531")
+mod:SetRevision("20260211133531")
 mod:SetCreatureID(15956)
 mod:SetEncounterID(1107)
 
@@ -10,8 +10,7 @@ mod:RegisterCombat("combat_yell", L.Pull1, L.Pull2)
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 28785 54021 28783",
 	"SPELL_CAST_SUCCESS 28783 56090",
-	"SPELL_AURA_REMOVED 28785 54021",
-	"UNIT_SPELLCAST_START"
+	"SPELL_AURA_REMOVED 28785 54021"
 )
 
 local warningLocustSoon		= mod:NewSoonAnnounce(28785, 2)
@@ -53,15 +52,13 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
-function mod:UNIT_SPELLCAST_START(unitID, spellName)
-	if spellName == GetSpellInfo(28783) or spellName == GetSpellInfo(56090) then  -- Impale
-		if self:GetUnitCreatureId("target") == 15956 and self:AntiSpam(3, 1) then
-		local targetName = UnitName("targettarget")
-			if targetName then
-				warnImpale:Show(targetName)
-				if targetName == UnitName("player") then
-					yellImpale:Yell()
-				end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpellID(28783, 56090) then
+		timerImpale:Start()
+		if args.destName then
+			warnImpale:Show(args.destName)
+			if args:IsPlayer() then
+				yellImpale:Yell()
 			end
 		end
 	end
