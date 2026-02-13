@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Grobbulus", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251204210600")
+mod:SetRevision("20260213210600")
 mod:SetCreatureID(15931)
 mod:SetUsedIcons(1, 2, 3, 4)
 mod:SetEncounterID(1111)
@@ -12,6 +12,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 28169",
 	"SPELL_AURA_REMOVED 28169",
 	"SPELL_CAST_SUCCESS 28240 28157 54364",
+	"SPELL_SUMMON 28240",
 	"UNIT_HEALTH boss1"
 )
 
@@ -105,12 +106,16 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpellID(28157, 54364) then
+		warnSlimeSpray:Show()
+		timerSlimeSpray:Start()
+	end
+end
+
+function mod:SPELL_SUMMON(args)
 	if args.spellId == 28240 then
 		warnCloud:Show()
 		timerCloud:Start()
-	elseif args:IsSpellID(28157, 54364) then
-		warnSlimeSpray:Show()
-		timerSlimeSpray:Start()
 	end
 end
 
@@ -119,7 +124,6 @@ function mod:UNIT_HEALTH(uId)
 		local h = UnitHealth(uId) / UnitHealthMax(uId)
 		if h < 0.35 then
 			warnedHealth = true
-			-- Injections will be coming very rapidly now (around 10 seconds at 25% health)
 		end
 	end
 end
