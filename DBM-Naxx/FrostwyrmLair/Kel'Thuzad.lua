@@ -5,7 +5,7 @@ local select, tContains = select, tContains
 local PickupInventoryItem, PutItemInBackpack, UseEquipmentSet, CancelUnitBuff = PickupInventoryItem, PutItemInBackpack, UseEquipmentSet, CancelUnitBuff
 local UnitClass = UnitClass
 
-mod:SetRevision("20251222154330")
+mod:SetRevision("20260215154330")
 mod:SetCreatureID(15990)
 mod:SetModelID("creature/lich/lich.m2")
 mod:SetMinCombatTime(60)
@@ -50,7 +50,7 @@ local specWarnFrostBlastSoon = mod:NewSpecialWarningSoon(27808, nil, nil, nil, 2
 local timerFissure			= mod:NewTargetTimer(5, 27810, nil, nil, 2, 3)
 local timerFissureCD 		= mod:NewCDTimer(25, 27810, nil, nil, nil, 3, nil, nil, true) 
 local timerMC				= mod:NewBuffActiveTimer(20, 28410, nil, nil, nil, 3)
-local timerMCCD				= mod:NewCDTimer(90, 28410, nil, nil, nil, 3)--actually 60 second cdish but its easier to do it this way for the first one.
+local timerMCCD				= mod:NewCDTimer(90, 28410, nil, nil, nil, 3)
 local timerPhase2			= mod:NewTimer(228, "TimerPhase2", nil, nil, nil, 6)
 
 mod:AddRangeFrameOption(12)
@@ -254,8 +254,8 @@ local function StartPhase2(self)
 		specWarnFrostBlastSoon:Schedule(38)
 		specWarnFrostBlastSoon:ScheduleVoice(38, "scatter")
 		if self:IsDifficulty("normal25") then
-			timerMCCD:Start(30)
-			warnMindControlSoon:Schedule(25)
+			timerMCCD:Start(90)
+			warnMindControlSoon:Schedule(85)
 			specWarnWeapons:Show(checkWeaponRemovalSetting(self) and ENABLE or ADDON_DISABLED, (self.Options.EqUneqWeaponsKT2 and self.Options.EqUneqWeaponsKT and (SLASH_STOPWATCH2):sub(2)) or (self.Options.EqUneqWeaponsKT2 and COMBAT_LOG) or NONE, self.Options.EqUneqFilter)
 			if self.Options.EqUneqWeaponsKT and checkWeaponRemovalSetting(self) then
 				self:Schedule(29.95, UnWKT, self)
@@ -357,7 +357,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self:AntiSpam() then
 			timerMC:Start()
 			timerMCCD:Start()
-			warnMindControlSoon:Schedule(60)
+			warnMindControlSoon:Schedule(85)
 		end
 		if self.Options.SetIconOnMC then
 			self:SetIcon(args.destName, self.vb.MCIcon)
@@ -405,6 +405,8 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		specWarnFrostBlastSoon:ScheduleVoice(timerFrostBlast:GetRemaining() - 7, "scatter")
 	if self:IsDifficulty("normal25") then
 		timerMCCD:AddTime(5.5)
+		self:Unschedule(warnMindControlSoon)
+		warnMindControlSoon:Schedule(timerMCCD:GetRemaining() - 5)
 	end
 	elseif msg == L.YellGuardians or msg:find(L.YellGuardians) then
 		specWarnAddsGuardians:Show()
