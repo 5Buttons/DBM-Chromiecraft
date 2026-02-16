@@ -83,7 +83,7 @@ end
 
 mod:AddMiscLine(L.EqUneqLineDescription)
 mod:AddBoolOption("EqUneqWeaponsKT", false) -- automation by timer
-mod:AddBoolOption("EqUneqWeaponsKT2", mod:IsDps(), nil, selfWarnMissingSet) -- automation by event
+mod:AddBoolOption("EqUneqWeaponsKT2", false, nil, selfWarnMissingSet)-- automation by event
 mod:AddDropdownOption("EqUneqFilter", {"OnlyDPS", "DPSTank", "NoFilter"}, "OnlyDPS", "misc")
 
 local function selfSchedWarnMissingSet(self)
