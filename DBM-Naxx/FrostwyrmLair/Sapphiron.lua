@@ -203,6 +203,7 @@ function mod:UNIT_HEALTH(uId)
 		warned_lowhp = true
 		specWarnLowHP:Show()
 		timerAirPhase:Cancel()
+		self:Unschedule(warnAirPhaseSoon.Show, warnAirPhaseSoon)
 	end
 end
 
