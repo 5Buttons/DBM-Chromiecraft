@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Horsemen", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251208210600")
+mod:SetRevision("20260222210600")
 mod:SetCreatureID(16063, 16064, 16065, 30549)
 mod:SetEncounterID(1121)
 
@@ -9,7 +9,7 @@ mod:RegisterCombat("combat", 16063, 16064, 16065, 30549)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 28884 57467",
-	"SPELL_CAST_SUCCESS 28832 28833 28834 28835 28883 53638 57466 32455",
+	"SPELL_CAST_SUCCESS 28832 28833 28834 28835 28883 53638 57466 32455 57463",
 	"SPELL_AURA_APPLIED 29061",
 	"SPELL_AURA_REMOVED 29061",
 	"SPELL_AURA_APPLIED_DOSE 28832 28833 28834 28835",
@@ -17,7 +17,6 @@ mod:RegisterEventsInCombat(
 )
 
 --TODO, first marks
---TODO, verify stuff migrated from naxx 40
 local warnMarkSoon				= mod:NewAnnounce("WarningMarkSoon", 1, 28835, false, nil, nil, 28835)
 local warnMeteor				= mod:NewSpellAnnounce(57467, 4)
 local warnVoidZone				= mod:NewTargetNoFilterAnnounce(28863, 3)--Only warns for nearby targets, to reduce spam
@@ -48,13 +47,6 @@ mod:SetBossHealthInfo(
 
 mod.vb.markCount = 0
 
--- REVIEW-Have two logs where this is NOT verified! Still 15s timer on next meteor when he skips one (usually on tank swaps)
---[[local function MeteorCast(self)
-	self:Unschedule(MeteorCast)
-	timerMeteorCD:Restart()
-	self:Schedule(15, MeteorCast, self)
-end]]
-
 function mod:OnCombatStart()
 	self.vb.markCount = 0
 	timerLadyMark:Start(24)
@@ -63,7 +55,7 @@ function mod:OnCombatStart()
 	timerThaneMark:Start(24)
 	warnMarkSoon:Schedule(12)
 	timerMeteorCD:Start("v10-15")
-	timerHolyWrathCD:Start(15) -- REVIEW! ~2s variance? (25man Lordaeron 2022/10/16 wipe || 25man Lordaeron 2022/10/16 kill) - 12.3 || 10.1
+	timerHolyWrathCD:Start(15)
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(12)
 	end
@@ -79,7 +71,6 @@ function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(28884, 57467) then
 		warnMeteor:Show()
 		timerMeteorCD:Start()
---		MeteorCast(self)
 	end
 end
 
@@ -97,7 +88,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 			timerThaneMark:Start()
 		end
 		warnMarkSoon:Schedule(12)
-	elseif args.spellId == 28863 then
+	elseif args.spellId == 57463 then
 --		timerVoidZoneCD:Start()
 		if args:IsPlayer() then
 			specWarnVoidZone:Show()
@@ -140,7 +131,6 @@ function mod:UNIT_DIED(args)
 	if cid == 16064 then
 		timerThaneMark:Cancel()
 		timerMeteorCD:Cancel()
---		self:Unschedule(MeteorCast)
 	elseif cid == 30549 then
 		timerBaronMark:Cancel()
 	elseif cid == 16065 then
