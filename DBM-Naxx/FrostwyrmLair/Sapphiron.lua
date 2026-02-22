@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Sapphiron", "DBM-Naxx", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251222224400")
+mod:SetRevision("20260222224400")
 mod:SetCreatureID(15989)
 mod:SetEncounterID(1119)
 mod:SetHotfixNoticeRev(20251222224400)
@@ -12,7 +12,7 @@ mod:SetModelScale(0.1)
 
 mod:RegisterEventsInCombat(
 --	"SPELL_CAST_START 28524",
-	"SPELL_CAST_SUCCESS 28542 55665 28560 55697",
+	"SPELL_CAST_SUCCESS 28542 55665 28560 55696",
 	"SPELL_AURA_APPLIED 28522 28547 55699",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_HEALTH"
@@ -163,7 +163,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		else
 			timerBlizzard:Start(8) -- 10-man
 		end
-	elseif spellId == 55697 then
+	elseif spellId == 55696 then
 		timerTailSweep:Start()
 	end
 end
