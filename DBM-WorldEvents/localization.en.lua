@@ -20,7 +20,10 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	SayCombatStart		= "Did they bother to tell you who I am and why I am doing this?"
+	SayCombatStart	= "Did they bother to tell you who I am and why I am doing this?",
+	SayHummelDeath	= "...please don't think less of me.",
+	SayBaxterDeath	= "It has been the greatest honor of my life to serve with you, Hummel.",
+	SayFryeDeath	= "Great. We're not gutless, we're incompetent."
 })
 
 ----------------------------
