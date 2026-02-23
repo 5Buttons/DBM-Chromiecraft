@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Grobbulus", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260213220600")
+mod:SetRevision("20260223165304")
 mod:SetCreatureID(15931)
 mod:SetUsedIcons(1, 2, 3, 4)
 mod:SetEncounterID(1111)
@@ -12,13 +12,14 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 28169",
 	"SPELL_AURA_REMOVED 28169",
 --	"SPELL_CAST_SUCCESS 28240 28157 54364",
+	"SPELL_CAST_SUCCESS 28157 54364",
 	"SPELL_SUMMON 28240",
 	"UNIT_HEALTH boss1"
 )
 
 local warnInjection			= mod:NewTargetNoFilterAnnounce(28169, 2)
 local warnCloud				= mod:NewSpellAnnounce(28240, 2)
---local warnSlimeSpray 		= mod:NewSpellAnnounce(28157, 2, nil, false)
+local warnSlimeSpray 		= mod:NewSpellAnnounce(28157, 2, nil, false)
 
 local specWarnInjection		= mod:NewSpecialWarningYou(28169, nil, nil, nil, 1, 2)
 local yellInjection			= mod:NewYellMe(28169, nil, false)
@@ -26,7 +27,7 @@ local yellInjection			= mod:NewYellMe(28169, nil, false)
 local timerInjection		= mod:NewTargetTimer(10, 28169, nil, nil, nil, 3)
 local timerInjectionCD		= mod:NewCDTimer(20, 28169, nil, nil, nil, 3)
 local timerCloud			= mod:NewNextTimer(15, 28240, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
---local timerSlimeSpray		= mod:NewCDTimer(20, 28157, nil, false, nil, 2)
+local timerSlimeSpray		= mod:NewCDTimer(20, 28157, nil, false, nil, 2)
 local enrageTimer			= mod:NewBerserkTimer(720)
 
 mod:AddSetIconOption("SetIconOnInjectionTarget", 28169, false, false, {1, 2, 3, 4})
@@ -67,7 +68,7 @@ function mod:OnCombatStart(delay)
 	end
 	timerCloud:Start(15 - delay)
 	timerInjectionCD:Start(20 - delay)
---	timerSlimeSpray:Start(10 - delay)
+	timerSlimeSpray:Start(10 - delay)
 end
 
 function mod:OnCombatEnd()
@@ -105,12 +106,12 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
---[[function mod:SPELL_CAST_SUCCESS(args)
+function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(28157, 54364) then
 		warnSlimeSpray:Show()
 		timerSlimeSpray:Start()
 	end
---end]]
+end
 
 function mod:SPELL_SUMMON(args)
 	if args.spellId == 28240 and args:GetSrcCreatureID() == 15931 then
