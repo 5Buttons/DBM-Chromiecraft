@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Gothik", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251204210600")
+mod:SetRevision("20260223175536")
 mod:SetCreatureID(16060)
 mod:SetEncounterID(1109)
 mod:RegisterCombat("combat")
@@ -21,7 +21,7 @@ local warnKnightDown	= mod:NewAnnounce("WarningKnightDown", 2)
 local warnGateOpen		= mod:NewSpellAnnounce(3366, 2)
 local warnPhase2		= mod:NewPhaseAnnounce(2, 3)
 
-local timerPhase2		= mod:NewTimer(270, "TimerPhase2", 27082, nil, nil, 6)
+local timerPhase2		= mod:NewTimer(274.33, "TimerPhase2", 27082, nil, nil, 6)
 local timerWave			= mod:NewTimer(20, "TimerWave", 5502, nil, nil, 1)
 local timerGate			= mod:NewTimer(120, "Gate Opens", 9484)
 
@@ -110,11 +110,11 @@ function mod:OnCombatStart()
 	self.vb.wave = 0
 	timerGate:Start()
 	timerPhase2:Start()
-	warnPhase2:Schedule(270)
+	warnPhase2:Schedule(274.33)
 	timerWave:Start(30, self.vb.wave + 1)
 	warnWaveSoon:Schedule(27, self.vb.wave + 1, getWaveString(self.vb.wave + 1))
 	self:Schedule(30, NextWave, self)
-	self:Schedule(270, StartPhase2, self)
+	self:Schedule(274.33, StartPhase2, self)
 end
 
 function mod:OnTimerRecovery()
