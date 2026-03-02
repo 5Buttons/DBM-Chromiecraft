@@ -3,30 +3,35 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20260222220131")
 mod:SetCreatureID(27483)
 mod:SetEncounterID(373)
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 22686",
+	"SPELL_CAST_SUCCESS 22686 59416",
 	"SPELL_AURA_APPLIED 48920 48873 48878"
 )
 
 local warningSlash	= mod:NewSpellAnnounce(48873, 3)
 local warningBite	= mod:NewTargetNoFilterAnnounce(48920, 2, nil, "Healer")
 local warningFear	= mod:NewSpellAnnounce(22686, 1)
+local warningRaptorCall  = mod:NewSpellAnnounce(59416, 3)
+local timerRaptorCallCD  = mod:NewCDTimer(30, 59416, nil, nil, nil, 2)
 
-local timerFearCD	= mod:NewCDTimer(15, 22686, nil, nil, nil, 2)  -- cooldown ??
+--local timerFearCD	= mod:NewCDTimer(15, 22686, nil, nil, nil, 2)  -- HP based on AC. 67% and 34%
 local timerSlash	= mod:NewTargetTimer(10, 48873)
-local timerSlashCD	= mod:NewCDTimer(18, 48873, nil, "Tank|Healer", nil, 5)
+local timerSlashCD	= mod:NewCDTimer(20, 48873, nil, "Tank|Healer", nil, 5)
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 22686 and args.sourceGUID == 27483 then
 		warningFear:Show()
-		timerFearCD:Start()
-	end
+--		timerFearCD:Start()
+	elseif args.spellId == 59416 then
+        warningRaptorCall:Show()
+        timerRaptorCallCD:Start()
+    end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
