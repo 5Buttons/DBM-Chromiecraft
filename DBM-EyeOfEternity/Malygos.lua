@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malygos", "DBM-EyeOfEternity")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251221025043")
+mod:SetRevision("20260302025043")
 mod:SetCreatureID(28859)
 
 mod:RegisterCombat("yell", L.YellPull)
@@ -13,7 +13,7 @@ mod:RegisterEvents(
 )
 
 mod:RegisterEventsInCombat(
-	"SPELL_AURA_APPLIED 60936 57407 56263 57429",
+	"SPELL_AURA_APPLIED 60936 57407 56263 57429 57428 55853",
 	"SPELL_CAST_START 56505",
 	"SPELL_CAST_SUCCESS 56105 57430",
 	"CHAT_MSG_RAID_BOSS_EMOTE"
@@ -31,7 +31,7 @@ local warnVortexSoon			= mod:NewSoonAnnounce(56105, 2)
 
 local timerSummonPowerSpark		= mod:NewCDTimer("v20-30", 56140, nil, nil, nil, 1, 59381, DBM_COMMON_L.DAMAGE_ICON)
 local timerVortex				= mod:NewCastTimer(10, 56105, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
-local timerVortexCD				= mod:NewCDTimer(78, 56105, nil, nil, nil, 2)
+local timerVortexCD				= mod:NewCDTimer(75, 56105, nil, nil, nil, 2)
 
 -- Stage Two
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2))
@@ -48,16 +48,15 @@ local timerIntermission			= mod:NewPhaseTimer(22)
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(3))
 local warnPhase3				= mod:NewPhaseAnnounce(3)
 local warnSurge					= mod:NewTargetAnnounce(60936, 3)
-local warnStaticField			= mod:NewTargetNoFilterAnnounce(57430, 3)
+--local warnStaticField			= mod:NewTargetNoFilterAnnounce(57430, 3)
 
 local specWarnSurge				= mod:NewSpecialWarningDefensive(60936, nil, nil, nil, 1, 2)
 local specWarnP3SurgeOfPowerSoon= mod:NewSpecialWarningYou(60936, nil, nil, nil, 1, 2)
 local specWarnStaticField		= mod:NewSpecialWarningYou(57430, nil, nil, nil, 1, 2)
-local specWarnStaticFieldNear	= mod:NewSpecialWarningClose(57430, nil, nil, nil, 1, 2)
+--local specWarnStaticFieldNear	= mod:NewSpecialWarningClose(57430, nil, nil, nil, 1, 2)
 local yellStaticField			= mod:NewYellMe(57430)
 
-local timerStaticFieldCD		= mod:NewCDTimer(12, 57430, nil, nil, nil, 3, nil, nil, true)
---local timerAttackable			= mod:NewTimer(24, "Malygos Wipes Debuffs") -- Not enough info nor locales on the code from previous contributor to know what this is intended for. Disabled for now
+local timerStaticFieldCD		= mod:NewCDTimer(12, 57430, nil, nil, nil, 3)
 
 local tableBuild = false
 local guids = {}
@@ -73,7 +72,7 @@ local function buildGuidTable()
 	tableBuild = true
 end
 
-function mod:StaticFieldTarget()
+--[[function mod:StaticFieldTarget()
 	local targetname, uId = self:GetBossTarget(28859)
 	if not targetname or not uId then return end
 	local targetGuid = UnitGUID(uId)
@@ -91,7 +90,7 @@ function mod:StaticFieldTarget()
 	else
 		warnStaticField:Show(announcetarget)
 	end
-end
+end]]
 
 function mod:OnCombatStart(delay)
 	tableBuild = false
@@ -110,8 +109,8 @@ function mod:StartPhase1()
 	startedPhase1 = true
 	self:SetStage(1)
 	self:UnregisterShortTermEvents()
-	timerVortexCD:Start(30)
-	timerSummonPowerSpark:Start(10)
+	timerVortexCD:Start(29)
+	timerSummonPowerSpark:Start("v10-15")
 end
 
 function mod:SWING_DAMAGE(sourceGUID, sourceName)
@@ -123,7 +122,7 @@ end
 mod.SWING_MISSED = mod.SWING_DAMAGE
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(56263) then
+	if args:IsSpellID(55853) then
 		timerVortex:Start()
 	elseif args:IsSpellID(60936, 57407) then
 		DBM:Debug("SURGE " .. (guids[args.destGUID] or "Unknown"), 2)
@@ -134,6 +133,14 @@ function mod:SPELL_AURA_APPLIED(args)
 				specWarnSurge:Show()
 				specWarnSurge:Play("defensive")
 			end
+		end
+	elseif args:IsSpellID(57429) then
+			timerStaticFieldCD:Start()
+		local target = guids[args.destGUID]
+		if target == UnitName("player") then
+			specWarnStaticField:Show()
+			specWarnStaticField:Play("runaway")
+			yellStaticField:Yell()
 		end
 	end
 end
