@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malygos", "DBM-EyeOfEternity")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260302025043")
+mod:SetRevision("20260327025043")
 mod:SetCreatureID(28859)
 
 mod:RegisterCombat("yell", L.YellPull)
@@ -31,7 +31,7 @@ local warnVortexSoon			= mod:NewSoonAnnounce(56105, 2)
 
 local timerSummonPowerSpark		= mod:NewCDTimer("v20-30", 56140, nil, nil, nil, 1, 59381, DBM_COMMON_L.DAMAGE_ICON)
 local timerVortex				= mod:NewCastTimer(10, 56105, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
-local timerVortexCD				= mod:NewCDTimer(75, 56105, nil, nil, nil, 2)
+local timerVortexCD				= mod:NewCDTimer("v72-74", 56105, nil, nil, nil, 2) --or normal timer cd timer with 72?
 
 -- Stage Two
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2))
@@ -54,7 +54,7 @@ local specWarnSurge				= mod:NewSpecialWarningDefensive(60936, nil, nil, nil, 1,
 local specWarnP3SurgeOfPowerSoon= mod:NewSpecialWarningYou(60936, nil, nil, nil, 1, 2)
 local specWarnStaticField		= mod:NewSpecialWarningYou(57430, nil, nil, nil, 1, 2)
 --local specWarnStaticFieldNear	= mod:NewSpecialWarningClose(57430, nil, nil, nil, 1, 2)
-local yellStaticField			= mod:NewYellMe(57430)
+local yellStaticField			= mod:NewYellMe(57430, nil, false)
 
 local timerStaticFieldCD		= mod:NewCDTimer(12, 57430, nil, nil, nil, 3)
 
@@ -186,7 +186,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		DBM:StartCombat(self, 0)
 	elseif msg == L.YellVortex or msg:find(L.YellVortex) then
 		timerVortexCD:Start()
-		warnVortexSoon:Schedule(70)
+		warnVortexSoon:Schedule(67)
 		warnVortex:Show()
 		local elapsed, total = timerSummonPowerSpark:GetTime()
 		if elapsed and total and total > 0 then
@@ -237,7 +237,7 @@ function mod:OnSync(event, arg)
 		warnVortexSoon:Cancel()
 		warnPhase2:Show()
 		timerIntermission:Start()
-		timerBreathCD:Start(65) -- REVIEW! no variance? (10man Lordaeron 2022/09/27 || 25man Lordaeron 2022/09/27) - Stage 2/68.0 || Stage 2/68.0
+		timerBreathCD:Start(79)
 	elseif event == "BreathSoon" then
 		warnBreathInc:Show()
 	elseif event == "Phase3" then
