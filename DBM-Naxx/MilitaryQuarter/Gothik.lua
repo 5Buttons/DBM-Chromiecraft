@@ -1,19 +1,19 @@
 local mod	= DBM:NewMod("Gothik", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260223175536")
+mod:SetRevision("20260408175536")
 mod:SetCreatureID(16060)
 mod:SetEncounterID(1109)
-mod:RegisterCombat("combat")
+mod:RegisterCombat("yell", L.yell)
 
 mod:RegisterEventsInCombat(
 	"CHAT_MSG_MONSTER_YELL",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
+	"UNIT_SPELLCAST_SUCCEEDED",
+	"UNIT_HEALTH",
 	"UNIT_DIED"
 )
 
---TODO, sync infoframe from classic era version?
---(source.type = "NPC" and source.firstSeen = timestamp) or (target.type = "NPC" and target.firstSeen = timestamp)
 local warnWaveNow		= mod:NewAnnounce("WarningWaveSpawned", 3, nil, false)
 local warnWaveSoon		= mod:NewAnnounce("WarningWaveSoon", 2)
 local warnRiderDown		= mod:NewAnnounce("WarningRiderDown", 4)
@@ -24,8 +24,13 @@ local warnPhase2		= mod:NewPhaseAnnounce(2, 3)
 local timerPhase2		= mod:NewTimer(274.33, "TimerPhase2", 27082, nil, nil, 6)
 local timerWave			= mod:NewTimer(20, "TimerWave", 5502, nil, nil, 1)
 local timerGate			= mod:NewTimer(120, "Gate Opens", 9484)
+local timerTeleport		= mod:NewCDTimer(20, 46573, "TimerTeleport", nil, nil, 3)
+local specWarnLowHP		= mod:NewSpecialWarning("SpecWarnGothLow")
+
 
 mod.vb.wave = 0
+mod.vb.lowHealthWarned = false
+
 local wavesNormal = {
 	{2, L.Trainee, timer = 20},     -- Wave 1: 20s
 	{2, L.Trainee, timer = 20},     -- Wave 2: 20s
@@ -73,6 +78,7 @@ local waves = wavesNormal
 local function StartPhase2(self)
 	self:SetStage(2)
 	warnPhase2:Show()
+	timerTeleport:Start(20)
 end
 
 local function getWaveString(wave)
@@ -108,13 +114,12 @@ function mod:OnCombatStart()
 		waves = wavesNormal
 	end
 	self.vb.wave = 0
+	self.vb.lowHealthWarned = false
 	timerGate:Start()
 	timerPhase2:Start()
-	warnPhase2:Schedule(274.33)
 	timerWave:Start(30, self.vb.wave + 1)
 	warnWaveSoon:Schedule(27, self.vb.wave + 1, getWaveString(self.vb.wave + 1))
 	self:Schedule(30, NextWave, self)
-	self:Schedule(274.33, StartPhase2, self)
 end
 
 function mod:OnTimerRecovery()
@@ -125,11 +130,11 @@ function mod:OnTimerRecovery()
 	end
 end
 
---[[function mod:CHAT_MSG_MONSTER_YELL(msg)
+function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.GothikPhase2Yell or msg:find(L.GothikPhase2Yell) then
 		StartPhase2(self)
 	end
-end]]
+end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 	if msg == L.GothikDoorEmote or msg:find(L.GothikDoorEmote) then
@@ -147,4 +152,19 @@ function mod:UNIT_DIED(args)
 			warnKnightDown:Show()
 		end
 	end
+end
+
+function mod:UNIT_SPELLCAST_SUCCEEDED(unit, spellName)
+    if spellName == GetSpellInfo(28025) or spellName == GetSpellInfo(28026) then
+        timerTeleport:Start(20)
+    end
+end
+
+function mod:UNIT_HEALTH(uId)
+    local cid = self:GetUnitCreatureId(uId)
+    if cid == 16060 and not self.vb.lowHealthWarned and UnitHealth(uId) / UnitHealthMax(uId) < 0.3 then
+        self.vb.lowHealthWarned = true
+        specWarnLowHP:Show()
+        timerTeleport:Stop()
+    end
 end

@@ -264,12 +264,14 @@ L:SetWarningLocalization({
 	WarningWaveSpawned	= "Wave %d: %s spawned",
 	WarningRiderDown	= "Rider down",
 	WarningKnightDown	= "Knight down",
-	WarningPhase2		= "Phase 2"
+	WarningPhase2		= "Phase 2",
+	SpecWarnGothLow		= "Gothik can't teleport anymore"
 })
 
 L:SetTimerLocalization({
 	TimerWave	= "Wave %d",
-	TimerPhase2	= "Phase 2"
+	TimerPhase2	= "Phase 2",
+	TimerTeleport = "Teleport",
 })
 
 L:SetOptionLocalization({
@@ -278,7 +280,9 @@ L:SetOptionLocalization({
 	WarningWaveSoon		= "Show pre-warning for wave",
 	WarningWaveSpawned	= "Show warning for wave spawned",
 	WarningRiderDown	= "Show warning when an Unrelenting Rider dies",
-	WarningKnightDown	= "Show warning when an Unrelenting Death Knight dies"
+	WarningKnightDown	= "Show warning when an Unrelenting Death Knight dies",
+	SpecWarnGothLow		= "Special Warning when Gothik can't teleport anymore in P2",
+	TimerTeleport 		= "Show timer for Gothik teleport",
 })
 
 L:SetMiscLocalization({
