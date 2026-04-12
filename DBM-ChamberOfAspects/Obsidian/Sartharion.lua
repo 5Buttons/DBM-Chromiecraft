@@ -3,34 +3,10 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,normal25"
 
-mod:SetRevision("20251210220131")
+mod:SetRevision("20260412220131")
 mod:SetCreatureID(28860)
 mod:SetEncounterID(742)
 
---mod:RegisterCombat("combat") -- Don't use IEEU, because on Warmane 3 Drakes, Sartharion NOT is engaged first, but Tenebron > Shadron > Vesperon > Sartharion (Sartharion will end up on boss1).
--- "<15.29 22:46:09> [CHAT_MSG_MONSTER_YELL] It is my charge to watch over these eggs. I will see you burn before any harm comes to them!:Sartharion:::::0:0::0:6450::0:", -- [120]
--- "<15.30 22:46:09> [CLEU] SPELL_CAST_SUCCESS:0xF1300076F4000109:Tenebron:0x0000000000000000:nil:61248:Power of Tenebron:nil:nil:", -- [121]
--- "<15.30 22:46:09> [DBM_Debug] INSTANCE_ENCOUNTER_ENGAGE_UNIT event fired for zoneId532:3:", -- [122]
--- "<15.30 22:46:09> [DBM_Debug] StartCombat called by : IEEU for mod : Tenebron. LastInstanceMapID is 532:nil:", -- [123]
--- "<15.30 22:46:09> [DBM_Pull] Tenebron:0:nil:100:", -- [124]
--- "<15.30 22:46:09> [DBM_Debug] DBMv4-Pull 0 Tenebron 20220806121300 100 20221004114721 20220805000000 IEEU:3:", -- [125]
--- "<15.30 22:46:09> [INSTANCE_ENCOUNTER_ENGAGE_UNIT] Fake Args::boss1:1:1:1:Tenebron:30452:0xF1300076F4000109:worldboss:1337325:boss2:nil:nil:nil:??:1:nil:normal:0:boss3:nil:nil:nil:??:1:nil:normal:0:boss4:nil:nil:nil:??:1:nil:normal:0:boss5:nil:nil:nil:??:1:nil:normal:0:Real Args::", -- [126]
--- "<15.30 22:46:09> [CLEU] SPELL_CAST_SUCCESS:0xF1300076F300010A:Shadron:0x0000000000000000:nil:58105:Power of Shadron:nil:nil:", -- [127]
--- "<15.30 22:46:09> [DBM_Debug] INSTANCE_ENCOUNTER_ENGAGE_UNIT event fired for zoneId532:3:", -- [128]
--- "<15.30 22:46:09> [INSTANCE_ENCOUNTER_ENGAGE_UNIT] Fake Args::boss1:1:1:1:Tenebron:30452:0xF1300076F4000109:worldboss:1337325:boss2:1:1:1:Shadron:30451:0xF1300076F300010A:worldboss:1337325:boss3:nil:nil:nil:??:1:nil:normal:0:boss4:nil:nil:nil:??:1:nil:normal:0:boss5:nil:nil:nil:??:1:nil:normal:0:Real Args::", -- [129]
--- "<15.30 22:46:09> [DBM_Debug] INSTANCE_ENCOUNTER_ENGAGE_UNIT event fired for zoneId532:3:", -- [130]
--- "<15.30 22:46:09> [INSTANCE_ENCOUNTER_ENGAGE_UNIT] Fake Args::boss1:1:1:1:Tenebron:30452:0xF1300076F4000109:worldboss:1337325:boss2:1:1:1:Shadron:30451:0xF1300076F300010A:worldboss:1337325:boss3:1:1:1:Vesperon:30449:0xF1300076F100010B:worldboss:1337325:boss4:nil:nil:nil:??:1:nil:normal:0:boss5:nil:nil:nil:??:1:nil:normal:0:Real Args::", -- [131]
--- "<15.30 22:46:09> [UNIT_SPELLCAST_SUCCEEDED] Vesperon(??) -Power of Vesperon- [[boss3:Power of Vesperon::0:]]", -- [132]
--- "<15.30 22:46:09> [CLEU] SPELL_CAST_SUCCESS:0xF1300076F100010B:Vesperon:0x0000000000000000:nil:61251:Power of Vesperon:nil:nil:", -- [133]
--- "<15.30 22:46:09> [UNIT_SPELLCAST_SUCCEEDED] Sartharion(Sanarticon) -Will of Sartharion- [[target:Will of Sartharion::0:]]", -- [134]
--- "<15.30 22:46:09> [CLEU] SPELL_CAST_SUCCESS:0xF1300070BC000062:Sartharion:0x0000000000000000:nil:61254:Will of Sartharion:nil:nil:", -- [135]
--- "<15.30 22:46:09> [DBM_Debug] INSTANCE_ENCOUNTER_ENGAGE_UNIT event fired for zoneId532:3:", -- [136]
--- "<15.30 22:46:09> [DBM_Debug] StartCombat called by : IEEU for mod : Sartharion. LastInstanceMapID is 532:nil:", -- [137]
--- "<15.30 22:46:09> [DBM_Pull] Sartharion:0:nil:100:", -- [138]
--- "<15.30 22:46:09> [DBM_TimerStart] Timer43113next:Next Fire Wall:30:Interface\\Icons\\Spell_Fire_MoltenBlood:next:43113:2:Sartharion:nil:nil:Fire Wall:nil:", -- [139]
--- "<15.30 22:46:09> [DBM_TimerStart] Timer58956cd:Flame Breath CD:10:Interface\\Icons\\Spell_Fire_Fire:cd:58956:5:Sartharion:nil:nil:Flame Breath:nil:", -- [140]
--- "<15.30 22:46:09> [DBM_Debug] DBMv4-Pull 0 Sartharion 20220925145940 100 20221004114721 0 IEEU:3:", -- [141]
--- "<15.30 22:46:09> [INSTANCE_ENCOUNTER_ENGAGE_UNIT] Fake Args::boss1:1:1:1:Sartharion:28860:0xF1300070BC000062:worldboss:4392675:boss2:1:1:1:Tenebron:30452:0xF1300076F4000109:worldboss:1337325:boss3:1:1:1:Shadron:30451:0xF1300076F300010A:worldboss:1337325:boss4:1:1:1:Vesperon:30449:0xF1300076F100010B:worldboss:1337325:boss5:nil:nil:nil:??:1:nil:normal:0:Real Args::", -- [142]
 mod:RegisterCombat("yell", L.YellSarthPull)
 
 mod:RegisterEventsInCombat(
@@ -39,6 +15,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 57491",
 	"SPELL_DAMAGE 59128",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
+	"CHAT_MSG_MONSTER_YELL",
 	"CHAT_MSG_MONSTER_EMOTE"
 )
 
@@ -56,16 +33,17 @@ local specWarnVesperonPortal	= mod:NewSpecialWarning("WarningVesperonPortal", fa
 local specWarnTenebronPortal	= mod:NewSpecialWarning("WarningTenebronPortal", false, nil, nil, 1, 7)
 local specWarnShadronPortal		= mod:NewSpecialWarning("WarningShadronPortal", false, nil, nil, 1, 7)
 
-local timerShadowFissure		= mod:NewCastTimer(5, 59128, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON) --Cast timer until Void Blast. it's what happens when shadow fissure explodes.
-local timerBreath				= mod:NewCDTimer(20, 58956, nil, "Tank|Healer", nil, 5) -- REVIEW! ~1s variance? (25N Lordaeron 2022/09/23) - 10.4, 11.4, 10.4, 10.1
-local timerWall					= mod:NewNextTimer(25, 43113, nil, nil, nil, 2) -- (25N Lordaeron 2022/09/23) - pull:30.0, 30.0
-local timerTenebron				= mod:NewTimer(30, "TimerTenebron", 61248, nil, nil, 1)
-local timerShadron				= mod:NewTimer(80, "TimerShadron", 58105, nil, nil, 1)
-local timerVesperon				= mod:NewTimer(120, "TimerVesperon", 61251, nil, nil, 1)
-local timerTenebronWhelps		= mod:NewTimer(60, "TimerTenebronWhelps", 1022)
-local timerShadronPortal		= mod:NewTimer(105, "TimerShadronPortal", 11420)
-local timerVesperonPortal		= mod:NewTimer(175, "TimerVesperonPortal", 57988)
---local timerVesperonPortal2		= mod:NewTimer(199, "TimerVesperonPortal2", 57988) -- what's the purpose of this?
+local timerShadowFissure		= mod:NewCastTimer(5, 59128, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
+local timerBreath 				= mod:NewCDTimer(10, 58956, nil, false, "Tank|Healer", 5)
+local timerWall					= mod:NewNextTimer(25, 43113, nil, nil, nil, 2)
+
+--Drake and Portals timings
+local timerTenebron       = mod:NewTimer(28, "TimerTenebron", 61248, nil, nil, 1)
+local timerShadron        = mod:NewTimer (68, "TimerShadron", 58105, nil, nil, 1)
+local timerVesperon       = mod:NewTimer(122, "TimerVesperon", 61251, nil, nil, 1)
+local timerTenebronWhelps = mod:NewTimer(49, "TimerTenebronWhelps", 1022)
+local timerShadronPortal  = mod:NewTimer(23, "TimerShadronPortal", 11420)
+local timerVesperonPortal = mod:NewTimer(36, "TimerVesperonPortal", 57988)
 
 mod:AddBoolOption("AnnounceFails", true, "announce")
 
@@ -86,39 +64,37 @@ local function isunitdebuffed(spellName)
 end
 
 local function CheckDrakes(self, delay)
-	if self.Options.HealthFrame then
-		DBM.BossHealth:Show(L.name)
-		DBM.BossHealth:AddBoss(28860, "Sartharion")
-	end
-	if isunitdebuffed(DBM:GetSpellInfo(61248)) then	-- Power of Tenebron
-		timerTenebron:Start(26 - delay) -- 30
-		warnTenebron:Schedule(21 - delay) -- 25
-		timerTenebronWhelps:Start(51- delay)
-		warnTenebronWhelpsSoon:Schedule(55 - delay)
-		if self.Options.HealthFrame then
-			DBM.BossHealth:AddBoss(30452, "Tenebron")
-		end
-	end
-	if isunitdebuffed(DBM:GetSpellInfo(58105)) then	-- Power of Shadron
-		timerShadron:Start(74 - delay) -- 75
-		warnShadron:Schedule(69 - delay) -- 70
-		timerShadronPortal:Start(- delay)
-		warnShadronPortalSoon:Schedule(89 - delay)
-		if self.Options.HealthFrame then
-			DBM.BossHealth:AddBoss(30451, "Shadron")
-		end
-	end
-	if isunitdebuffed(DBM:GetSpellInfo(61251)) then	-- Power of Vesperon
-		timerVesperon:Start(119 - delay) -- 120
-		warnVesperon:Schedule(114 - delay) -- 115
-		timerVesperonPortal:Start(- delay)
---		timerVesperonPortal2:Start(- delay)
-		warnVesperonPortalSoon:Schedule(134 - delay)
---		warnVesperonPortalSoon:Schedule(194 - delay)
-		if self.Options.HealthFrame then
-			DBM.BossHealth:AddBoss(30449, "Vesperon")
-		end
-	end
+    if self.Options.HealthFrame then
+        DBM.BossHealth:Show(L.name)
+        DBM.BossHealth:AddBoss(28860, "Sartharion")
+    end
+    if isunitdebuffed(DBM:GetSpellInfo(61248)) then    -- Power of Tenebron
+        timerTenebron:Start(-delay)
+        warnTenebron:Schedule(25-delay)
+--        timerTenebronWhelps:Start(-delay)
+--        warnTenebronWhelpsSoon:Schedule(-delay)
+        if self.Options.HealthFrame then
+            DBM.BossHealth:AddBoss(30452, "Tenebron")
+        end
+    end
+    if isunitdebuffed(DBM:GetSpellInfo(58105)) then    -- Power of Shadron
+        timerShadron:Start(-delay)
+        warnShadron:Schedule(62-delay)
+--        timerShadronPortal:Start(-delay)
+--        warnShadronPortalSoon:Schedule(-delay)
+        if self.Options.HealthFrame then
+            DBM.BossHealth:AddBoss(30451, "Shadron")
+        end
+    end
+    if isunitdebuffed(DBM:GetSpellInfo(61251)) then    -- Power of Vesperon
+        timerVesperon:Start(-delay)
+        warnVesperon:Schedule(115-delay)
+--        timerVesperonPortal:Start(-delay)
+--        warnVesperonPortalSoon:Schedule(-delay)
+        if self.Options.HealthFrame then
+            DBM.BossHealth:AddBoss(30449, "Vesperon")
+        end
+    end
 end
 
 local sortedFails = {}
@@ -133,8 +109,8 @@ function mod:OnCombatStart(delay)
 	--Cache spellnames so a solo player check doesn't fail in CheckDrakes in 8.0+
 	self:Schedule(5, CheckDrakes, self, delay)
 	timerWall:Start(20-delay)
-	warnBreathSoon:Schedule(10-delay)
-	timerBreath:Start(15-delay) -- REVIEW! variance? (25N Lordaeron 2022/09/23) - pull:11.0
+	warnBreathSoon:Schedule(7-delay)
+	timerBreath:Start(5-delay)
 
 	twipe(lastvoids)
 	twipe(lastfire)
@@ -195,20 +171,32 @@ function mod:SPELL_DAMAGE(_, _, _, _, destName, _, spellId)
 	end
 end
 
-function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, mob)
-	if msg == L.Wall or msg:find(L.Wall) then
-		self:SendSync("FireWall")
-	elseif msg == L.Portal or msg:find(L.Portal) then
-		if mob == L.NameVesperon then
-			self:SendSync("VesperonPortal")
-		elseif mob == L.NameTenebron then
-			self:SendSync("TenebronPortal")
-		elseif mob == L.NameShadron then
-			self:SendSync("ShadronPortal")
-		end
-	end
+function mod:CHAT_MSG_MONSTER_YELL(msg, mob)
+    if mob == L.NameTenebron and L.YellTenebronLand and msg:find(L.YellTenebronLand, 1, true) then
+        timerTenebronWhelps:Start(49)       -- 22s Portal + 2s Eggs + 25s Hatch
+        warnTenebronWhelpsSoon:Schedule(45)
+    elseif mob == L.NameShadron and L.YellShadronLand and msg:find(L.YellShadronLand, 1, true) then
+        timerShadronPortal:Start(23)
+        warnShadronPortalSoon:Schedule(19)
+    elseif mob == L.NameVesperon and L.YellVesperonLand and msg:find(L.YellVesperonLand, 1, true) then
+        timerVesperonPortal:Start(36)
+        warnVesperonPortalSoon:Schedule(32)
+    end
 end
-mod.CHAT_MSG_MONSTER_EMOTE = mod.CHAT_MSG_RAID_BOSS_EMOTE
+
+function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, mob)
+    if msg == L.Wall or msg:find(L.Wall) then
+        self:SendSync("FireWall")
+    elseif msg == L.Portal or msg:find(L.Portal) then
+        if mob == L.NameVesperon then
+            self:SendSync("VesperonPortal")
+        elseif mob == L.NameTenebron then
+            self:SendSync("TenebronPortal")
+        elseif mob == L.NameShadron then
+            self:SendSync("ShadronPortal")
+        end
+    end
+end
 
 function mod:OnSync(event)
 	if event == "FireWall" then

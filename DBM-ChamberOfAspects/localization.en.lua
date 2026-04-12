@@ -95,18 +95,20 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	YellSarthPull	= "It is my charge to watch over these eggs. I will see you burn before any harm comes to them!",
-	Wall			= "The lava surrounding %s churns!",
-	Portal			= "%s begins to open a Twilight Portal!",
-	NameTenebron	= "Tenebron",
-	NameShadron		= "Shadron",
-	NameVesperon	= "Vesperon",
-	FireWallOn		= "Fire Wall: %s",
-	VoidZoneOn		= "Shadow Fissure: %s",
-	VoidZones		= "Shadow Fissure fails (this try): %s",
-	FireWalls		= "Fire Wall fails (this try): %s"
+    YellSarthPull    = "It is my charge to watch over these eggs. I will see you burn before any harm comes to them!",
+    Wall             = "The lava surrounding %s churns!",
+    Portal           = "%s begins to open a Twilight Portal!",
+    NameTenebron     = "Tenebron",
+    NameShadron      = "Shadron",
+    NameVesperon     = "Vesperon",
+    FireWallOn       = "Fire Wall: %s",
+    VoidZoneOn       = "Shadow Fissure: %s",
+    VoidZones        = "Shadow Fissure fails (this try): %s",
+    FireWalls        = "Fire Wall fails (this try): %s",
+	YellTenebronLand = "It is amusing to watch you struggle. Very well, witness how it is done!",
+	YellShadronLand  = "I will take pity on you, Sartharion, just this once.",
+	YellVesperonLand = "Father was right about you, Sartharion. You ARE a weakling.",
 })
-
 ------------------------
 --  The Ruby Sanctum  --
 ------------------------
