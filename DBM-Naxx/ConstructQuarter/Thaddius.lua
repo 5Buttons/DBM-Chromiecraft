@@ -2,7 +2,7 @@
 local mod	= DBM:NewMod("Thaddius", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251204210600")
+mod:SetRevision("20260502210600")
 mod:SetCreatureID(15928)
 mod:SetEncounterID(1120)
 
@@ -10,12 +10,14 @@ mod:RegisterCombat("combat_yell", L.Yell)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 28089",
+	"SPELL_CAST_SUCCESS 28134",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_AURA player"
 )
 
 local warnShiftSoon			= mod:NewPreWarnAnnounce(28089, 5, 3)
 local warnShiftCasting		= mod:NewCastAnnounce(28089, 4)
+local warnPowerSurge			= mod:NewSpecialWarningDefensive(54529, nil, nil, "Tank", 3, 2)
 --local warnThrow				= mod:NewSpellAnnounce(28338, 2)
 local warnThrowSoon			= mod:NewSoonAnnounce(28338, 1)
 
@@ -114,6 +116,13 @@ do
 			currentCharge = charge
 		end
 	end
+end
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 28134 and DBM:IsTanking("player", DBM:GetUnitIdFromCID(15929, false)) then
+		warnPowerSurge:Show()
+		warnChargeChanged:Play("defensive")
+	end	
 end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
