@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,normal25"
 
-mod:SetRevision("20260412220131")
+mod:SetRevision("20260503220131")
 mod:SetCreatureID(28860)
 mod:SetEncounterID(742)
 
@@ -32,16 +32,20 @@ local specWarnFireWall			= mod:NewSpecialWarning("WarningFireWall", nil, nil, ni
 local specWarnVesperonPortal	= mod:NewSpecialWarning("WarningVesperonPortal", false, nil, nil, 1, 7)
 local specWarnTenebronPortal	= mod:NewSpecialWarning("WarningTenebronPortal", false, nil, nil, 1, 7)
 local specWarnShadronPortal		= mod:NewSpecialWarning("WarningShadronPortal", false, nil, nil, 1, 7)
+local specWarnFissureYou    = mod:NewSpecialWarningYou(59127, nil, nil, nil, 3, 2)
+local specWarnFissureClose  = mod:NewSpecialWarningClose(59127, nil, nil, nil, 2, 8)
 
 local timerShadowFissure		= mod:NewCastTimer(5, 59128, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerBreath 				= mod:NewCDTimer(10, 58956, nil, false, "Tank|Healer", 5)
 local timerWall					= mod:NewNextTimer(25, 43113, nil, nil, nil, 2)
 
+local yellFissure           = mod:NewYellMe(59127)
+
 --Drake and Portals timings
 local timerTenebron       = mod:NewTimer(28, "TimerTenebron", 61248, nil, nil, 1)
 local timerShadron        = mod:NewTimer (68, "TimerShadron", 58105, nil, nil, 1)
 local timerVesperon       = mod:NewTimer(122, "TimerVesperon", 61251, nil, nil, 1)
-local timerTenebronWhelps = mod:NewTimer(49, "TimerTenebronWhelps", 1022)
+local timerTenebronWhelps = mod:NewTimer(51, "TimerTenebronWhelps", 1022)
 local timerShadronPortal  = mod:NewTimer(23, "TimerShadronPortal", 11420)
 local timerVesperonPortal = mod:NewTimer(36, "TimerVesperonPortal", 57988)
 
@@ -150,11 +154,19 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(57579, 59127) then
-		warnShadowFissure:Show()
-		warnShadowFissure:Play("watchstep")
-		timerShadowFissure:Start()
-	end
+    if args:IsSpellID(57579, 59127) then
+        if args:IsPlayer() then
+            specWarnFissureYou:Show()
+            specWarnFissureYou:Play("watchfeet")
+            yellFissure:Yell()
+        elseif self:CheckNearby(8, args.destName) then
+            specWarnFissureClose:Show(args.destName)
+            specWarnFissureClose:Play("watchfeet")
+        end
+        warnShadowFissure:Show()
+        warnShadowFissure:Play("watchstep")
+        timerShadowFissure:Start()
+    end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
@@ -173,8 +185,8 @@ end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg, mob)
     if mob == L.NameTenebron and L.YellTenebronLand and msg:find(L.YellTenebronLand, 1, true) then
-        timerTenebronWhelps:Start(49)       -- 22s Portal + 2s Eggs + 25s Hatch
-        warnTenebronWhelpsSoon:Schedule(45)
+        timerTenebronWhelps:Start(51)       -- 22s Portal + 2s Eggs + 25s Hatch
+        warnTenebronWhelpsSoon:Schedule(46)
     elseif mob == L.NameShadron and L.YellShadronLand and msg:find(L.YellShadronLand, 1, true) then
         timerShadronPortal:Start(23)
         warnShadronPortalSoon:Schedule(19)
@@ -195,6 +207,9 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, mob)
         elseif mob == L.NameShadron then
             self:SendSync("ShadronPortal")
         end
+    elseif L.TenebronHatch and msg:find(L.TenebronHatch, 1, true) then
+        timerTenebronWhelps:Start(27)
+        warnTenebronWhelpsSoon:Schedule(23)
     end
 end
 
