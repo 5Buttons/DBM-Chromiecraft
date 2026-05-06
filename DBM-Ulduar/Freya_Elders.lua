@@ -20,7 +20,7 @@ local specWarnGroundTremor		= mod:NewSpecialWarningCast(62932, "SpellCaster", ni
 
 local timerImpale				= mod:NewTargetTimer(5, 62928, nil, "Healer|Tank", nil, 5)
 
-mod:AddBoolOption("TrashRespawnTimer", true, "timer")
+--mod:AddBoolOption("TrashRespawnTimer", true, "timer")
 
 -- Trash: 33430 Guardian Lasher (flower)
 -- 33355 (nymph)
@@ -60,11 +60,11 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-function mod:UNIT_DIED(args)
+--[[function mod:UNIT_DIED(args)
 	if self.Options.TrashRespawnTimer and not DBT:GetBar(L.TrashRespawnTimer) then
 		local guid = tonumber(args.destGUID:sub(9, 12), 16)
 		if guid == 33430 or guid == 33355 or guid == 33354 then		-- guardian lasher / nymph / tree
 			DBT:CreateBar(7200, L.TrashRespawnTimer)
 		end
 	end
-end
+end]]
