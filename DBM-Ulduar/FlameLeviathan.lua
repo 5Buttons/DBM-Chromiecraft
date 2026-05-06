@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("FlameLeviathan", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20260506220131")
 
 mod:SetCreatureID(33113)
 mod:SetEncounterID(744)
@@ -27,8 +27,8 @@ local specWarnPursue			= mod:NewSpecialWarning("SpecialPursueWarnYou", nil, nil,
 
 local timerSystemOverload		= mod:NewBuffActiveTimer(20, 62475, nil, nil, nil, 6)
 local timerFlameVents			= mod:NewCastTimer(10, 62396, nil, nil, nil, 2, nil, DBM_COMMON_L.INTERRUPT_ICON)
-local timertFlameVentsCD		= mod:NewCDTimer(19.7, 62396, nil, nil, nil, 2) -- ~0.5s variance (S3 FM Log review 2022/07/17 || 25m Lordaeron 2022/10/30) - 0.1, 20.0, 20.0, 20.1, 20.0, 20.3 || 20.3, 19.7, 20.0, 20.1
-local timerPursued				= mod:NewTargetTimer(30, 62374, nil, nil, nil, 3) -- Variance dependent on whether boss is pulled right after gate opens or not. Corrected using count. S3 FM Log review 2022/07/17 - 0.1, 11.0, 19.0, 30.0, 30.0, 30.0
+local timertFlameVentsCD		= mod:NewCDTimer(20, 62396, nil, nil, nil, 2)
+local timerPursued				= mod:NewTargetTimer(31, 62374, nil, nil, nil, 3)
 
 -- Hard Mode
 mod:AddTimerLine(DBM_COMMON_L.HEROIC_ICON..DBM_CORE_L.HARD_MODE)
