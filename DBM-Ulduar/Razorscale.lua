@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Razorscale", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260506220131")
+mod:SetRevision("20260507220131")
 mod:SetCreatureID(33186)
 mod:SetEncounterID(746)
 
@@ -33,10 +33,10 @@ local specWarnDevouringFlameNear	= mod:NewSpecialWarningClose(64733, false, nil,
 local yellDevouringFlame			= mod:NewYell(64733)
 
 --Harpoons
-local timerTurret1					= mod:NewTimer(38, "timerTurret1", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
-local timerTurret2					= mod:NewTimer(65, "timerTurret2", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
-local timerTurret3					= mod:NewTimer(92, "timerTurret3", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
-local timerTurret4					= mod:NewTimer(119, "timerTurret4", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret1					= mod:NewTimer(40, "timerTurret1", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret2					= mod:NewTimer(67, "timerTurret2", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret3					= mod:NewTimer(94, "timerTurret3", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret4					= mod:NewTimer(121, "timerTurret4", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
 
 -- Stage Two
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2))
@@ -45,7 +45,7 @@ local warnFuseArmor					= mod:NewStackAnnounce(64771, 2, nil, "Tank")
 local specWarnFuseArmor				= mod:NewSpecialWarningStack(64771, nil, 2, nil, nil, 1, 6)
 local specWarnFuseArmorOther		= mod:NewSpecialWarningTaunt(64771, nil, nil, nil, 1, 2)
 
-local timerDeepBreathCooldown		= mod:NewCDTimer(20.1, 64021, nil, nil, nil, 5)
+local timerDeepBreathCooldown		= mod:NewCDTimer(20, 64021, nil, nil, nil, 5) --20s on AC
 local timerDeepBreathCast			= mod:NewCastTimer(2.5, 64021)
 local timerGrounded					= mod:NewTimer(45, "timerGrounded", nil, nil, nil, 6)
 local timerFuseArmorCD				= mod:NewCDTimer(10.1, 64771, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)
@@ -80,10 +80,10 @@ function mod:OnCombatStart(delay)
 	else
 		warnTurretsReadySoon:Schedule(34-delay)
 		warnTurretsReady:Schedule(37-delay)
-		timerTurret1:Start(-delay) -- 38s
-		timerTurret2:Start(-delay) -- 65s
-		timerTurret3:Start(-delay) -- 92s
-		timerTurret4:Start(-delay) -- 119s
+		timerTurret1:Start(-delay)
+		timerTurret2:Start(-delay)
+		timerTurret3:Start(-delay)
+		timerTurret4:Start(-delay)
 	end
 end
 
@@ -147,6 +147,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(emote)
 		timerTurret4:Stop()
 		timerGrounded:Stop()
 		timerFuseArmorCD:Start(12)
+		timerDeepBreathCooldown:Start()
 	end
 end
 
