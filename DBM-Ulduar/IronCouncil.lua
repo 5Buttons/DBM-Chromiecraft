@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IronCouncil", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20260507220131")
 mod:SetCreatureID(32867, 32927, 32857)
 mod:SetEncounterID(748)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -11,7 +11,7 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 61920 63479 61879 61903 63493 62274 63489 62273 61973",
 	"SPELL_CAST_SUCCESS 63490 62269 61869 63481",
-	"SPELL_AURA_APPLIED 61903 63493 62269 63490 62277 63967 64637 61888 63486 61887 61912 63494 63483 61915",
+	"SPELL_AURA_APPLIED 61903 61920 63493 62269 63490 62277 63967 64637 61888 63486 61887 61912 63494 63483 61915",
 	"SPELL_AURA_REMOVED 64637 61888 63483 61915 61912 63494",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED boss2"
@@ -38,7 +38,7 @@ local specwarnOverload			= mod:NewSpecialWarningRun(63481, nil, nil, nil, 4, 2)
 local specWarnLightningWhirl	= mod:NewSpecialWarningInterrupt(63483, "HasInterrupt", nil, nil, 1, 2)
 
 local timerOverload				= mod:NewCastTimer(6, 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON)
-local timerOverloadCD			= mod:NewCDTimer(60, 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON, nil, 1)
+local timerOverloadCD			= mod:NewCDTimer("v25-40", 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON, nil, 1) --25-40s variance on AC
 local timerLightningWhirl		= mod:NewCastTimer(5, 63483, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
 local timerLightningWhirlCD		= mod:NewCDTimer(32, 63483)
 local timerLightningTendrils	= mod:NewBuffActiveTimer(35, 63486, nil, nil, nil, 6)
@@ -96,7 +96,7 @@ end
 function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
 	timerRuneofPowerCD:Start(20-delay) -- One log review (2022/07/05)
-	timerOverloadCD:Start(68) -- REVIEW! Insufficent data to validate if it's correct
+	timerOverloadCD:Start(-delay) -- 20-40s variance on AC
 	table.wipe(disruptTargets)
 	self.vb.disruptIcon = 7
 	runemasterAlive = true
@@ -172,6 +172,8 @@ function mod:SPELL_AURA_APPLIED(args)
 		specWarnRuneofShields:Show(args.destName)
 		specWarnRuneofShields:Play("dispelboss")
 		timerRuneofShields:Start()
+	elseif args:IsSpellID(61920) then --Supercharge REVIEW
+		warnSupercharge:Show()
 	elseif args:IsSpellID(64637, 61888) then	-- Overwhelming Power
 		warnOverwhelmingPower:Show(args.destName)
 		if args:IsPlayer() then
