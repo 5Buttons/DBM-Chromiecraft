@@ -27,7 +27,7 @@ local timerFlameJetsCooldown	= mod:NewCDTimer(40, 63472, nil, nil, nil, 2, nil, 
 local timerActivateConstruct	= mod:NewCDCountTimer(38, 62488, nil, nil, nil, 1, nil, nil, true)
 
 local timerScorchCast			= mod:NewCastTimer(3, 63473)
-local timerScorchCooldown		= mod:NewCDTimer(26, 63473, nil, nil, nil, 5)
+local timerScorchCooldown		= mod:NewCDTimer(20, 63473, nil, nil, nil, 5)
 
 
 local timerSlagPot				= mod:NewTargetTimer(10, 63477, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
@@ -52,16 +52,15 @@ end
 function mod:GrabDelay()
 	timerScorchCooldown:AddTime(6)
 	timerFlameJetsCooldown:AddTime(6)
-	timerActivateConstruct:AddTime(6)
 	self:ScheduleMethod(24, "GrabDelay")
 end
 
 function mod:OnCombatStart(delay)
 	self.vb.ConstructCount = 0
 	timerAchieve:Start()
-	timerActivateConstruct:Start(36-delay, 1)
+	timerActivateConstruct:Start(39-delay, 1)
 	timerScorchCooldown:Start(10-delay)
-	timerFlameJetsCooldown:Start(40-delay)
+	timerFlameJetsCooldown:Start(32-delay)
 	self:ScheduleMethod(27-delay, "GrabDelay")
 end
 
@@ -78,7 +77,7 @@ function mod:SPELL_CAST_START(args)
 		else
 			specWarnFlameJetsCast:Play("stopcast")
 		end
-		timerFlameJetsCooldown:Start(self:IsDifficulty("normal10") and 31 or 31)
+		timerFlameJetsCooldown:Start(self:IsDifficulty("normal10") and 25 or 25)
 	elseif args.spellId == 62488 then			-- Activate Construct
 		self.vb.ConstructCount = self.vb.ConstructCount + 1
 		warnConstruct:Show(self.vb.ConstructCount)
@@ -91,7 +90,7 @@ end
 function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(62548, 63474) then		-- Scorch
 		timerScorchCast:Start()
-		timerScorchCooldown:Start(self:IsDifficulty("normal10") and 26 or 26)
+		timerScorchCooldown:Start(self:IsDifficulty("normal10") and 20 or 20)
 	end
 end
 
