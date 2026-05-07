@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Auriaya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20260507220131")
 
 mod:SetCreatureID(33515)
 mod:SetEncounterID(750)
@@ -26,11 +26,11 @@ local specWarnVoid		= mod:NewSpecialWarningMove(64675, nil, nil, nil, 1, 2)
 local specWarnSonic		= mod:NewSpecialWarningMoveTo(64688, nil, nil, nil, 2, 2)
 
 local enrageTimer		= mod:NewBerserkTimer(600)
-local timerDefender		= mod:NewNextCountTimer(30, 64447, nil, nil, nil, 1) -- First timer is time for boss spellcast, afterwards is time to revive
+local timerDefender		= mod:NewNextCountTimer(25, 64447, nil, nil, nil, 1) -- 25s on AC
 local timerFear			= mod:NewCastTimer(64386, nil, nil, nil, 4)
-local timerFearCD		= mod:NewCDTimer(27.7, 64386, nil, nil, nil, 4, nil, nil, true) -- REVIEW! ~9s variance [27.7-36.3]. Added "Keep" arg (25m Frostmourne 2022/09/07 || 25m Lordaeron 2022/10/09 || 25m Lordaeron 2022/10/30) - 33.8, 34.3, 32.6 || 34.5, 36.3, 29.1 || 30.4, 28.9, 27.8, 32.4
-local timerSwarmCD		= mod:NewCDTimer(31.8, 64396, nil, nil, nil, 1, nil, nil, true) -- REVIEW! ~4s variance? Added "Keep" arg (25m Frostmourne 2022/09/07 || 25m Lordaeron 2022/10/09) - 34.5, 32.3 || 31.8
-local timerSonicCD		= mod:NewCDTimer(27.2, 64688, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON, true) -- REVIEW! ~10s variance [27.2-37.2]. Added "Keep" arg (10m Frostmourne 2022/08/09 || 25m Frostmourne 2022/09/07 || 25m Lordaeron 2022/10/09 || 25m Lordaeron 2022/10/30) - 28.7, 35.4, 37.2 || 30.8, 29.5 || 32.9, 33.4 || 35.1, 27.2, 31.3
+local timerFearCD		= mod:NewCDTimer(35, 64386, nil, nil, nil, 4, nil, nil, true) -- 35s on AC
+local timerSwarmCD		= mod:NewCDTimer(40, 64396, nil, nil, nil, 1, nil, nil, true) 
+local timerSonicCD		= mod:NewCDTimer(50, 64688, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON, true) --50s on AC
 local timerSonic		= mod:NewCastTimer(64688, nil, nil, nil, 2)
 
 mod:GroupSpells(64447, 64455) -- Activate Feral Defender, Feral Essence
@@ -40,9 +40,10 @@ mod.vb.catLives = 9
 function mod:OnCombatStart(delay)
 	self.vb.catLives = 9
 	enrageTimer:Start(-delay)
-	timerFearCD:Start(34.9-delay) -- 18s variance! REVIEW: 25m ~35s, 10m ~50s?? (2022/07/08 10m Lord transcriptor log || 2021 S2 cleu 25m, 10m || VOD review || 10m Frostmourne 2022/08/09 || 25m Lordaeron 2022/10/09 || 25m Lordaeron 2022/10/30) - 53 || 35, 50 || 35, 36 || 34.9 || 34.9 || 35.1
-	timerSonicCD:Start(63-delay) -- 33s variance! (... ||| 10m Frostmourne 2022/08/09 || 25m Frostmourne 2022/09/07 || 25m Lordaeron 2022/10/09 || 25m Lordaeron 2022/10/30) 81, 61, 94... ||| 63.0 || 63.0 || 63.0 || 63.0
-	timerDefender:Start(59.9-delay, self.vb.catLives)
+	timerFearCD:Start(35-delay) --35s on AC
+	timerSonicCD:Start(45-delay) --45s on AC
+	timerSwarmCD:Start(70-delay) --70s on AC
+	timerDefender:Start(60-delay, self.vb.catLives)
 end
 
 function mod:SPELL_CAST_START(args)
@@ -54,7 +55,7 @@ function mod:SPELL_CAST_START(args)
 		specWarnFear:Play("fearsoon")
 		timerFear:Start()
 		timerFearCD:Schedule(2)
-		warnFearSoon:Schedule(34)
+		warnFearSoon:Schedule(30)
 	elseif args:IsSpellID(64688, 64422) then --Sonic Screech
 		specWarnSonic:Show(TANK)
 		specWarnSonic:Play("gathershare")
