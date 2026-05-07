@@ -57,7 +57,7 @@ local specwarnRuneofDeath		= mod:NewSpecialWarningMove(63490, nil, nil, nil, 1, 
 local specWarnRuneofShields		= mod:NewSpecialWarningDispel(62274, "MagicDispeller", nil, nil, 1, 2)
 
 local timerRuneofShields		= mod:NewBuffActiveTimer(15, 62274, nil, nil, nil, 5, nil, DBM_COMMON_L.MAGIC_ICON)
-local timerRuneofDeath			= mod:NewCDTimer(30, 63490, nil, nil, nil, 3)
+local timerRuneofDeath			= mod:NewCDTimer("v30-40", 63490, nil, nil, nil, 3)
 local timerRuneofPowerCast		= mod:NewCastTimer(1.5, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)  -- One log review (2022/07/05) - 60.0
 local timerRuneofPowerCD		= mod:NewCDTimer(60, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)  -- One log review (2022/07/05) - 60.0
 local timerRuneofSummoning		= mod:NewCDTimer(30, 62273, nil, nil, nil, 1)
@@ -124,7 +124,7 @@ end
 function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
 	if spellId == 61920 then -- Supercharge - Unleashes one last burst of energy as the caster dies, increasing all allies damage by 25% and granting them an additional ability.
-		warnSupercharge:Show()
+		warnSupercharge:Show()   --doesnt fire on AC 
 	elseif args:IsSpellID(63479, 61879) then	-- Chain light
 		warnChainlight:Show()
 	elseif args:IsSpellID(61903, 63493) then	-- Fusion Punch
@@ -234,7 +234,7 @@ function mod:UNIT_DIED(args)
 	if cid == 32867 then		--Steelbreaker
 		steelbreakerAlive = false
 		if runemasterAlive and brundirAlive then
-			timerRuneofDeath:Start()
+			timerRuneofDeath:Start(35)
 			warnRuneofDeathIn10Sec:Schedule(20)
 			timerLightningWhirlCD:Start()
 		elseif runemasterAlive then
@@ -253,7 +253,7 @@ function mod:UNIT_DIED(args)
 	elseif cid == 32857 then	--Stormcaller Brundir
 		brundirAlive = false
 		if runemasterAlive and steelbreakerAlive then
-			timerRuneofDeath:Start()
+			timerRuneofDeath:Start(35)
 			warnRuneofDeathIn10Sec:Schedule(20)
 		elseif runemasterAlive then
 			timerRuneofSummoning:Start(25)
