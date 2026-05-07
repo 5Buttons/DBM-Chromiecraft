@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Hodir", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20260507220131")
 mod:SetCreatureID(32845,32926)
 mod:SetEncounterID(751)
 mod:SetUsedIcons(7, 8)
@@ -38,7 +38,7 @@ function mod:OnCombatStart(delay)
 	self.vb.stormCloudIcon = 8
 	enrageTimer:Start(-delay)
 	timerAchieve:Start()
-	timerFlashFrCD:Start(63-delay) -- REVIEW! Need more logs to validate variance (25 man log review (2022/07/10) || S2 VOD review) - 66.7 || 63, 65
+	timerFlashFrCD:Start(48-delay) -- REVIEW! Need more logs to validate variance (25 man log review (2022/07/10) || S2 VOD review) - 66.7 || 63, 65
 end
 
 function mod:SPELL_CAST_START(args)
