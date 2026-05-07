@@ -11,10 +11,10 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 61920 63479 61879 61903 63493 62274 63489 62273 61973",
 	"SPELL_CAST_SUCCESS 63490 62269 61869 63481",
-	"SPELL_AURA_APPLIED 61903 61920 63493 62269 63490 62277 63967 64637 61888 63486 61887 61912 63494 63483 61915",
+	"SPELL_AURA_APPLIED 61903 63489 61920 63493 62269 63490 62277 63967 64637 61888 63486 61887 61912 63494 63483 61915",
 	"SPELL_AURA_REMOVED 64637 61888 63483 61915 61912 63494",
 	"UNIT_DIED",
-	"UNIT_SPELLCAST_SUCCEEDED boss2"
+	"UNIT_SPELLCAST_SUCCEEDED"
 )
 
 mod:SetBossHealthInfo(
@@ -95,7 +95,7 @@ end
 
 function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
-	timerRuneofPowerCD:Start(20-delay) -- One log review (2022/07/05)
+	timerRuneofPowerCD:Start(30-delay) -- 30s on AC
 	timerOverloadCD:Start(-delay) -- 20-40s variance on AC
 	table.wipe(disruptTargets)
 	self.vb.disruptIcon = 7
@@ -168,7 +168,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			specwarnRuneofDeath:Show()
 			specwarnRuneofDeath:Play("runaway")
 		end
-	elseif args:IsSpellID(62277, 63967) and not args:IsDestTypePlayer() then		-- Shield of Runes
+	elseif args:IsSpellID(62277, 63967, 63489) and not args:IsDestTypePlayer() then		-- Shield of Runes
 		specWarnRuneofShields:Show(args.destName)
 		specWarnRuneofShields:Play("dispelboss")
 		timerRuneofShields:Start()
