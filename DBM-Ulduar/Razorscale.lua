@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Razorscale", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260507220131")
+mod:SetRevision("20260508220131")
 mod:SetCreatureID(33186)
 mod:SetEncounterID(746)
 
@@ -73,17 +73,17 @@ function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
 	combattime = GetTime()
 	if self:IsDifficulty("normal10") then -- REVIEW: No log yet to validate 10-man timers.
-		warnTurretsReadySoon:Schedule(53-delay)
-		warnTurretsReady:Schedule(73-delay)
+		warnTurretsReadySoon:Schedule(101-delay)
+		warnTurretsReady:Schedule(121-delay)
 		timerTurret1:Start(-delay)
 		timerTurret2:Start(-delay)
 	else
 		warnTurretsReadySoon:Schedule(34-delay)
 		warnTurretsReady:Schedule(37-delay)
-		timerTurret1:Start(-delay)
-		timerTurret2:Start(-delay)
-		timerTurret3:Start(-delay)
-		timerTurret4:Start(-delay)
+		timerTurret1:Start(-delay) -- ~40s
+		timerTurret2:Start(-delay) -- +27
+		timerTurret3:Start(-delay) -- +27
+		timerTurret4:Start(-delay) -- +27
 	end
 end
 
@@ -160,8 +160,8 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 			timerTurret2:Start(57)
 		else
 
-			warnTurretsReadySoon:Schedule(27)
-			warnTurretsReady:Schedule(30)
+			warnTurretsReadySoon:Schedule(91)
+			warnTurretsReady:Schedule(111)
 			timerTurret1:Start(30)
 			timerTurret2:Start(57)
 			timerTurret3:Start(84)
