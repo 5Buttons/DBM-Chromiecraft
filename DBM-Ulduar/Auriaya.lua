@@ -28,7 +28,7 @@ local specWarnSonic		= mod:NewSpecialWarningMoveTo(64688, nil, nil, nil, 2, 2)
 local enrageTimer		= mod:NewBerserkTimer(600)
 local timerDefender		= mod:NewNextCountTimer(25, 64447, nil, nil, nil, 1) -- 25s on AC
 local timerFear			= mod:NewCastTimer(64386, nil, nil, nil, 4)
-local timerFearCD		= mod:NewCDTimer(35, 64386, nil, nil, nil, 4, nil, nil, true) -- 35s on AC
+local timerFearCD		= mod:NewCDTimer(35, 64386, nil, nil, nil, 4, nil, nil, nil) -- 35s on AC
 local timerSwarmCD		= mod:NewCDTimer(40, 64396, nil, nil, nil, 1, nil, nil, true) 
 local timerSonicCD		= mod:NewCDTimer(50, 64688, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON, true) --50s on AC
 local timerSonic		= mod:NewCastTimer(64688, nil, nil, nil, 2)
@@ -40,10 +40,10 @@ mod.vb.catLives = 9
 function mod:OnCombatStart(delay)
 	self.vb.catLives = 9
 	enrageTimer:Start(-delay)
-	timerFearCD:Start(35-delay) --35s on AC
-	timerSonicCD:Start(45-delay) --45s on AC
-	timerSwarmCD:Start(70-delay) --70s on AC
-	timerDefender:Start(60-delay, self.vb.catLives)
+	timerFearCD:Start(35-delay)
+	timerSonicCD:Start(50-delay)
+	timerSwarmCD:Start(75-delay)
+	timerDefender:Start(65-delay, self.vb.catLives)
 end
 
 function mod:SPELL_CAST_START(args)
