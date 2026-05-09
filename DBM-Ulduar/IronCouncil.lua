@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IronCouncil", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260507220131")
+mod:SetRevision("20260509220131")
 mod:SetCreatureID(32867, 32927, 32857)
 mod:SetEncounterID(748)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -47,7 +47,7 @@ mod:AddBoolOption("AlwaysWarnOnOverload", false, "announce", nil, nil, nil, 6348
 -- Runemaster Molgeim
 -- Lightning Blast ... don't know, maybe 63491
 mod:AddTimerLine(L.RunemasterMolgeim)
-local warnRuneofPower			= mod:NewTargetNoFilterAnnounce(64320, 2)
+local warnRuneofPower			= mod:NewSpellAnnounce(64320, 2)
 local warnRuneofDeathIn10Sec	= mod:NewSoonAnnounce(63490, 3)
 local warnRuneofDeath			= mod:NewSpellAnnounce(63490, 2)
 local warnShieldofRunes			= mod:NewSpellAnnounce(62274, 2)
@@ -110,10 +110,10 @@ function mod:OnCombatEnd()
 	end
 end
 
-function mod:RuneTarget(targetname)
+--[[function mod:RuneTarget(targetname) --no target indication on AC only UNIT_SPELLCAST_SUCCEEDED 
 	if not targetname then return end
 	warnRuneofPower:Show(targetname)
-end
+	end]]
 
 local function warnStaticDisruptionTargets(self)
 	warnStaticDisruption:Show(table.concat(disruptTargets, "<, >"))
@@ -266,6 +266,7 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	if spellName == GetSpellInfo(61973) then	-- Rune of Power
+		warnRuneofPower:Show()
 		timerRuneofPowerCD:Start()
 	end
 end
