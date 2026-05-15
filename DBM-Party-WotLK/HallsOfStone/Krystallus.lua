@@ -14,7 +14,7 @@ mod:RegisterEventsInCombat(
 local specWarningShatter	= mod:NewSpecialWarningMoveAway(50810, nil, nil, nil, 1, 2)
 local timerGroundSlamCD		= mod:NewCDTimer(20, 50833, nil, nil, nil, 3)
 
-mod:AddRangeFrameOption("10")
+mod:AddRangeFrameOption("20")
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	if spellName == GetSpellInfo(50827) and self:AntiSpam(5, 2) then  -- Ground Slam
@@ -22,7 +22,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 		specWarningShatter:Play("scatter")
 		timerGroundSlamCD:Start()
 		if self.Options.RangeFrame then
-			DBM.RangeCheck:Show(10)
+			DBM.RangeCheck:Show(20)
 		end
 		elseif spellName == GetSpellInfo(50810) and self:AntiSpam(5, 3) then  -- Shatter
 		if self.Options.RangeFrame then
