@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Freya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260509220131")
+mod:SetRevision("20260501820131")
 
 mod:SetCreatureID(32906)
 mod:SetEncounterID(753)
@@ -43,10 +43,10 @@ local specWarnLifebinder		= mod:NewSpecialWarningSwitch(62869, "Dps", nil, nil, 
 local specWarnNatureFury		= mod:NewSpecialWarningMoveAway(63571, nil, nil, nil, 1, 2)
 local yellNatureFury			= mod:NewYell(63571)
 
-local timerAlliesOfNature		= mod:NewNextTimer(60, 62678, nil, nil, nil, 1, 62947, DBM_COMMON_L.IMPORTANT_ICON..DBM_COMMON_L.DAMAGE_ICON) -- REVIEW! From retail: No longer has CD, they spawn instant last set is dead, and not a second sooner, except first set; 60s log reviewed (25 man HM log 2022/07/17)
-local timerSimulKill			= mod:NewTimer(12, "TimerSimulKill", nil, nil, nil, 5, DBM_COMMON_L.DAMAGE_ICON, nil, nil, nil, nil, nil, nil, 62678)
-local timerNatureFury			= mod:NewTargetTimer(7.9, 63571, nil, nil, nil, 3) -- ~5s variance (25 man HM log 2022/07/17) - 13.6, 7.9, 8.8, 11.7, 11.7, 12.9, 11.4
-local timerLifebinderCD			= mod:NewCDTimer(45, 62584, nil, nil, nil, 1, nil, DBM_COMMON_L.IMPORTANT_ICON) --first 30s repeart 45s on AC
+local timerAlliesOfNature		= mod:NewNextTimer(60, 62678, nil, nil, nil, 1, 62947, DBM_COMMON_L.IMPORTANT_ICON..DBM_COMMON_L.DAMAGE_ICON) --60s on AC
+local timerSimulKill			= mod:NewTimer(10, "TimerSimulKill", nil, nil, nil, 5, DBM_COMMON_L.DAMAGE_ICON, nil, nil, nil, nil, nil, nil, 62678) --10s on AC
+local timerNatureFury			= mod:NewTargetTimer(14, 63571, nil, nil, nil, 3) -- 14s on AC
+local timerLifebinderCD			= mod:NewCDTimer(45, 62584, nil, nil, nil, 1, nil, DBM_COMMON_L.IMPORTANT_ICON) --first 30s repeat 45s on AC
 
 mod:AddRangeFrameOption(8, 63571)
 mod:AddSetIconOption("SetIconOnFury", 63571, false, false, {7, 8})
@@ -57,12 +57,11 @@ local warnPhase2				= mod:NewPhaseAnnounce(2, 3, nil, nil, nil, nil, nil, 2)
 
 local specWarnNatureBombSummon	= mod:NewSpecialWarningMove(64604) -- Nature Bomb (Summon) - Move away from area of effect when Nature Bomb is summoned
 
-local timerNextNatureBombSummon	= mod:NewNextTimer(2, 64604, nil, nil, nil, 2) -- Nature Bomb (Summon), estimated from first explosion. REVIEW! Has variance (2s?)
-local timerNatureBombExplosion	= mod:NewCastTimer(10, 64587, 34539, nil, nil, 2) -- On explosion, not on summon. Applied a Explosion text. REVIEW! 2s variance from first explosion from the set to the first explosion from the next set (S3 HM log 2022/07/22) - 11, 10.3, 11.9, 11.2, 10.4, 11.3, 10.5
+local timerNextNatureBombSummon	= mod:NewNextTimer(18, 64604, nil, nil, nil, 2) -- 18s on AC
+local timerNatureBombExplosion	= mod:NewCastTimer(11, 64587, 34539, nil, nil, 2) -- On explosion, not on summon. Applied a Explosion text. REVIEW! 2s variance from first explosion from the set to the first explosion from the next set (S3 HM log 2022/07/22) - 11, 10.3, 11.9, 11.2, 10.4, 11.3, 10.5
 
 -- Hard Mode
 mod:AddTimerLine(DBM_COMMON_L.HEROIC_ICON..DBM_CORE_L.HARD_MODE)
-local warnUnstableBeamSoon		= mod:NewSoonAnnounce(62865, 3) -- Hard mode Sun Beam Elder Brightleaf Alive
 local warnIronRoots				= mod:NewTargetNoFilterAnnounce(62438, 2) -- Hard mode Elder Ironbranch Alive
 
 local yellIronRoots				= mod:NewYell(62438)
@@ -71,7 +70,6 @@ local specWarnUnstableBeam		= mod:NewSpecialWarningMove(62865, nil, nil, nil, 1,
 
 local timerGroundTremorCD		= mod:NewCDTimer("v25-35", 62859, nil, nil, nil, 2) -- 25-35s variance on AC
 local timerIronRootsCD			= mod:NewCDTimer("v45-55", 62438, nil, nil, nil, 3) -- 45-55s variance on AC
-local timerUnstableBeamCD		= mod:NewCDTimer("v38-48", 62865, nil, nil, nil, 2, nil, nil, true) -- Hard mode Sun Beam. 38-48s variance on AC
 
 mod:AddSetIconOption("SetIconOnRoots", 62438, false, false, {6, 5, 4})
 
@@ -149,17 +147,14 @@ function mod:SPELL_CAST_SUCCESS(args)
 		if self:AntiSpam(5, 64650) and self:IsInCombat() then
 			specWarnNatureBombSummon:Cancel()
 			specWarnNatureBombSummon:Schedule(4) -- delay to max possible time to avoid warning before bombs are thrown
-			timerNextNatureBombSummon:Start()
+			timerNextNatureBombSummon:Start(6)
 			timerNatureBombExplosion:Start()
 		end
 	elseif spellId == 63601 then -- Strengthened Iron Roots
-		DBM:AddMsg("Strengthened Iron Roots unhidden from combat log. Notify Zidras on Discord or GitHub") -- REVIEW! Strengthened Iron Roots never fired on Warmane. Instead there is only an emote event.
+		DBM:AddMsg("Strengthened Iron Roots unhidden from combat log. Notify Fivebuttons on Discord or GitHub")
 		--if self.vb.phase == 2 then
-			timerIronRootsCD:Start()
+		timerIronRootsCD:Start()
 		--end
-	elseif args:IsSpellID(62451, 62865) and self:AntiSpam(5, 2) then -- Unstable Energy (Sun Beam)
-		timerUnstableBeamCD:Start()
-		warnUnstableBeamSoon:Schedule(12)
 	end
 end
 
@@ -236,8 +231,6 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self.vb.isHardMode = true
 		timerGroundTremorCD:Start(35) --35s on AC
 		timerIronRootsCD:Start(20) -- 20s on AC
-		timerUnstableBeamCD:Start(60) -- 60s on AC
-		warnUnstableBeamSoon:Schedule(7.7)
 	elseif msg == L.SpawnYell then
 		timerAlliesOfNature:Start()
 		if self.Options.HealthFrame then
