@@ -147,7 +147,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		if self:AntiSpam(5, 64650) and self:IsInCombat() then
 			specWarnNatureBombSummon:Cancel()
 			specWarnNatureBombSummon:Schedule(4) -- delay to max possible time to avoid warning before bombs are thrown
-			timerNextNatureBombSummon:Start(6)
+			timerNextNatureBombSummon:Start()
 			timerNatureBombExplosion:Start()
 		end
 	elseif spellId == 63601 then -- Strengthened Iron Roots
