@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ignis", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260506000000")
+mod:SetRevision("20260524000000")
 mod:SetCreatureID(33118)
 mod:SetEncounterID(745)
 mod:SetUsedIcons(8)
@@ -9,7 +9,7 @@ mod:SetUsedIcons(8)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START 62680 63472 62488",
+	"SPELL_CAST_START 62680 63472 62488 62546 63473",
 	"SPELL_CAST_SUCCESS 62548 63474",
 	"SPELL_AURA_APPLIED 62717 63477 62382",
 	"SPELL_AURA_REMOVED 62717 63477"
@@ -49,27 +49,16 @@ local function isBuffOwner(uId, spellId)
 	end
 end
 
-function mod:GrabDelay()
-	timerScorchCooldown:AddTime(6)
-	timerFlameJetsCooldown:AddTime(6)
-	self:ScheduleMethod(24, "GrabDelay")
-end
-
 function mod:OnCombatStart(delay)
 	self.vb.ConstructCount = 0
 	timerAchieve:Start()
-	timerActivateConstruct:Start(39-delay, 1)
+	timerActivateConstruct:Start(36-delay, 1)
 	timerScorchCooldown:Start(10-delay)
 	timerFlameJetsCooldown:Start(32-delay)
-	self:ScheduleMethod(27-delay, "GrabDelay")
-end
-
-function mod:OnCombatEnd()
-	self:UnscheduleMethod("GrabDelay")
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(62680, 63472) then		-- Flame Jets
+	if args:IsSpellID(62680, 63472) then			-- Flame Jets
 		timerFlameJetsCast:Start()
 		specWarnFlameJetsCast:Show()
 		if self.Options.soundConcAuraMastery and isBuffOwner("player", 19746) then
@@ -77,25 +66,28 @@ function mod:SPELL_CAST_START(args)
 		else
 			specWarnFlameJetsCast:Play("stopcast")
 		end
-		timerFlameJetsCooldown:Start(self:IsDifficulty("normal10") and 25 or 25)
-	elseif args.spellId == 62488 then			-- Activate Construct
+		timerFlameJetsCooldown:Start(25)
+	elseif args.spellId == 62488 then				-- Activate Construct
 		self.vb.ConstructCount = self.vb.ConstructCount + 1
 		warnConstruct:Show(self.vb.ConstructCount)
 		if self.vb.ConstructCount < 20 then
-			timerActivateConstruct:Start(self:IsDifficulty("normal10") and 38 or 38, self.vb.ConstructCount+1)
+			timerActivateConstruct:Start(38, self.vb.ConstructCount+1)
 		end
+	elseif args:IsSpellID(62546, 63473) then		-- Scorch cast begin
+		timerScorchCast:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(62548, 63474) then		-- Scorch
-		timerScorchCast:Start()
-		timerScorchCooldown:Start(self:IsDifficulty("normal10") and 20 or 20)
+	if args:IsSpellID(62548, 63474) then			-- Scorch channel end
+		timerScorchCooldown:Start(20)
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(62717, 63477) then		-- Slag Pot
+	if args:IsSpellID(62717, 63477) then			-- Slag Pot
+		timerFlameJetsCooldown:AddTime(6)
+		timerScorchCooldown:AddTime(6)
 		warnSlagPot:Show(args.destName)
 		timerSlagPot:Start(args.destName)
 		if self.Options.SlagPotIcon then
@@ -108,7 +100,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(62717, 63477) then		-- Slag Pot
+	if args:IsSpellID(62717, 63477) then			-- Slag Pot
 		if self.Options.SlagPotIcon then
 			self:SetIcon(args.destName, 0)
 		end
