@@ -270,7 +270,7 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnSimulKill		= "First add down - Resurrection in ~12 seconds"
+	WarnSimulKill		= "First add down - Resurrection in 10 seconds"
 })
 
 L:SetTimerLocalization({
