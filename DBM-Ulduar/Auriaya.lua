@@ -47,29 +47,29 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-    if args:IsSpellID(64678, 64389) then -- Sentinel Blast
-        specWarnBlast:Show(args.sourceName)
-        specWarnBlast:Play("kickcast")
-        if self:AntiSpam(5, 1) then
-            timerFearCD:AddTime(5)
-            timerSonicCD:AddTime(5)
-            timerSwarmCD:AddTime(5)
-            self:Unschedule(warnFearSoon.Show, warnFearSoon)
-            warnFearSoon:Schedule(timerFearCD:GetRemaining() - 5)
-        end
-    elseif args.spellId == 64386 then -- Terrifying Screech
-        specWarnFear:Show()
-        specWarnFear:Play("fearsoon")
-        timerFear:Start()
-        timerFearCD:Start(35)
-        self:Unschedule(warnFearSoon.Show, warnFearSoon)
-        warnFearSoon:Schedule(timerFearCD:GetRemaining() - 5)
-    elseif args:IsSpellID(64688, 64422) then -- Sonic Screech
-        specWarnSonic:Show(TANK)
-        specWarnSonic:Play("gathershare")
-        timerSonic:Start()
-        timerSonicCD:Start(50)
-    end
+	if args:IsSpellID(64678, 64389) then -- Sentinel Blast
+		specWarnBlast:Show(args.sourceName)
+		specWarnBlast:Play("kickcast")
+		if self:AntiSpam(5, 1) then
+			timerFearCD:AddTime(5)
+			timerSonicCD:AddTime(5)
+			timerSwarmCD:AddTime(5)
+			self:Unschedule(warnFearSoon.Show, warnFearSoon)
+			warnFearSoon:Schedule(timerFearCD:GetRemaining() - 5)
+		end
+	elseif args.spellId == 64386 then -- Terrifying Screech
+		specWarnFear:Show()
+		specWarnFear:Play("fearsoon")
+		timerFear:Start()
+		timerFearCD:Start(35)
+		self:Unschedule(warnFearSoon.Show, warnFearSoon)
+		warnFearSoon:Schedule(timerFearCD:GetRemaining() - 5)
+	elseif args:IsSpellID(64688, 64422) then -- Sonic Screech
+		specWarnSonic:Show(TANK)
+		specWarnSonic:Play("gathershare")
+		timerSonic:Start()
+		timerSonicCD:Start(50)
+	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
