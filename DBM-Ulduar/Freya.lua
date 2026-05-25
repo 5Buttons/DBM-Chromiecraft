@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Freya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260501820131")
+mod:SetRevision("20260525820131")
 
 mod:SetCreatureID(32906)
 mod:SetEncounterID(753)
@@ -39,7 +39,7 @@ local timerEnrage				= mod:NewBerserkTimer(600)
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(1))
 local warnNatureFury			= mod:NewTargetAnnounce(63571, 2)
 
-local specWarnLifebinder		= mod:NewSpecialWarningSwitch(62869, "Dps", nil, nil, 1, 2)
+local specWarnLifebinder		= mod:NewSpecialWarningSwitch(62584, "Dps", nil, nil, 1, 2) --actual spell id for the summon is 62869
 local specWarnNatureFury		= mod:NewSpecialWarningMoveAway(63571, nil, nil, nil, 1, 2)
 local yellNatureFury			= mod:NewYell(63571)
 
@@ -146,7 +146,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 	elseif args:IsSpellID(64587, 64650) then -- Nature Bomb
 		if self:AntiSpam(5, 64650) and self:IsInCombat() then
 			specWarnNatureBombSummon:Cancel()
-			specWarnNatureBombSummon:Schedule(4) -- delay to max possible time to avoid warning before bombs are thrown
+			specWarnNatureBombSummon:Schedule(6)
 			timerNextNatureBombSummon:Start()
 			timerNatureBombExplosion:Start()
 		end
