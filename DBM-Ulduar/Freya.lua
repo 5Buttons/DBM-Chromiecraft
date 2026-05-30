@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Freya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260525820131")
+mod:SetRevision("20260530820131")
 
 mod:SetCreatureID(32906)
 mod:SetEncounterID(753)
@@ -57,8 +57,8 @@ local warnPhase2				= mod:NewPhaseAnnounce(2, 3, nil, nil, nil, nil, nil, 2)
 
 local specWarnNatureBombSummon	= mod:NewSpecialWarningMove(64604) -- Nature Bomb (Summon) - Move away from area of effect when Nature Bomb is summoned
 
-local timerNextNatureBombSummon	= mod:NewNextTimer(18, 64604, nil, nil, nil, 2) -- 18s on AC
-local timerNatureBombExplosion	= mod:NewCastTimer(11, 64587, 34539, nil, nil, 2) -- On explosion, not on summon. Applied a Explosion text. REVIEW! 2s variance from first explosion from the set to the first explosion from the next set (S3 HM log 2022/07/22) - 11, 10.3, 11.9, 11.2, 10.4, 11.3, 10.5
+local timerNextNatureBombSummon	= mod:NewNextTimer(18, 64587, 34539, nil, nil, 2) -- 18s on AC
+--local timerNatureBombExplosion	= mod:NewCastTimer(11, 64587, 34539, nil, nil, 2) -- On explosion, not on summon. Applied a Explosion text. REVIEW! 2s variance from first explosion from the set to the first explosion from the next set (S3 HM log 2022/07/22) - 11, 10.3, 11.9, 11.2, 10.4, 11.3, 10.5
 
 -- Hard Mode
 mod:AddTimerLine(DBM_COMMON_L.HEROIC_ICON..DBM_CORE_L.HARD_MODE)
@@ -146,9 +146,9 @@ function mod:SPELL_CAST_SUCCESS(args)
 	elseif args:IsSpellID(64587, 64650) then -- Nature Bomb
 		if self:AntiSpam(5, 64650) and self:IsInCombat() then
 			specWarnNatureBombSummon:Cancel()
-			specWarnNatureBombSummon:Schedule(6)
+			specWarnNatureBombSummon:Schedule(12)
 			timerNextNatureBombSummon:Start()
-			timerNatureBombExplosion:Start()
+			--timerNatureBombExplosion:Start()
 		end
 	elseif spellId == 63601 then -- Strengthened Iron Roots
 		DBM:AddMsg("Strengthened Iron Roots unhidden from combat log. Notify Fivebuttons on Discord or GitHub")
@@ -181,7 +181,7 @@ function mod:SPELL_AURA_REMOVED(args)
 		self:SetStage(2)
 		timerNextNatureBombSummon:Start(6) --  Confirmed bug (2022/08/01) that Freya uses this ability before phase 2 begins! No log to identify a trigger for it. REVIEW! variance [?] (VODs) - ~8; ~6
 		specWarnNatureBombSummon:Schedule(8) -- delayed to the maximum timer possible
-		timerNatureBombExplosion:Start(13.4) -- REVIEW! variance [?] (S3 HM log 2022/07/22) - 13.4
+		--timerNatureBombExplosion:Start(13.4) -- REVIEW! variance [?] (S3 HM log 2022/07/22) - 13.4
 	elseif args:IsSpellID(62861, 62438) then
 		if self.Options.SetIconOnRoots then
 			self:RemoveIcon(args.destName)
