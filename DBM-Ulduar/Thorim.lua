@@ -1,11 +1,11 @@
 local mod	= DBM:NewMod("Thorim", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260506220131")
+mod:SetRevision("20260607220131")
 mod:SetCreatureID(32865)
 mod:SetEncounterID(752)
 mod:SetUsedIcons(7)
-mod:SetHotfixNoticeRev(20230927000000)
+mod:SetHotfixNoticeRev(20260927000000)
 
 mod:RegisterCombat("yell", L.YellPhase1) -- [2023-09-24]@[21:34:20]: do not use combat_yell, for some reason on Warmane, PRD triggered combat start on arena adds engage
 mod:RegisterKill("yell", L.YellKill)
@@ -46,9 +46,9 @@ local warnLightningCharge			= mod:NewSpellAnnounce(62466, 2)
 local specWarnUnbalancingStrikeSelf	= mod:NewSpecialWarningDefensive(62130, nil, nil, nil, 1, 2)
 local specWarnUnbalancingStrike		= mod:NewSpecialWarningTaunt(62130, nil, nil, nil, 1, 2)
 
-local timerLightningCharge			= mod:NewCDTimer(15, 62466, nil, nil, nil, 3)
-local timerUnbalancingStrike		= mod:NewCDTimer(19.6, 62130, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON) -- ~12s variance (25 man NM log 2022/07/10 || 25 man HM log 2022/07/17) - 24.9, 31.4, 31.8, 26.7 || 27.7, 28.5, 19.6, 26.5, 21.5, 28.6, 21.1, 28.5, 26.9
-local timerChainLightning			= mod:NewNextTimer(10.2, 64390) -- ~5s variance (25 man NM log 2022/07/10 || 25 man HM log 2022/07/17) - 14.5, 13.3, 13.8, 14.7, 10.3, 14.8, 10.3, 13.3, 12.4 || 12.3, 10.2, 14.4, 14.9, 12.5, 11.0, 14.4, 12.2, 13.4, 12.3, 11.6, 12.8, 10.6, 12.2, 10.3, 14.1
+local timerLightningCharge			= mod:NewCDTimer(15, 62466, nil, nil, nil, 3) --15s on AC
+local timerUnbalancingStrike		= mod:NewCDTimer(20, 62130, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON) --20s on AC
+local timerChainLightning			= mod:NewNextTimer(15, 64390) --15s on AC
 
 mod:AddBoolOption("AnnounceFails", false, "announce", nil, nil, nil, 62466)
 
@@ -58,9 +58,9 @@ local specWarnHardModeActivated		= mod:NewSpecialWarning("specWarnHardmode", nil
 local specWarnHardModeFailed		= mod:NewSpecialWarningEnd(62507, nil, nil, nil, 1, 2)
 
 local timerHardmode					= mod:NewTimer(150, "TimerHardmode", "Interface\\Icons\\achievement_boss_thorim", nil, nil, 0, nil, nil, nil, nil, nil, nil, nil, "at3183") -- 25 man NM log review (2022/07/10), 2:30 from 62507 SPELL_AURA_APPLIED to SPELL_AURA_REMOVED
-local timerFrostNova				= mod:NewNextTimer(10.4, 62605, nil, nil, nil, 2, nil, DBM_COMMON_L.MAGIC_ICON)
+local timerFrostNova				= mod:NewNextTimer(20, 62605, nil, nil, nil, 2, nil, DBM_COMMON_L.MAGIC_ICON)
 local timerFrostNovaCast			= mod:NewCastTimer(2.5, 62605, nil, nil, nil, 2, nil, DBM_COMMON_L.MAGIC_ICON)
-local timerFBVolley					= mod:NewCDTimer(8.0, 62604)
+local timerFBVolley					= mod:NewCDTimer(13, 62604) --13s on AC
 
 --mod:GroupSpells(62042, 62470) -- Stormhammer, Deafening Thunder
 mod:GroupSpells(62526, 62527) -- Rune of Detonation
@@ -208,6 +208,6 @@ function mod:OnSync(event)
 		timerHardmode:Stop() -- Phase 2 detection happens before the yell, so keep this here
 		timerStormhammerCD:Stop()
 		enrageTimerStage2:Start(300)
-		timerLightningCharge:Start(35.6) --TO-DO CHROMIE
+		timerLightningCharge:Start(17.5)
 	end
 end
