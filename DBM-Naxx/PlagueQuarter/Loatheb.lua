@@ -23,8 +23,8 @@ local warnSporeNow	= mod:NewCountAnnounce(29234, 2)
 local warnSporeSoon	= mod:NewSoonAnnounce(29234, 1)
 local warnDoomNow	= mod:NewSpellAnnounce(29204, 3)
 local warnBerserk	= mod:NewSpellAnnounce(26662, 4)
-local warnHealSoon	= mod:NewAnnounce("WarningHealSoon", 4, 48071, nil, nil, nil, 55593)
-local warnHealNow	= mod:NewAnnounce("WarningHealNow", 1, 48071, false, nil, nil, 55593)
+local specWarnHealSoon	= mod:NewSpecialWarning("WarningHealSoon", nil, nil, nil, 1, 2)
+local specWarnHealNow	= mod:NewSpecialWarning("WarningHealNow", nil, nil, nil, 3, 2)
 
 local timerSpore	= mod:NewNextTimer(35, 29234, nil, nil, nil, 5, 42524, DBM_COMMON_L.DAMAGE_ICON)
 local timerDoom		= mod:NewNextTimer(120, 29204, nil, nil, nil, 2)
@@ -122,8 +122,9 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerDoom:Start(timer, self.vb.doomCounter + 1)
 	elseif spellId == 55593 then  -- Necrotic Aura
 		timerAura:Start()
-		warnHealSoon:Schedule(14)
-		warnHealNow:Schedule(17)
+		specWarnHealSoon:Schedule(14)
+		specWarnHealNow:Schedule(17)
+		specWarnHealNow:ScheduleVoice(17, "healall")
 	elseif spellId == 26662 then  -- Berserk
 		warnBerserk:Show()
 	end
@@ -141,7 +142,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(29194, 29196, 29185, 29198) and DBM:UnitDebuff(args.destName, 29184, 29195, 29197, 29199) then
 		hadCorrupted[args.destName] = GetTime() + 60
 		if args:IsPlayer() then
-			warnHealSoon:Schedule(55)
+			specWarnHealSoon:Schedule(55)
 		end
 	end
 end
@@ -149,7 +150,8 @@ end
 function mod:SPELL_AURA_REMOVED(args)
 	if args:IsSpellID(29194, 29196, 29185, 29198) and not DBM:UnitDebuff(args.destName, 29184, 29195, 29197, 29199) then
 		if args:IsPlayer() then
-			warnHealNow:Show()
+			specWarnHealNow:Show()
+			specWarnHealNow:Play("healall")
 		end
 	end
 end
@@ -167,8 +169,9 @@ function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 16011 then  -- Loatheb died
 		warnSporeSoon:Cancel()
-		warnHealSoon:Cancel()
-		warnHealNow:Cancel()
+		specWarnHealSoon:Cancel()
+		specWarnHealNow:Cancel()
+		self:Unschedule(specWarnHealNow.ScheduleVoice, specWarnHealNow)
 	elseif hadCorrupted[args.destName] then
 		hadCorrupted[args.destName] = nil
 	end
