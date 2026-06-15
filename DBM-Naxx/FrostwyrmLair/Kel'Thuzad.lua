@@ -18,7 +18,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED 28410",
 	"SPELL_CAST_SUCCESS 27810 27819 27808 28410",
 	"CHAT_MSG_MONSTER_YELL",
-	"UNIT_HEALTH boss1"
+	"UNIT_HEALTH"
 )
 
 local specWarnWeapons		= mod:NewSpecialWarning("WeaponsStatus", false)
