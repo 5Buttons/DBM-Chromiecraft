@@ -106,11 +106,11 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Steelbreaker		= "Steelbreaker",
 	RunemasterMolgeim	= "Runemaster Molgeim",
-	StormcallerBrundir	= "Stormcaller Brundir"
+	StormcallerBrundir	= "Stormcaller Brundir",
 --	YellPull1					= "Whether the world's greatest gnats or the world's greatest heroes, you're still only mortal!",
 --	YellPull2					= "Nothing short of total decimation will suffice.",
 --	YellPull3					= "You will not defeat the Assembly of Iron so easily, invaders!",
---	YellRuneOfDeath				= "Decipher this!",
+	YellRuneOfDeath				= "Decipher this!"
 --	YellRunemasterMolgeimDied	= "What have you gained from my defeat? You are no less doomed, mortals!",
 --	YellRunemasterMolgeimDied2	= "The legacy of storms shall not be undone.",
 --	YellStormcallerBrundirDied	= "The power of the storm lives on...",

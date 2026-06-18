@@ -12,9 +12,11 @@ mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 61920 63479 61879 61903 63493 62274 63489 62273 61973",
 	"SPELL_CAST_SUCCESS 63490 62269 61869 63481",
 	"SPELL_AURA_APPLIED 61903 63489 61920 63493 62269 63490 62277 63967 64637 61888 63486 61887 61912 63494 63483 61915",
+	"SPELL_AURA_APPLIED_DOSE 61920",
 	"SPELL_AURA_REMOVED 64637 61888 63483 61915 61912 63494",
 	"UNIT_DIED",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED",
+	"CHAT_MSG_MONSTER_YELL"
 )
 
 mod:SetBossHealthInfo(
@@ -141,6 +143,14 @@ function mod:SPELL_CAST_START(args)
 	end
 end
 
+function mod:CHAT_MSG_MONSTER_YELL(msg)
+	if msg == L.YellRuneOfDeath then
+		warnRuneofDeath:Show()
+		timerRuneofDeath:Start()
+		warnRuneofDeathIn10Sec:Schedule(20)
+	end
+end
+
 function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(63490, 62269) then		-- Rune of Death
 		warnRuneofDeath:Show()
@@ -172,7 +182,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		specWarnRuneofShields:Show(args.destName)
 		specWarnRuneofShields:Play("dispelboss")
 		timerRuneofShields:Start()
-	elseif args:IsSpellID(61920) then --Supercharge REVIEW
+	elseif args:IsSpellID(61920) and self:AntiSpam(3, 2) then --Supercharge (first stack)
 		warnSupercharge:Show()
 	elseif args:IsSpellID(64637, 61888) then	-- Overwhelming Power
 		warnOverwhelmingPower:Show(args.destName)
@@ -212,6 +222,12 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnLightningWhirl:Show(args.destName)
 			specWarnLightningWhirl:Play("kickcast")
 		end
+	end
+end
+
+function mod:SPELL_AURA_APPLIED_DOSE(args)
+	if args:IsSpellID(61920) and self:AntiSpam(3, 2) then	-- Supercharge (2nd)
+		warnSupercharge:Show()
 	end
 end
 
@@ -265,7 +281,7 @@ function mod:UNIT_DIED(args)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(61973) then	-- Rune of Power
+	if spellName == GetSpellInfo(61973) and self:AntiSpam(3, 3) then	-- Rune of Power
 		warnRuneofPower:Show()
 		timerRuneofPowerCD:Start()
 	end
