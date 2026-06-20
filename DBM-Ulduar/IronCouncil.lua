@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IronCouncil", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260509220131")
+mod:SetRevision("20260621220131")
 mod:SetCreatureID(32867, 32927, 32857)
 mod:SetEncounterID(748)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -58,10 +58,10 @@ local warnRuneofSummoning		= mod:NewSpellAnnounce(62273, 3)
 local specwarnRuneofDeath		= mod:NewSpecialWarningMove(63490, nil, nil, nil, 1, 2)
 local specWarnRuneofShields		= mod:NewSpecialWarningDispel(62274, "MagicDispeller", nil, nil, 1, 2)
 
-local timerRuneofShields		= mod:NewBuffActiveTimer(15, 62274, nil, nil, nil, 5, nil, DBM_COMMON_L.MAGIC_ICON)
+local timerRuneofShieldsCD		= mod:NewCDTimer("v27-34", 62274, nil, nil, nil, 5, nil, DBM_COMMON_L.MAGIC_ICON)
 local timerRuneofDeath			= mod:NewCDTimer("v30-40", 63490, nil, nil, nil, 3)
-local timerRuneofPowerCast		= mod:NewCastTimer(1.5, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)  -- One log review (2022/07/05) - 60.0
-local timerRuneofPowerCD		= mod:NewCDTimer(60, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)  -- One log review (2022/07/05) - 60.0
+local timerRuneofPowerCast		= mod:NewCastTimer(1.5, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
+local timerRuneofPowerCD		= mod:NewCDTimer(60, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 local timerRuneofSummoning		= mod:NewCDTimer(30, 62273, nil, nil, nil, 1)
 
 -- Steelbreaker
@@ -99,6 +99,7 @@ function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
 	timerRuneofPowerCD:Start(30-delay) -- 30s on AC
 	timerOverloadCD:Start(-delay) -- 20-40s variance on AC
+	timerRuneofShieldsCD:Start(20-delay)
 	table.wipe(disruptTargets)
 	self.vb.disruptIcon = 7
 	runemasterAlive = true
@@ -134,6 +135,7 @@ function mod:SPELL_CAST_START(args)
 		timerFusionPunchCast:Start()
 	elseif args:IsSpellID(62274, 63489) then	-- Shield of Runes
 		warnShieldofRunes:Show()
+		timerRuneofShieldsCD:Start()
 	elseif spellId == 62273 then			-- Rune of Summoning
 		warnRuneofSummoning:Show()
 		timerRuneofSummoning:Start()
@@ -181,7 +183,6 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif args:IsSpellID(62277, 63967, 63489) and not args:IsDestTypePlayer() then		-- Shield of Runes
 		specWarnRuneofShields:Show(args.destName)
 		specWarnRuneofShields:Play("dispelboss")
-		timerRuneofShields:Start()
 	elseif args:IsSpellID(61920) and self:AntiSpam(3, 2) then --Supercharge (first stack)
 		warnSupercharge:Show()
 	elseif args:IsSpellID(64637, 61888) then	-- Overwhelming Power
@@ -266,6 +267,7 @@ function mod:UNIT_DIED(args)
 		warnRuneofDeathIn10Sec:Cancel()
 		timerRuneofPowerCD:Cancel()
 		timerRuneofPowerCast:Cancel()
+		timerRuneofShieldsCD:Cancel()
 	elseif cid == 32857 then	--Stormcaller Brundir
 		brundirAlive = false
 		if runemasterAlive and steelbreakerAlive then
