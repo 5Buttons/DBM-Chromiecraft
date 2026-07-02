@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Anub'Rekhan", "DBM-Naxx", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260211133531")
+mod:SetRevision("20260702133531")
 mod:SetCreatureID(15956)
 mod:SetEncounterID(1107)
 
@@ -68,7 +68,12 @@ function mod:SPELL_AURA_REMOVED(args)
 	if args:IsSpellID(28785, 54021)
 	and args.auraType == "BUFF" then
 		warningLocustFaded:Show()
-		timerLocustIn:Start()
-		warningLocustSoon:Schedule(80)
+		if self:IsDifficulty("normal25") then
+			timerLocustIn:Start(67)
+			warningLocustSoon:Schedule(57)
+		else
+			timerLocustIn:Start(71)
+			warningLocustSoon:Schedule(61)
+		end
 	end
 end
