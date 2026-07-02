@@ -68,8 +68,6 @@ function mod:SPELL_AURA_REMOVED(args)
 	if args:IsSpellID(28785, 54021)
 	and args.auraType == "BUFF" then
 		warningLocustFaded:Show()
-		-- AzerothCore schedules next cast 90s from PREVIOUS cast start, not from aura fade.
-		-- So we must subtract the buff duration from the 90s repeat interval.
 		if self:IsDifficulty("normal25") then
 			timerLocustIn:Start(67)			-- 90 - 23 = 67
 			warningLocustSoon:Schedule(57)	-- 67 - 10 = 57
