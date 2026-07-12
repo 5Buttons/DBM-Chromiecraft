@@ -33,9 +33,9 @@ local specWarnPhasePunch		= mod:NewSpecialWarningStack(64412, nil, 4, nil, nil, 
 local specWarnBigBang			= mod:NewSpecialWarningSpell(64584, nil, nil, nil, 3, 2)
 local specWarnCosmicSmash		= mod:NewSpecialWarningDodge(64596, nil, nil, nil, 2, 2)
 
-local timerNextBigBang			= mod:NewNextTimer(91.0, 64584, nil, nil, nil, 2) -- REVIEW! no data for 2nd cast onwards (2022/07/05 || 25 man Lord log 2022/08/02 || 25 man FM log 2022/08/07 || 10 man FM log 2022/08/09) - 91.0 || 91.0 || 91.0; 91.1; 91.0 || 91.0; 91.0
+local timerNextBigBang			= mod:NewNextTimer(90.5, 64584, nil, nil, nil, 2) -- 90,5s on AC
 local timerBigBangCast			= mod:NewCastTimer(8, 64584, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
-local timerNextCollapsingStar	= mod:NewTimer(97.5, "NextCollapsingStar", "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater", nil, nil, 2, DBM_COMMON_L.HEALER_ICON) -- Instead of 15s (retail), this event fired with 97s after the first emote and then 91s difference (S2 || 25 man Lord log 2022/08/02 || 25 man FM log 2022/08/07 || 10 man FM log 2022/08/09) - 91 || 97.5 || 97.5; 97.6, 91.0; 97.5; 97.5; 97.6; 97.6; 97.5; 97.5; 97.5 || 97.5, 91.0; 97.5; 97.5; 97.5; 97.5; 97.5
+local timerNextCollapsingStar	= mod:NewTimer(60, "NextCollapsingStar", "Interface\\Icons\\INV_Enchant_EssenceCosmicGreater", nil, nil, 2, DBM_COMMON_L.HEALER_ICON) --60s on AC
 local timerCDCosmicSmash		= mod:NewCDTimer(25.5, 64596, nil, nil, nil, 3) -- Log reviewed (2022/07/05 || 25 man FM log 2022/08/07) - 25.5, 25.5, 25.5, 25.5, 25.5, 25.5, 25.6, 25.5 || 25.5, 25.5, 25.6, 25.5, 25.5, 25.5
 local timerCastCosmicSmash		= mod:NewCastTimer(4.5, 64596)
 local timerPhasePunch			= mod:NewTargetTimer(45, 64412, nil, "Tank", 2, 5, nil, DBM_COMMON_L.TANK_ICON)
