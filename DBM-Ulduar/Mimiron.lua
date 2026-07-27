@@ -326,7 +326,7 @@ end
 
 function mod:SPELL_SUMMON(args)
 	if args.spellId == 63811 then -- Bomb Bot, never fired on Warmane
-		DBM:Debug("Bomb Bot unhidden from combat log. Notify Zidras on Discord or GitHub")
+		DBM:Debug("Bomb Bot unhidden from combat log. Notify Fivebuttons on Discord or GitHub")
 		timerBombBotSpawn:Start()
 		warnBombBotSpawn:Show()
 	end
@@ -353,19 +353,25 @@ function mod:UNIT_SPELLCAST_START(_, spellName)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
+local function cidFromGUID(guid)
+	return guid and tonumber(guid:sub(9, 12), 16) or 0
+end
+
+function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
 	if spellName == GetSpellInfo(64402) or spellName == GetSpellInfo(65034) then	--P2, P4 Rocket Strike (Warmane)
 		if self:AntiSpam(3, 3) then
 			specWarnRocketStrike:Show()
 			specWarnRocketStrike:Play("watchstep")
 			timerRocketStrikeCD:Start()
 		end
-	elseif spellName == GetSpellInfo(63811) and self:AntiSpam(3, 5) then	--Bomb Bot
-		warnBombBotSpawn:Show()
-		timerBombBotSpawn:Start()
+	elseif spellName == GetSpellInfo(63811) then	--Bomb Bot
+		if cidFromGUID(UnitGUID(uId)) ~= 33670 then return end --to avoid double trigger
+		if self:AntiSpam(3, 5) then
+			warnBombBotSpawn:Show()
+			timerBombBotSpawn:Start()
+		end
 	end
 end
-
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.YellPull or msg:find(L.YellPull) then -- register Normal Mode
 		self.vb.hardmode = false -- set this here instead of CombatStart to prevent possible overwrites
