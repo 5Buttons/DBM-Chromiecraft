@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Freya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260530820131")
+mod:SetRevision("20260727820131")
 
 mod:SetCreatureID(32906)
 mod:SetEncounterID(753)
@@ -66,10 +66,10 @@ local warnIronRoots				= mod:NewTargetNoFilterAnnounce(62438, 2) -- Hard mode El
 
 local yellIronRoots				= mod:NewYell(62438)
 local specWarnGroundTremor		= mod:NewSpecialWarningCast(62859, "SpellCaster", nil, 2, 1, 2)	-- Hard mode Elder Stonebark Alive
-local specWarnUnstableBeam		= mod:NewSpecialWarningMove(62865, nil, nil, nil, 1, 2)	-- Hard mode Elder Brightleaf Alive
+local specWarnUnstableBeam		= mod:NewSpecialWarningMove(62865, nil, nil, nil, 1, 2)			-- Hard mode Elder Brightleaf Alive
 
-local timerGroundTremorCD		= mod:NewCDTimer("v25-35", 62859, nil, nil, nil, 2) -- 25-35s variance on AC
-local timerIronRootsCD			= mod:NewCDTimer("v45-55", 62438, nil, nil, nil, 3) -- 45-55s variance on AC
+local timerGroundTremorCD 		= mod:NewCDCountTimer("v25-35", 62859, nil, nil, nil, 2)  	-- 25-35s variance on AC
+local timerIronRootsCD			= mod:NewCDTimer("v45-55", 62438, nil, nil, nil, 3) 		-- 45-55s variance on AC
 
 mod:AddSetIconOption("SetIconOnRoots", 62438, false, false, {6, 5, 4})
 
@@ -79,12 +79,14 @@ local adds = {}
 mod.vb.altIcon = true
 mod.vb.iconId = 6
 mod.vb.waves = 0
+mod.vb.tremorCount = 0
 mod.vb.isHardMode = false
 
 function mod:OnCombatStart(delay)
 	self.vb.altIcon = true
 	self.vb.iconId = 6
 	self.vb.waves = 0
+	self.vb.tremorCount = 0
 	self:SetStage(1)
 	timerEnrage:Start(-delay)
 	table.wipe(adds)
@@ -108,9 +110,10 @@ end
 
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(62437, 62859) then
+		self.vb.tremorCount = self.vb.tremorCount + 1
 		specWarnGroundTremor:Show()
 		specWarnGroundTremor:Play("stopcast")
-		timerGroundTremorCD:Start()
+		timerGroundTremorCD:Start(nil, self.vb.tremorCount + 1)
 	end
 end
 
@@ -229,7 +232,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self.vb.isHardMode = false
 	elseif msg == L.YellPullHard then
 		self.vb.isHardMode = true
-		timerGroundTremorCD:Start(35) --35s on AC
+		timerGroundTremorCD:Start(35, 1) --35s on AC
 		timerIronRootsCD:Start(20) -- 20s on AC
 	elseif msg == L.SpawnYell then
 		timerAlliesOfNature:Start()
