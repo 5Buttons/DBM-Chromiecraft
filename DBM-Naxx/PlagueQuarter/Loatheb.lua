@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Loatheb", "DBM-Naxx", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251209220131")
+mod:SetRevision("20260727220131")
 mod:SetCreatureID(16011)
 mod:SetEncounterID(1115)
 
@@ -120,11 +120,11 @@ function mod:SPELL_CAST_SUCCESS(args)
 		warnDoomNow:Show(self.vb.doomCounter)
 		local timer = (self.vb.doomCounter < 6) and 30 or 15
 		timerDoom:Start(timer, self.vb.doomCounter + 1)
-	elseif spellId == 55593 then  -- Necrotic Aura
+	elseif args:IsSpellID(55593) then  -- Necrotic Aura
 		timerAura:Start()
 		warnHealSoon:Schedule(14)
 		warnHealNow:Schedule(17)
-	elseif spellId == 26662 then  -- Berserk
+	elseif args:IsSpellID(26662) then  -- Berserk
 		warnBerserk:Show()
 	end
 end
