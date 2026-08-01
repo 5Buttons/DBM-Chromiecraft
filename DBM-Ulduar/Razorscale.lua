@@ -33,10 +33,10 @@ local specWarnDevouringFlameNear	= mod:NewSpecialWarningClose(64733, false, nil,
 local yellDevouringFlame			= mod:NewYell(64733)
 
 --Harpoons
-local timerTurret1					= mod:NewTimer(40, "timerTurret1", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
-local timerTurret2					= mod:NewTimer(67, "timerTurret2", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
-local timerTurret3					= mod:NewTimer(94, "timerTurret3", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
-local timerTurret4					= mod:NewTimer(121, "timerTurret4", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret1					= mod:NewTimer(34, "timerTurret1", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret2					= mod:NewTimer(61, "timerTurret2", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret3					= mod:NewTimer(88, "timerTurret3", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
+local timerTurret4					= mod:NewTimer(115, "timerTurret4", 48642, nil, nil, 5, DBM_COMMON_L.IMPORTANT_ICON)
 
 -- Stage Two
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2))
@@ -48,7 +48,7 @@ local specWarnFuseArmorOther		= mod:NewSpecialWarningTaunt(64771, nil, nil, nil,
 local timerDeepBreathCooldown		= mod:NewCDTimer(20, 64021, nil, nil, nil, 5) --20s on AC
 local timerDeepBreathCast			= mod:NewCastTimer(2.5, 64021)
 local timerGrounded					= mod:NewTimer(45, "timerGrounded", nil, nil, nil, 6)
-local timerFuseArmorCD				= mod:NewCDTimer(10.1, 64771, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)
+local timerFuseArmorCD				= mod:NewCDTimer(12, 64771, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 
 mod:GroupSpells(63236, 64733) -- Devouring Flame (cast and damage)
 
@@ -78,8 +78,8 @@ function mod:OnCombatStart(delay)
 		timerTurret1:Start(-delay)
 		timerTurret2:Start(-delay)
 	else
-		warnTurretsReadySoon:Schedule(34-delay)
-		warnTurretsReady:Schedule(37-delay)
+		warnTurretsReadySoon:Schedule(95-delay)
+		warnTurretsReady:Schedule(115-delay)
 		timerTurret1:Start(-delay) -- ~40s
 		timerTurret2:Start(-delay) -- +27
 		timerTurret3:Start(-delay) -- +27
@@ -146,7 +146,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(emote)
 		timerTurret3:Stop()
 		timerTurret4:Stop()
 		timerGrounded:Stop()
-		timerFuseArmorCD:Start(12)
+		timerFuseArmorCD:Start(15)
 		timerDeepBreathCooldown:Start()
 	end
 end
@@ -154,18 +154,17 @@ end
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if (msg == L.YellAir or msg == L.YellAir2) and GetTime() - combattime > 30 then
 		if self:IsDifficulty("normal10") then -- REVIEW: 10-man timers unvalidated.
-			warnTurretsReadySoon:Schedule(27)
-			warnTurretsReady:Schedule(30)
-			timerTurret1:Start(30)
-			timerTurret2:Start(57)
+			warnTurretsReadySoon:Schedule(41)
+			warnTurretsReady:Schedule(61)
+			timerTurret1:Start(34)
+			timerTurret2:Start(61)
 		else
-
-			warnTurretsReadySoon:Schedule(91)
-			warnTurretsReady:Schedule(111)
-			timerTurret1:Start(30)
-			timerTurret2:Start(57)
-			timerTurret3:Start(84)
-			timerTurret4:Start(111)
+			warnTurretsReadySoon:Schedule(95)
+			warnTurretsReady:Schedule(115)
+			timerTurret1:Start(34)
+			timerTurret2:Start(61)
+			timerTurret3:Start(88)
+			timerTurret4:Start(115)
 		end
 	elseif msg == L.YellGround then
 		timerGrounded:Start()
