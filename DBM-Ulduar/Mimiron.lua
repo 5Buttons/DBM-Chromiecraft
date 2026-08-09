@@ -95,7 +95,7 @@ local timerNextFlameSuppressantP1	= mod:NewCDTimer(60, 64570, nil, false, nil, 3
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2)..": "..L.MobPhase2)
 local warnFrostBomb					= mod:NewSpellAnnounce(64623, 3)
 
-local timerFrostBombExplosion		= mod:NewCastTimer(15, 65333, nil, nil, nil, 3)
+local timerFrostBombExplosion		= mod:NewCastTimer(13.5, 65333, nil, nil, nil, 3)
 local timerNextFrostBomb			= mod:NewNextTimer(45, 64623, nil, false, nil, 3, nil, DBM_COMMON_L.HEROIC_ICON, true) --disabled by default to reduce clutter; not part of classic DBM
 local timerNextFlameSuppressantP2	= mod:NewNextTimer(10, 65192, nil, false, nil, 3) --disabled by default to reduce clutter; not part of classic DBM
 
