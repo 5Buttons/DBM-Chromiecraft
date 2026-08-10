@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Freya", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260727820131")
+mod:SetRevision("20260810820131")
 
 mod:SetCreatureID(32906)
 mod:SetEncounterID(753)
@@ -58,18 +58,20 @@ local warnPhase2				= mod:NewPhaseAnnounce(2, 3, nil, nil, nil, nil, nil, 2)
 local specWarnNatureBombSummon	= mod:NewSpecialWarningMove(64604) -- Nature Bomb (Summon) - Move away from area of effect when Nature Bomb is summoned
 
 local timerNextNatureBombSummon	= mod:NewNextTimer(18, 64587, 34539, nil, nil, 2) -- 18s on AC
---local timerNatureBombExplosion	= mod:NewCastTimer(11, 64587, 34539, nil, nil, 2) -- On explosion, not on summon. Applied a Explosion text. REVIEW! 2s variance from first explosion from the set to the first explosion from the next set (S3 HM log 2022/07/22) - 11, 10.3, 11.9, 11.2, 10.4, 11.3, 10.5
 
 -- Hard Mode
 mod:AddTimerLine(DBM_COMMON_L.HEROIC_ICON..DBM_CORE_L.HARD_MODE)
 local warnIronRoots				= mod:NewTargetNoFilterAnnounce(62438, 2) -- Hard mode Elder Ironbranch Alive
-
 local yellIronRoots				= mod:NewYell(62438)
-local specWarnGroundTremor		= mod:NewSpecialWarningCast(62859, "SpellCaster", nil, 2, 1, 2)	-- Hard mode Elder Stonebark Alive
-local specWarnUnstableBeam		= mod:NewSpecialWarningMove(62865, nil, nil, nil, 1, 2)			-- Hard mode Elder Brightleaf Alive
-
-local timerGroundTremorCD 		= mod:NewCDCountTimer("v25-35", 62859, nil, nil, nil, 2)  	-- 25-35s variance on AC
 local timerIronRootsCD			= mod:NewCDTimer("v45-55", 62438, nil, nil, nil, 3) 		-- 45-55s variance on AC
+
+local specWarnUnstableBeam		= mod:NewSpecialWarningMove(62865, nil, nil, nil, 1, 2)			-- Hard mode Elder Brightleaf Alive
+local timerUnstableBeamCD		= mod:NewCDTimer("v38-48", 62865, nil, nil, nil, 3)	-- 38-48s variance on AC, first 60s
+
+local specWarnGroundTremor		= mod:NewSpecialWarningCast(62859, "SpellCaster", nil, 2, 1, 2)	-- Hard mode Elder Stonebark Alive
+local timerGroundTremorCD 		= mod:NewCDCountTimer("v25-35", 62859, nil, nil, nil, 2)  	-- 25-35s variance on AC
+
+
 
 mod:AddSetIconOption("SetIconOnRoots", 62438, false, false, {6, 5, 4})
 
@@ -119,14 +121,14 @@ end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	local spellId = args.spellId
-	if args:IsSpellID(62678, 62873) then -- REVIEW! Summon Allies of Nature, never fired on Warmane. Instead there are Summon Wave spells: 62688 (confirmed), 62685 and 62686. To be confirmed adequacy via logs
+	if args:IsSpellID(62678, 62873) then
 		DBM:AddMsg("Summon Allies of Nature unhidden from combat log. Notify Zidras on Discord or GitHub")
 		self.vb.waves = self.vb.waves + 1
 		if self.vb.waves < 6 then
 			timerAlliesOfNature:Start()
 		end
-	elseif args.spellId == 62619 and self:GetUnitCreatureId(args.sourceName) == 33228 then -- Pheromones spell, cast by newly spawned Eonar's Gift second they spawn to allow melee to dps them while protector is up.
-		DBM:AddMsg("Pheromones unhidden from combat log. Notify Zidras on Discord or GitHub") -- REVIEW! Pheromones never fired on Warmane. Instead there is only an emote event.
+	elseif args.spellId == 62619 and self:GetUnitCreatureId(args.sourceName) == 33228 then
+		DBM:AddMsg("Pheromones unhidden from combat log. Notify Zidras on Discord or GitHub")
 		specWarnLifebinder:Show()
 		specWarnLifebinder:Play("targetchange")
 		timerLifebinderCD:Start()
@@ -171,9 +173,14 @@ function mod:SPELL_AURA_APPLIED(args)
 		if self.Options.SetIconOnRoots then
 			self:SetIcon(args.destName, self.vb.iconId, 15)
 		end
-	elseif args:IsSpellID(62451, 62865) and args:IsPlayer() then
-		specWarnUnstableBeam:Show()
-		specWarnUnstableBeam:Play("runaway")
+	elseif args:IsSpellID(62451, 62865) then
+		if self:AntiSpam(20, 62451) then
+			timerUnstableBeamCD:Start()
+		end
+		if args:IsPlayer() then
+			specWarnUnstableBeam:Show()
+			specWarnUnstableBeam:Play("runaway")
+		end
 	end
 end
 
@@ -182,7 +189,7 @@ function mod:SPELL_AURA_REMOVED(args)
 		warnPhase2:Show()
 		warnPhase2:Play("ptwo")
 		self:SetStage(2)
-		timerNextNatureBombSummon:Start(6) --  Confirmed bug (2022/08/01) that Freya uses this ability before phase 2 begins! No log to identify a trigger for it. REVIEW! variance [?] (VODs) - ~8; ~6
+		timerNextNatureBombSummon:Start(6) -- 
 		specWarnNatureBombSummon:Schedule(8) -- delayed to the maximum timer possible
 		--timerNatureBombExplosion:Start(13.4) -- REVIEW! variance [?] (S3 HM log 2022/07/22) - 13.4
 	elseif args:IsSpellID(62861, 62438) then
@@ -234,6 +241,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self.vb.isHardMode = true
 		timerGroundTremorCD:Start(35, 1) --35s on AC
 		timerIronRootsCD:Start(20) -- 20s on AC
+		timerUnstableBeamCD:Start(60) -- 60s on AC
 	elseif msg == L.SpawnYell then
 		timerAlliesOfNature:Start()
 		if self.Options.HealthFrame then
