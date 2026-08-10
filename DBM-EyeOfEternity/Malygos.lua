@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malygos", "DBM-EyeOfEternity")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260327025043")
+mod:SetRevision("20260810025043")
 mod:SetCreatureID(28859)
 
 mod:RegisterCombat("yell", L.YellPull)
@@ -135,12 +135,14 @@ function mod:SPELL_AURA_APPLIED(args)
 			end
 		end
 	elseif args:IsSpellID(57429) then
-			timerStaticFieldCD:Start()
-		local target = guids[args.destGUID]
-		if target == UnitName("player") then
-			specWarnStaticField:Show()
-			specWarnStaticField:Play("runaway")
-			yellStaticField:Yell()
+		if self:AntiSpam(11, 2) then
+        timerStaticFieldCD:Start()
+    end
+	local target = guids[args.destGUID]
+	if target == UnitName("player") and self:AntiSpam(3, 1) then
+        specWarnStaticField:Show()
+        specWarnStaticField:Play("runaway")
+        yellStaticField:Yell()
 		end
 	end
 end
