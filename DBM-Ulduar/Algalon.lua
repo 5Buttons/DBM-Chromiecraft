@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Algalon", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260907000000")
+mod:SetRevision("20260912000000")
 mod:SetCreatureID(32871)
 mod:SetEncounterID(757)
 mod:RegisterCombat("yell", L.YellPull)
@@ -67,6 +67,21 @@ function mod:startTimers()
 	enrageTimer:Start(360)
 end
 
+local function getDespawnMinutes()
+	for i = 1, GetNumWorldStateUI() do
+		local _, _, text = GetWorldStateUIInfo(i)
+		if text then
+			local time = string.match(text, L.PullCheck)
+			if not time and text:find("Algalon", nil, true) then
+				time = string.match(text, "(%d+)")
+			end
+			if time then
+				return tonumber(time)
+			end
+		end
+	end
+end
+
 function mod:OnCombatStart(delay)
 	self:SetStage(1)
 	stars = {}
@@ -74,14 +89,14 @@ function mod:OnCombatStart(delay)
 	stars_hp = {}
 	star_num = 1
 	self.vb.warned_preP2 = false
-	local text = select(3, GetWorldStateUIInfo(1))
-	local minutes = tonumber(text and text:match("%d+")) or 0 -- before firstpull there is no timer yet
-	if minutes == 0 then
-		timerCombatStart:Start(-delay)			-- 26s Roleplay
-		self:ScheduleMethod(26 - delay, "startTimers")
+	local minutes = getDespawnMinutes()
+	local rpTime = (not minutes or minutes == 0 or minutes >= 60) and 26 or 8
+	local remaining = rpTime - delay
+	if remaining > 0 then
+		timerCombatStart:Start(remaining)	-- 26 seconds roleplaying on the first pull, else 8
+		self:ScheduleMethod(remaining, "startTimers")
 	else
-		timerCombatStart:Start(8 - delay)		-- 8s Roleplay
-		self:ScheduleMethod(8 - delay, "startTimers")
+		self:startTimers()
 	end
 end
 
