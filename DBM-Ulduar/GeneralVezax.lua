@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("GeneralVezax", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260926220131")
+mod:SetRevision("20260926230131")
 mod:SetCreatureID(33271)
 mod:SetEncounterID(755)
 mod:SetUsedIcons(7, 8)
@@ -25,6 +25,7 @@ local warnLeechLife					= mod:NewTargetNoFilterAnnounce(63276, 3)
 local warnSaroniteVapor				= mod:NewCountAnnounce(63322, 2)
 
 local specWarnShadowCrash			= mod:NewSpecialWarningDodge(62660, nil, nil, nil, 1, 2)
+local specWarnShadowCrashNear		= mod:NewSpecialWarningClose(62660, nil, nil, nil, 1, 2)
 local yellShadowCrash				= mod:NewYell(62660)
 local specWarnSurgeDarkness			= mod:NewSpecialWarningDefensive(62662, nil, nil, 2, 1, 2)
 local specWarnMarkoftheFacelessYou	= mod:NewSpecialWarningMoveAway(63276, nil, nil, nil, 3, 2)
@@ -108,6 +109,9 @@ function mod:SPELL_CAST_SUCCESS(args)
 			specWarnShadowCrash:Show()
 			specWarnShadowCrash:Play("runaway")
 			yellShadowCrash:Yell()
+		elseif self:CheckNearby(11, args.destName) then
+			specWarnShadowCrashNear:Show(args.destName)
+			specWarnShadowCrashNear:Play("runaway")
 		else
 			warnShadowCrash:Show(args.destName)
 		end
