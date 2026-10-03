@@ -1,11 +1,12 @@
 local mod	= DBM:NewMod("YoggSaron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20268317220131")
+mod:SetRevision("20261003220131")
 mod:SetCreatureID(33288)
 mod:SetEncounterID(756)
 mod:RegisterCombat("combat_yell", L.YellPull)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
+mod:SetBossHealthInfo(33134, L.Sara) -- Health frame: Sara (P1) -> Brain (P2) -> Yogg-Saron (P3)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 64059 64189 63138 63830 63802",
@@ -34,7 +35,6 @@ local specWarnFervor				= mod:NewSpecialWarningYou(63138, nil, nil, nil, 1, 2)
 local timerFervor					= mod:NewTargetTimer(15, 63138, nil, false, 2)
 
 mod:AddSetIconOption("SetIconOnFervorTarget", 63138, false, false, {7})
-mod:AddBoolOption("ShowSaraHealth", false)
 
 -- Guardian of Yogg-Saron
 -- mod:AddTimerLine(L.GuardianofYoggSaron)
@@ -154,13 +154,6 @@ function mod:OnCombatStart()
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:SetHeader(SanityBuff)
 		DBM.InfoFrame:Show(30, "playerdebuffstacks", SanityBuff, 2)--Sorted lowest first (highest first is default of arg not given)
-	end
-	if self.Options.ShowSaraHealth then
-		if not self.Options.HealthFrame then
-			DBM.BossHealth:Show(L.name)
-		else
-			DBM.BossHealth:AddBoss(33134, L.Sara)
-		end
 	end
 end
 
@@ -300,11 +293,9 @@ function mod:SPELL_AURA_APPLIED(args)
 		specWarnBrainPortalSoon:Schedule(56)
 		warnP2:Show()
 		warnP2:Play("ptwo")
-		if self.Options.ShowSaraHealth then
+		if DBM.BossHealth:IsShown() then
 			DBM.BossHealth:RemoveBoss(33134)
-			if not self.Options.HealthFrame then
-				DBM.BossHealth:Hide()
-			end
+			DBM.BossHealth:AddBoss(33890, L.BrainofYoggSaron)
 		end
 	elseif spellId == 64163 then	-- Lunatic Gaze phase 3 (reduces sanity) ; 64167 Lunatic Gaze is related to Laughing Skulls, which is not important
 		specWarnLunaticGaze:Show(args.sourceName)
@@ -373,6 +364,10 @@ end]]
 function mod:OnSync(msg)
 	if msg == "Phase3" then
 		self:SetStage(3)
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:RemoveBoss(33890)
+			DBM.BossHealth:AddBoss(33288, L.name)
+		end
 		timerBrainPortal:Cancel()
 		warnBrainPortalSoon:Cancel()
 		timerMaladyCD:Cancel()
