@@ -330,6 +330,23 @@ DBM.DefaultOptions = {
 	HealthFrameGrowUp = false,
 	HealthFrameLocked = false,
 	HealthFrameWidth = 200,
+	HealthFrameScale = 1,
+	HealthFrameStyle = "Classic",
+	HealthFrameBarHeight = 18,
+	HealthFrameSpacing = 2,
+	HealthFrameBorder = true,
+	HealthFrameTexture = "Interface\\PaperDollInfoFrame\\UI-Character-Skills-Bar",
+	HealthFrameBgAlpha = 0.3,
+	HealthFrameFont = "standardFont",
+	HealthFrameFontSize = 10,
+	HealthFrameFontStyle = "None",
+	HealthFrameColorMode = "Gradient",
+	HealthFrameColorR = 0.8,
+	HealthFrameColorG = 0.1,
+	HealthFrameColorB = 0.1,
+	HealthFrameShowHeader = true,
+	HealthFrameDecimals = false,
+	HealthFrameClickable = true,
 	ArrowPosX = 0,
 	ArrowPosY = -150,
 	ArrowPoint = "TOP",
@@ -1708,6 +1725,7 @@ function DBM:RepositionFrames()
 		infoFrame:ClearAllPoints()
 		infoFrame:SetPoint(self.Options.InfoFramePoint, UIParent, self.Options.InfoFramePoint, self.Options.InfoFrameX, self.Options.InfoFrameY)
 	end
+	self.BossHealth:UpdateSettings()
 end
 
 ----------------------
@@ -4964,6 +4982,7 @@ do
 			mod.combatInfo.pull = GetTime() - (delay or 0)
 			bossuIdFound = event == "IEEU"
 			if (self.Options.AlwaysShowHealthFrame or mod.Options.HealthFrame) and mod.Options.Enabled then
+				self.BossHealth:PrepareCombat(mod)
 				self.BossHealth:Show(mod.localization.general.name)
 				if mod.bossHealthInfo then
 					for i = 1, #mod.bossHealthInfo, 2 do
@@ -5401,6 +5420,9 @@ do
 			if mod.OnCombatEnd then mod:OnCombatEnd(wipe) end
 			if mod.OnLeavingCombat then delayedFunction = mod.OnLeavingCombat end
 			self.BossHealth:Hide()
+			if not wipe then
+				self.BossHealth:Disarm(mod)
+			end
 			if #inCombat == 0 then--prevent error if you pulled multiple boss. (Earth, Wind and Fire)
 				private.statusGuildDisabled, private.statusWhisperDisabled, private.raidIconsDisabled, private.chatBubblesDisabled = false, false, false, false
 				if self.Options.RecordOnlyBosses then
@@ -7778,6 +7800,16 @@ end
 -------------------------
 function bossModPrototype:SetBossHealthInfo(...)
 	self.bossHealthInfo = {...}
+end
+
+
+function bossModPrototype:SetHealthFrameSlots(...)
+	local slots = {}
+	for i = 1, select("#", ...) do
+		local slot = select(i, ...)
+		slots[i] = {cid = slot[1], name = slot[2], target = slot[3]}
+	end
+	self.healthFrameSlots = slots
 end
 
 ----------------------------

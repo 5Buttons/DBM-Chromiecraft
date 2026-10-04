@@ -3,6 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250929220131")
 mod:SetCreatureID(39863)--40142 (twilight form)
+mod:SetHealthFrameSlots({39863, "Halion"}, {40142, "Halion (Twilight)", "Halion"})
 mod:SetEncounterID(887)
 mod:SetUsedIcons(7, 3)
 mod:SetMinSyncRevision(4358) -- try to preserve this as much as possible to receive old DBM comms

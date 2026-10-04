@@ -4,6 +4,7 @@ local L		= mod:GetLocalizedStrings()
 mod:SetRevision("20250929220131")
 
 mod:SetCreatureID(32906)
+mod:SetHealthFrameSlots({32906, mod.localization.general.name}, {33202, L.WaterSpirit}, {32916, L.Snaplasher}, {32919, L.StormLasher})
 mod:SetEncounterID(753)
 mod:RegisterCombat("combat")
 mod:RegisterKill("yell", L.YellKill)

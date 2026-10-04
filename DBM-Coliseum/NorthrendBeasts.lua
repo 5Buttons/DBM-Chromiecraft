@@ -7,6 +7,7 @@ local GetPlayerMapPosition, SetMapToCurrentZone = GetPlayerMapPosition, SetMapTo
 
 mod:SetRevision("20250929220131")
 mod:SetCreatureID(34796, 35144, 34799, 34797)
+mod:SetHealthFrameSlots({34796, L.Gormok}, {35144, L.Acidmaw}, {34799, L.Dreadscale}, {34797, L.Icehowl})
 mod:SetEncounterID(629)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
 mod:SetMinSyncRevision(20220925000000)

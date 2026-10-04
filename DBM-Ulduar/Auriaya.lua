@@ -4,6 +4,7 @@ local L		= mod:GetLocalizedStrings()
 mod:SetRevision("20250929220131")
 
 mod:SetCreatureID(33515)
+mod:SetHealthFrameSlots({33515, mod.localization.general.name}, {34035, L.Defender:gsub("%s*%(%%d%)", ""), (L.Defender:gsub("%s*%(%%d%)", ""))})
 mod:SetEncounterID(750)
 mod:RegisterCombat("combat")
 

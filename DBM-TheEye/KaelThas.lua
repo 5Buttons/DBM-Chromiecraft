@@ -3,6 +3,11 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20240818000000")
 mod:SetCreatureID(19622)
+mod:SetHealthFrameSlots(
+	{20064, L.Thaladred}, {20060, L.Sanguinar}, {20062, L.Capernian}, {20063, L.Telonicus},
+	{21268, L.Bow}, {21269, L.Axe}, {21270, L.Mace}, {21271, L.Dagger}, {21272, L.Sword}, {21273, L.Shield}, {21274, L.Staff},
+	{21364, L.Egg}, {19622, mod.localization.general.name}
+)
 mod:SetEncounterID(733)
 mod:RegisterCombat("yell", L.YellPull1, L.YellPull2)
 --mod:RegisterCombat("combat")

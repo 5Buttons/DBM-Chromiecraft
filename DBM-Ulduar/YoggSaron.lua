@@ -3,6 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision("20250929220131")
 mod:SetCreatureID(33288)
+mod:SetHealthFrameSlots({33134, L.Sara}, {33288, mod.localization.general.name})
 mod:SetEncounterID(756)
 mod:RegisterCombat("combat_yell", L.YellPull)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)

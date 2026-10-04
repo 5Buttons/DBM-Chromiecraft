@@ -5,6 +5,7 @@ mod.statTypes = "normal,normal25"
 
 mod:SetRevision("20251210220131")
 mod:SetCreatureID(28860)
+mod:SetHealthFrameSlots({28860, "Sartharion"}, {30452, "Tenebron"}, {30451, "Shadron"}, {30449, "Vesperon"})
 mod:SetEncounterID(742)
 
 --mod:RegisterCombat("combat") -- Don't use IEEU, because on Warmane 3 Drakes, Sartharion NOT is engaged first, but Tenebron > Shadron > Vesperon > Sartharion (Sartharion will end up on boss1).
