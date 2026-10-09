@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Mimiron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260727180000")
+mod:SetRevision("20261009180000")
 mod:SetCreatureID(33432)
 mod:SetEncounterID(754)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -258,7 +258,8 @@ end
 function mod:SPELL_CAST_START(args)
 	local spellId = args.spellId
 	if args:IsSpellID(64529, 62997) then	-- Plasma Blast
-		if self:IsTanking("player", "boss1", nil, true) then
+		local leviUnit = DBM:GetUnitIdFromCID(33432)
+		if leviUnit and self:IsTanking("player", leviUnit, nil, true, nil, true) and self:AntiSpam(5, 6) then
 			specWarnPlasmaBlast:Show()
 			specWarnPlasmaBlast:Play("defensive")
 		end
