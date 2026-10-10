@@ -12,8 +12,8 @@ mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
 mod:SetMinSyncRevision(20220925000000)
 mod:SetMinCombatTime(30)
 mod:SetBossHPInfoToHighest()
-
 mod:RegisterCombat("combat")
+mod:SetWipeTime(25) --Temporary band-aid, because you lose combat on AC during an encounter...
 
 mod:RegisterEvents(
 	"CHAT_MSG_MONSTER_YELL"
@@ -28,8 +28,8 @@ mod:RegisterEventsInCombat(
 	"SPELL_MISSED 66320 67472 67473 67475 66317 66881 67638 67639 67640",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_DIED",
-	"UNIT_SPELLCAST_START boss1",
-	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2"
+	"UNIT_SPELLCAST_START",
+	"UNIT_SPELLCAST_SUCCEEDED"
 )
 
 local gormok = L.Gormok
@@ -38,7 +38,7 @@ local acidmaw = L.Acidmaw
 local icehowl = L.Icehowl
 
 -- General
-local enrageTimer			= mod:NewBerserkTimer(223) -- REVIEW! 2022/09/05 log with 233s fight time. Does Icehowl actually gets enraged or just the next massive crash will wipe the raid?
+local enrageTimer			= mod:NewBerserkTimer(223)
 local timerCombatStart		= mod:NewCombatTimer(23)
 local timerNextBoss			= mod:NewTimer(150, "TimerNextBoss", 2457, nil, nil, 1) -- 2min 30s, as per TC.
 
@@ -56,7 +56,7 @@ local specWarnGTFO			= mod:NewSpecialWarningGTFO(66317, nil, nil, nil, 1, 8)
 local specWarnSilence		= mod:NewSpecialWarningSpell(66330, "SpellCaster")
 local specWarnStompPreWarn	= mod:NewSpecialWarningPreWarn(66330, "SpellCaster", 3, nil, nil, 1, 2)
 
-local timerNextStomp		= mod:NewNextTimer(20, 66330, nil, nil, nil, 2, nil, DBM_COMMON_L.INTERRUPT_ICON, nil, mod:IsSpellCaster() and 3 or nil, 3) -- (25H Lordaeron 2022/09/03) - 20.0, 20.0, 20.0
+local timerNextStomp		= mod:NewCDTimer("v20-25", 66330, nil, nil, nil, 2, nil, DBM_COMMON_L.INTERRUPT_ICON, nil, mod:IsSpellCaster() and 3 or nil, 3) -- (25H Lordaeron 2022/09/03) - 20.0, 20.0, 20.0
 local timerImpaleCD			= mod:NewCDTimer(8, 66331, nil, "Tank|Healer", nil, 5, nil, DBM_COMMON_L.TANK_ICON, true) -- 2s variance [8.0-9.9]. Added "keep" arg (10H 2021/10/22 || 10N 2021/10/22 || 25H Lordaeron 2022/09/03) - 8.3, 8.6, 9.4, 8.0, 9.6, 9.4, 9.0, 9.1, 8.7, 9.4, 9.9, 8.2, 8.6 || 8.6, 8.1, 9.5, 9.6, 9.8, 8.7, 8.8, 9.6 || 9.2, 9.5, 9.7, 9.3, 9.5, 8.3, 8.5
 local timerRisingAnger		= mod:NewCDTimer(20.5, 66636, nil, nil, nil, 1, nil, nil, true) -- REVIEW! Normal Dose > 2 is all over the place! Heroic variance? Added "keep" arg (25H Lordaeron 2022/09/03 || 25N Lordaeron 2022/09/23 || 25H Lordaeron 2022/09/24 || 25H Lordaeron 2022/09/28 || 10N Lordaeron 2022/10/02 || 25H Lordaeron [2023-08-23]@[22:38:12]) - 20, 25 || 28.9, 22.6, 2.4, 13.1, 6.8, 7.4, 4.1, 0.6, 1.7, 3.8 || 24.7 || 29.9, 17.5 || 26.8, 12.7, 3.4, 1.1 || pull:24.8, 29.7
 
@@ -98,7 +98,7 @@ local specWarnFrothingRage	= mod:NewSpecialWarningDispel(66759, "RemoveEnrage", 
 local timerBreath			= mod:NewCastTimer(5, 66689, nil, nil, nil, 3) -- 5s channel. is it random target or tank?
 local timerBreathCD			= mod:NewCDTimer(20, 66689, nil, nil, nil, 3)
 local timerStaggeredDaze	= mod:NewBuffActiveTimer(15, 66758, nil, nil, nil, 5, nil, DBM_COMMON_L.DAMAGE_ICON)
-local timerNextCrash		= mod:NewCDTimer(63.4, 66683, nil, nil, nil, 2, nil, DBM_COMMON_L.MYTHIC_ICON) -- REVIEW! variance? (25H Lordaeron 2022/09/03) - 63.4, 63.7
+local timerNextCrash		= mod:NewCDTimer(63.4, 66683, nil, nil, nil, 2, nil, DBM_COMMON_L.MYTHIC_ICON)
 
 mod:AddSetIconOption("SetIconOnChargeTarget", 52311, true, 0, {8})
 mod:AddBoolOption("ClearIconsOnIceHowl", true)
@@ -157,7 +157,7 @@ function mod:OnCombatStart(delay)
 	self.vb.DreadscaleDead = false
 	self.vb.AcidmawDead = false
 	self:SetStage(1)
-	specWarnStompPreWarn:Schedule(12-delay) -- 3s pre-warn. (10N Lordaeron 2022/10/02) - 14.9
+	specWarnStompPreWarn:Schedule(12-delay)
 	if self.Options.soundConcAuraMastery and isBuffOwner("player", 19746) then -- Concentration Aura Mastery by a Paladin will negate the interrupt effect of Staggering Stomp
 		soundAuraMastery:Schedule(12-delay, "Interface\\AddOns\\DBM-Core\\sounds\\PlayerAbilities\\AuraMastery.ogg")
 	else
@@ -166,9 +166,9 @@ function mod:OnCombatStart(delay)
 	if self:IsHeroic() then
 		timerNextBoss:Start(-delay)
 	end
-	timerRisingAnger:Start(18-delay) -- REVIEW! ~10s variance? (25H Lordaeron 2022/09/03 || 25N Lordaeron 2022/09/23 || 25H Lordaeron 2022/09/24 || 25H Lordaeron 2022/09/28 || 10N Lordaeron 2022/10/02) - 18.9 || 26.1 || 29.7 || 21.9 || 18.2
-	timerNextStomp:Start(15-delay) -- (25H Lordaeron 2022/09/03) - 15.0
-	timerImpaleCD:Start() -- REVIEW! same 2s variance? (10H 2021/10/22 || 10N 2021/10/22 || 25H Lordaeron 2022/09/03) - 8 || 8 || 9.9
+	timerRisingAnger:Start(18-delay)
+	timerNextStomp:Start(15-delay)
+	timerImpaleCD:Start()
 	updateHealthFrame(1)
 end
 
@@ -271,7 +271,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerImpaleCD:Start()
 		warnImpaleOn:Show(args.destName, 1)
 	elseif args:IsSpellID(67657, 66759, 67658, 67659) then	-- Frothing Rage
-		timerBreathCD:Start(5.5) -- variance? (Lordaeron 10N [2024-07-04]@[22:52:09]) - 5.5
+		timerBreathCD:Start(5.5)
 		warnRage:Show()
 		specWarnFrothingRage:Show()
 		specWarnFrothingRage:Play("trannow")
@@ -318,7 +318,7 @@ function mod:SPELL_AURA_APPLIED_DOSE(args)
 		WarningSnobold:Show(args.destName)
 		if amount < 3 then
 --			if self:IsHeroic() then
-				timerRisingAnger:Start(17.5) -- (25H Lordaeron 2022/09/28) - 17.5
+				timerRisingAnger:Start(17.5)
 --			else
 --				if amount < 3 then
 --					timerRisingAnger:Start() -- Variance for normal dose is all over the place... Only first dose is timed since it has "some" level of consistency. (25N Lordaeron 2022/09/23 || 10N Lordaeron 2022/10/02 wipe || 10N Lordaeron 2022/10/02 kill || 25N Lordaeron 2022/10/21) - 26.1, 28.9, 22.6 || 26.8, 12.7 || 20.8, 30.0 || 17.7
@@ -466,7 +466,7 @@ function mod:UNIT_DIED(args)
 	end
 end
 
-function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
+--[[function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT() --No IEEU on Azerothcore
 	for i = 1, 5 do
 		local unitID = "boss"..i
 		if UnitExists(unitID) then
@@ -498,7 +498,7 @@ function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
 			end
 		end
 	end
-end
+end]]
 
 function mod:UNIT_SPELLCAST_START(_, spellName)
 	if spellName == GetSpellInfo(66683) then -- Massive Crash
@@ -519,14 +519,14 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
 			timerParalyticSprayCD:Stop()
 			timerSlimePoolCD:Stop(acidmaw)
 			timerSweepCD:Stop(acidmaw)
-			timerEmerge:Start(7.5, unitName) -- REVIEW! 3s delay from visual to emerge (25H Lordaeron 2022/09/03) - 8, 7
+			timerEmerge:Start(7.5, unitName)
 		elseif npcId == 34799 then -- Dreadscale
 			timerMoltenSpewCD:Stop()
 			timerBurningBiteCD:Stop()
 			timerBurningSprayCD:Stop()
 			timerSlimePoolCD:Stop(dreadscale)
 			timerSweepCD:Stop(dreadscale)
-			timerEmerge:Start(6.5, unitName) -- (25H Lordaeron 2022/09/03) - 7, 6
+			timerEmerge:Start(6.5, unitName)
 		end
 	elseif spellName == GetSpellInfo(66947) then -- Emerge
 		local npcId = self:GetUnitCreatureId(uId)
@@ -538,24 +538,24 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
 			DBM:Debug("Acidmaw PHASE_STATIONARY: " .. tostring(self.vb.AcidmawMobile), 2)
 			timerSubmerge:Start(43, acidmaw)
 			if self.vb.AcidmawMobile then
-				timerSlimePoolCD:Start(acidmaw) -- (25H Lordaeron 2022/09/03) - 12
-				timerParalyticBiteCD:Start(13) -- (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/28 || 25H Lordearon 2022/10/09 || 25N Lordaeron 2022/10/13 || 25N Lordaeron 2022/10/21 || 25N Lordaeron 2022/12/07) - 28 || 26.2 || 22.0 || 20.2 || 16.5 || 13.0
-				timerAcidicSpewCD:Start(15.9) -- (25H Lordaeron 2022/09/03) - 21 || 15.9
+				timerSlimePoolCD:Start(acidmaw)
+				timerParalyticBiteCD:Start(13)
+				timerAcidicSpewCD:Start(15.9)
 			else
-				timerSweepCD:Start(22, acidmaw)	-- Log review: 22-24s (N/H?)
-				timerParalyticSprayCD:Start(16.7)	-- (old log review (N/H?) || 25H Lordaeron 2022/09/28) - 18-20 || 16.7
+				timerSweepCD:Start(22, acidmaw)
+				timerParalyticSprayCD:Start(16.7)
 			end
 		elseif npcId == 34799 then -- Dreadscale
 			self.vb.DreadscaleMobile = not self.vb.DreadscaleMobile
 			DBM:Debug("Dreadscale PHASE_STATIONARY: " .. tostring(self.vb.DreadscaleMobile), 2)
 			timerSubmerge:Start(44, dreadscale)
 			if self.vb.DreadscaleMobile then
-				timerSlimePoolCD:Start(dreadscale) -- (25H Lordaeron 2022/09/03) - 12
-				timerMoltenSpewCD:Start(21.4) -- (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/28 || 25N Lordaeron 2022/10/13) - 24 || 21.8 || 21.4
-				timerBurningBiteCD:Start(14.2) -- (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/28) - 19 || 14.2
+				timerSlimePoolCD:Start(dreadscale)
+				timerMoltenSpewCD:Start(21.4)
+				timerBurningBiteCD:Start(14.2)
 			else
-				timerSweepCD:Start(14.8, dreadscale) -- (25H Lordaeron 2022/09/03 || 25N Lordaeron 2022/10/21) - 17 || 14.8
-				timerBurningSprayCD:Start(13.4) -- (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/28) - 20 || 13.5
+				timerSweepCD:Start(14.8, dreadscale)
+				timerBurningSprayCD:Start(13.4)
 			end
 		end
 	end
