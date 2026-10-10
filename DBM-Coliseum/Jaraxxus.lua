@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Jaraxxus", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261004220131")
 mod:SetCreatureID(34780)
 mod:SetEncounterID(633)
 --mod:SetMinCombatTime(30)
@@ -16,13 +16,14 @@ mod:RegisterEvents(
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 66532 66963 66964 66965",
-	"SPELL_CAST_SUCCESS 66228 67106 67107 67108 67901 67902 67903 66258 66269 67898 67899 67900 66197 68123 68124 68125 67051 67050 67049 66237 66528 67029 67030 67031",
+	"SPELL_CAST_SUCCESS 66228 67106 67107 67108 67901 67902 67903 66258 66197 68123 68124 68125 67051 67050 67049 66237 66528 67029 67030 67031",
 	"SPELL_AURA_APPLIED 67051 67050 67049 66237 66197 68123 68124 68125 66334 67905 67906 67907 66532 66963 66964 66965",
 	"SPELL_AURA_REMOVED 67051 67050 67049 66237 66197 68123 68124 68125",
 	"SPELL_DAMAGE 66877 67070 67071 67072 66496 68716 68717 68718",
 	"SPELL_MISSED 66877 67070 67071 67072 66496 68716 68717 68718",
 	"SPELL_HEAL",
-	"SPELL_PERIODIC_HEAL"
+	"SPELL_PERIODIC_HEAL",
+	"SPELL_SUMMON 66269 67898 67899 67900"
 )
 
 --TODO, possibly just use args.amount from combatlog versus debuff scanning for flesh?
@@ -42,16 +43,16 @@ local SpecWarnFelFireball		= mod:NewSpecialWarningInterrupt(66532, "HasInterrupt
 local SpecWarnFelFireballDispel	= mod:NewSpecialWarningDispel(66532, "RemoveMagic", nil, 2, 1, 2)
 
 local timerCombatStart			= mod:NewCombatTimer(76)--roleplay for first pull
-local timerFlame				= mod:NewTargetTimer(8, 66197, nil, nil, nil, 3)--There are 8 debuff Ids. Since we detect first to warn, use an 8sec timer to cover duration of trigger spell and damage debuff.
-local timerFlameCD				= mod:NewNextTimer(30, 66197, nil, nil, nil, 3) -- (25H Lordaeron 2022/09/03) - 30.0, 30.0, 30.1, 30.0, 30.1, 30.0
-local timerNetherPowerCD		= mod:NewNextTimer(45, 67009, nil, "MagicDispeller", nil, 5, nil, DBM_COMMON_L.MAGIC_ICON) -- (25H Lordaeron 2022/09/03) - 45.1, 45.0, 45.0, 45.0
+local timerFlame				= mod:NewTargetTimer(8, 66197, nil, nil, nil, 3)
+local timerFlameCD				= mod:NewNextTimer(30, 66197, nil, nil, nil, 3)
+local timerNetherPowerCD		= mod:NewNextTimer("v25-45", 67009, nil, "MagicDispeller", nil, 5, nil, DBM_COMMON_L.MAGIC_ICON)
 local timerFlesh				= mod:NewTargetTimer(12, 66237, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON)
-local timerFleshCD				= mod:NewNextTimer(30, 66237, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON) -- (25H Lordaeron 2022/09/03) - 30.0, 30.0, 30.0, 30.1, 30.0, 30.0
-local timerPortalCD				= mod:NewCDTimer(120, 66269, nil, nil, nil, 1, nil, nil, true) -- REVIEW! 7s variance? Added "keep" arg (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/24) - 120.0 || 127.0
-local timerVolcanoCD			= mod:NewCDTimer(120, 66258, nil, nil, nil, 1) -- REVIEW! ~1s variance? (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/24) - 120.0 || 120.8
-local timerFelLightning			= mod:NewCDTimer(10, 67031, nil, nil, nil, 3, nil, nil, true) -- 7s variance [10-17]. Added "keep" arg (25H Lordaeron 2022/09/24 || 10N Lordaeron 2022/10/02) - 15.0, 12.8, 16.3, 12.1, 17.0, 14.8, 11.4, 11.1, 13.7, 14.0, 12.9, 14.2, 10.1, 10.5, 11.7 || 11.5, 12.4, 14.6, 13.4, 13.1
+local timerFleshCD				= mod:NewCDTimer("v20-25", 66237, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON)
+local timerPortalCD				= mod:NewCDTimer(120, 66269, nil, nil, nil, 1, nil, nil, true)
+local timerVolcanoCD			= mod:NewCDTimer(120, 66258, nil, nil, nil, 1)
+local timerFelLightning			= mod:NewCDTimer("v10-15", 67031, nil, nil, nil, 3, nil, nil, true)
 
-local enrageTimer				= mod:NewBerserkTimer(600)
+local enrageTimer				= mod:NewBerserkTimer(600) --no enrage on AC currently
 
 mod:AddSetIconOption("LegionFlameIcon", 66197, true, 0, {7})
 mod:AddSetIconOption("IncinerateFleshIcon", 66237, true, 0, {8})
@@ -68,14 +69,14 @@ function mod:OnCombatStart(delay)
 		DBM.BossHealth:AddBoss(34780, L.name)
 	end
 	self.vb.fleshCount = 0
-	timerPortalCD:Start(22-delay) -- (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/24) - 22.0 || 22.0
+	timerPortalCD:Start(20-delay)
 	warnPortalSoon:Schedule(17-delay)
-	timerVolcanoCD:Start(82-delay) -- (25H Lordaeron 2022/09/03 || 25H Lordaeron 2022/09/24) - 82.0 || 89.0
+	timerVolcanoCD:Start(80-delay)
 	warnVolcanoSoon:Schedule(77-delay)
-	timerNetherPowerCD:Start(15-delay) -- (25H Lordaeron 2022/09/03) - 15.0
-	timerFleshCD:Start(13-delay) -- (25H Lordaeron 2022/09/03) - 13.0
-	timerFlameCD:Start(20-delay) -- (25H Lordaeron 2022/09/03) - 20.0
-	timerFelLightning:Start(-delay) -- (25H Lordaeron 2022/09/24 || 10N Lordaeron 2022/10/02) - 10.0 || 10.1
+	timerNetherPowerCD:Start()
+	timerFleshCD:Start("v24-26")
+	timerFlameCD:Start()
+	timerFelLightning:Start(-delay)
 	enrageTimer:Start(-delay)
 end
 
@@ -148,12 +149,23 @@ function mod:SPELL_CAST_SUCCESS(args)
 		specWarnNetherPower:Show(args.sourceName)
 		specWarnNetherPower:Play("dispelboss")
 		timerNetherPowerCD:Start()
+		-- Nether Power delays all other boss events by 5s on AC
+		if timerPortalCD:GetRemaining() > 10 then -- soon warning not shown yet
+			self:Unschedule(warnPortalSoon.Show, warnPortalSoon)
+			warnPortalSoon:Schedule(timerPortalCD:GetRemaining() + 5 - 10)
+		end
+		if timerVolcanoCD:GetRemaining() > 10 then -- soon warning not shown yet
+			self:Unschedule(warnVolcanoSoon.Show, warnVolcanoSoon)
+			warnVolcanoSoon:Schedule(timerVolcanoCD:GetRemaining() + 5 - 10)
+		end
+		timerPortalCD:AddTime(5)
+		timerVolcanoCD:AddTime(5)
+		timerFlameCD:AddTime(5)
+		timerFleshCD:AddTime(5)
+		timerFelLightning:AddTime(5)
 	elseif args:IsSpellID(67901, 67902, 67903, 66258) then		-- Infernal Eruption
 		timerVolcanoCD:Start()
 		warnVolcanoSoon:Schedule(110)
-	elseif args:IsSpellID(66269, 67898, 67899, 67900) then		-- Nether Portal
-		timerPortalCD:Start()
-		warnPortalSoon:Schedule(110)
 	elseif args:IsSpellID(66197, 68123, 68124, 68125) then		-- Legion Flame
 		timerFlameCD:Start()
 		warnFlame:Show(args.destName) -- I prefer to keep this here, rather than a player elseif on aura applied. Faster and unfiltered.
@@ -162,6 +174,13 @@ function mod:SPELL_CAST_SUCCESS(args)
 	elseif args:IsSpellID(66528, 67029, 67030, 67031) then		-- Fel Lightning
 		timerFelLightning:Start()
 		warnFelLightning:Show()
+	end
+end
+
+function mod:SPELL_SUMMON(args)
+	if args:IsSpellID(66269, 67898, 67899, 67900) then -- Nether Portal
+		timerPortalCD:Start()
+		warnPortalSoon:Schedule(110)
 	end
 end
 
