@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Mimiron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261009180000")
+mod:SetRevision("20261011180000")
 mod:SetCreatureID(33432)
 mod:SetEncounterID(754)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -62,7 +62,7 @@ local specWarnRocketStrike			= mod:NewSpecialWarningDodge(64402, nil, nil, nil, 
 
 local timerSpinUp					= mod:NewCastTimer(4, 63414, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerP3Wx2LaserBarrageCast	= mod:NewCastTimer(10, 63274, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
-local timerNextP3Wx2LaserBarrage	= mod:NewNextTimer(45, 63414, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
+local timerNextP3Wx2LaserBarrage	= mod:NewNextTimer(60, 63414, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerRocketStrikeCD			= mod:NewCDTimer(20, 64402, nil, nil, nil, 3) -- AC: Repeat 20s
 local timerHeatWaveCD				= mod:NewCDCountTimer(10, 64533, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON)
 
@@ -83,7 +83,6 @@ local timerSelfRepair				= mod:NewCastSourceTimer(15, 64383, nil, nil, nil, 7, n
 mod:AddTimerLine(DBM_COMMON_L.HEROIC_ICON..DBM_CORE_L.HARD_MODE)
 local warnFlamesSoon				= mod:NewSoonAnnounce(64566, 1)
 
-local timerHardmode					= mod:NewTimer(600, "TimerHardmode", 64582, nil, nil, 6, nil, nil, nil, nil, nil, nil, nil, 64582) -- AC: 10min (25) / 8min (10)
 local timerNextFlames				= mod:NewNextTimer(30, 64566, nil, nil, nil, 7, nil, DBM_COMMON_L.IMPORTANT_ICON, nil, 1, 5)
 
 -- Stage One
@@ -281,7 +280,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		self.vb.is_spinningUp = true
 		timerSpinUp:Start()
 		timerP3Wx2LaserBarrageCast:Schedule(4)
-		timerNextP3Wx2LaserBarrage:Start()			-- AC: flat 45s cast-to-cast
+		timerNextP3Wx2LaserBarrage:Start()			-- AC: 60s cd
 		self:Schedule(0.15, show_warning_for_spinup, self)
 		lastSpinUp = GetTime()
 	elseif spellId == 65192 then	-- Flame Suppressant CD (phase 2)
@@ -383,8 +382,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	elseif msg == L.YellHardPull or msg:find(L.YellHardPull) then -- register HARD Mode
 		self.vb.hardmode = true
 		self:SetWipeTime(10)
-		local is25 = self:IsDifficulty("normal25") or self:IsDifficulty("heroic25")
-		timerHardmode:Start(is25 and 600 or 480)
+		timerEnrage:Start(600)
 		timerPlasmaBlastCD:Start(23)
 		timerNextFlameSuppressantP1:Start(73)
 		timerProximityMines:Start(19)
