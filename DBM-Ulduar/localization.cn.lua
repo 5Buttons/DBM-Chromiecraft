@@ -280,23 +280,6 @@ L:SetMiscLocalization({
 	YellPullHard		= "长老们，将你们的力量赐予我！"
 })
 
-----------------------
---  Freya's Elders  --
-----------------------
-L = DBM:GetModLocalization("Freya_Elders")
-
-L:SetGeneralLocalization({
-	name				= "弗蕾亚的长者"
-})
-
-L:SetOptionLocalization({
-	TrashRespawnTimer	= "为弗蕾亚的小怪重生显示计时条"
-})
-
-L:SetMiscLocalization({
-	TrashRespawnTimer	= "弗蕾亚的小怪重生"
-})
-
 ---------------
 --  Mimiron  --
 ---------------
@@ -418,4 +401,13 @@ L:SetMiscLocalization({
 	S3TrueFaceofDeath	= "第三阶段：死亡的真正面貌",
 	YoggSaron			= "尤格-萨隆",
 	ImmortalGuardian	= "不朽守护者"
+})
+
+-------------
+--  Trash  --
+-------------
+L = DBM:GetModLocalization("UlduarTrash")
+
+L:SetGeneralLocalization({
+	name = "奥杜尔小怪"
 })

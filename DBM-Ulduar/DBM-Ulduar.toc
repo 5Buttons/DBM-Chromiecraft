@@ -50,8 +50,8 @@ Auriaya.lua
 Hodir.lua
 Thorim.lua
 Freya.lua
-Freya_Elders.lua
 Mimiron.lua
 GeneralVezax.lua
 YoggSaron.lua
 Algalon.lua
+UlduarTrash.lua

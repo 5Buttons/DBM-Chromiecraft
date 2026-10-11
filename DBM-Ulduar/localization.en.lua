@@ -273,7 +273,8 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnSimulKill		= "First add down - Resurrection in 10 seconds"
+	WarnSimulKill		= "First add down - Resurrection in 11 seconds",
+	WarnWave			= "Wave %s: %s"
 })
 
 L:SetTimerLocalization({
@@ -282,7 +283,8 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	WarnSimulKill	= "Announce first mob down",
-	TimerSimulKill	= "Show timer for mob resurrection"
+	TimerSimulKill	= "Show timer for mob resurrection",
+	WarnWave		= "Announce $spell:62678 waves with count and group"
 })
 
 L:SetMiscLocalization({
@@ -290,6 +292,9 @@ L:SetMiscLocalization({
 	WaterSpirit			= "Ancient Water Spirit",
 	Snaplasher			= "Snaplasher",
 	StormLasher			= "Storm Lasher",
+	WaveTrio			= "Elementals",
+	WaveConservator		= "Ancient Conservator",
+	WaveLashers			= "Detonating Lashers",
 	YellKill			= "His hold on me dissipates. I can see clearly once more. Thank you, heroes.",
 	YellAdds1			= "Eonar, your servant requires aid!",
 	YellAdds2			= "The swarm of the elements shall overtake you!",
@@ -297,23 +302,6 @@ L:SetMiscLocalization({
 	TrashRespawnTimer	= "Freya trash respawn",
 	YellPullNormal		= "The Conservatory must be protected!",
 	YellPullHard		= "Elders grant me your strength!"
-})
-
-----------------------
---  Freya's Elders  --
-----------------------
-L = DBM:GetModLocalization("Freya_Elders")
-
-L:SetGeneralLocalization({
-	name = "Freya's Elders"
-})
-
-L:SetOptionLocalization({
-	TrashRespawnTimer	= "Show timer for trash respawn"
-})
-
-L:SetMiscLocalization({
-	TrashRespawnTimer	= "Freya trash respawn"
 })
 
 ---------------
@@ -437,4 +425,13 @@ L:SetMiscLocalization({
 	S3TrueFaceofDeath	= "Stage Three: True Face of Death",
 	YoggSaron			= "Yogg-Saron",
 	ImmortalGuardian	= "Immortal Guardian"
+})
+
+----------
+--  Trash  --
+----------
+L = DBM:GetModLocalization("UlduarTrash")
+
+L:SetGeneralLocalization({
+	name = "Ulduar Trash"
 })
