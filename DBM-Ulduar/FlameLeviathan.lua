@@ -20,7 +20,7 @@ local warnPursueTarget			= mod:NewTargetAnnounce(62374, 2)
 local warnNextPursueSoon		= mod:NewAnnounce("warnNextPursueSoon", 3, 62374, nil, nil, nil, 62374)
 
 local specWarnSystemOverload	= mod:NewSpecialWarningSpell(62475, nil, nil, nil, 1, 12)
-local specWarnPursue			= mod:NewSpecialWarning("SpecialPursueWarnYou", nil, nil, 2, 4, 2, nil, 62374, 62374)
+local specWarnPursue			= mod:NewSpecialWarning("SpecialPursueWarnYou", nil, nil, nil, 4, 2, nil, 62374, 62374)
 
 local timerSystemOverload		= mod:NewBuffActiveTimer(20, 62475, nil, nil, nil, 6)
 local timerFlameVents			= mod:NewCastTimer(10, 62396, nil, nil, nil, 2, nil, DBM_COMMON_L.INTERRUPT_ICON)
