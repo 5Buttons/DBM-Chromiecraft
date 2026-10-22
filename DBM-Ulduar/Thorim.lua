@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Thorim", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260823220131")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(32865)
 mod:SetEncounterID(752)
 mod:SetUsedIcons(7)
@@ -22,7 +22,7 @@ mod:RegisterEventsInCombat(
 -- General
 local enrageTimerStage1				= mod:NewBerserkTimer(300, nil, DBM_CORE_L.GENERIC_TIMER_BERSERK..": "..DBM_CORE_L.SCENARIO_STAGE:format(1)) -- REVIEW! Need log to validate, only used Wowhead as reference
 local enrageTimerStage2				= mod:NewBerserkTimer(300, nil, DBM_CORE_L.GENERIC_TIMER_BERSERK..": "..DBM_CORE_L.SCENARIO_STAGE:format(2)) -- REVIEW! Need log to validate, only used Wowhead as reference
-mod:AddRangeFrameOption("10")
+mod:AddRangeFrameOption("8") -- Chain Lightning jumps 5 yd edge to edge
 
 -- Stage One
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(1))
@@ -75,7 +75,7 @@ function mod:OnCombatStart()
 	enrageTimerStage1:Start()
 	timerStormhammerCD:Start(28) 
 	if self.Options.RangeFrame then
-		DBM.RangeCheck:Show(10)
+		DBM.RangeCheck:Show(8)
 	end
 	table.wipe(lastcharge)
 end
