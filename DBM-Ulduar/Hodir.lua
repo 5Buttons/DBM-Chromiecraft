@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Hodir", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260507220131")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(32845,32926)
 mod:SetEncounterID(751)
 mod:SetUsedIcons(7, 8)
@@ -27,6 +27,9 @@ local specWarnBitingCold	= mod:NewSpecialWarningMove(62188, nil, nil, nil, 1, 2)
 local enrageTimer			= mod:NewBerserkTimer(475)
 local timerFlashFreeze		= mod:NewCastTimer(9, 61968, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON..DBM_COMMON_L.DEADLY_ICON)
 local timerFrozenBlows		= mod:NewBuffActiveTimer(20, 63512, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.HEALER_ICON)
+-- Frozen Blows has no cooldown of its own: the Flash Freeze handler is the only thing that arms it,
+-- unconditionally 15s out, so the cast we already hook is an exact lead-in for tanks and healers.
+local timerFrozenBlowsCD	= mod:NewNextTimer(15, 63512, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.HEALER_ICON)
 local timerFlashFrCD		= mod:NewCDTimer(48, 61968, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON..DBM_COMMON_L.DEADLY_ICON)
 local timerAchieve			= mod:NewAchievementTimer(179, 3182)
 
@@ -47,11 +50,13 @@ function mod:SPELL_CAST_START(args)
 		specWarnFlashFreeze:Show()
 		specWarnFlashFreeze:Play("findshelter")
 		timerFlashFrCD:Start()
+		timerFrozenBlowsCD:Start()
 	end
 end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(62478, 63512) then
+		timerFrozenBlowsCD:Stop()
 		timerFrozenBlows:Start()
 	elseif args:IsSpellID(65123, 65133) then
 		if args:IsPlayer() then
