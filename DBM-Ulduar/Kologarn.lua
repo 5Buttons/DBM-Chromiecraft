@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kologarn", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260507220131")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(32930)
 mod:SetEncounterID(749)
 mod:SetUsedIcons(5, 6, 7, 8)
@@ -13,9 +13,10 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 64290 64292 64002 63355",
 	"SPELL_AURA_APPLIED_DOSE 64002 63355",
 	"SPELL_AURA_REMOVED 64290 64292",
-	"SPELL_DAMAGE 63783 63982 63346 63976",
-	"SPELL_MISSED 63783 63982 63346 63976",
+	"SPELL_DAMAGE 63356 64003 63783 63982 63346 63976",
+	"SPELL_MISSED 63356 64003 63783 63982 63346 63976",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
+	"CHAT_MSG_RAID_BOSS_WHISPER",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED"
 )
@@ -42,23 +43,23 @@ local specWarnEyebeamNear		= mod:NewSpecialWarningClose(63346, nil, nil, nil, 1,
 local yellBeam					= mod:NewYell(63346)
 
 local timerCrunch10				= mod:NewTargetTimer(6, 63355)
-local timerNextSmash			= mod:NewCDTimer(14, 64003, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON) --  14s on AC
-local timerNextEyebeam			= mod:NewCDTimer(20, 63346, nil, nil, nil, 3, nil, DBM_COMMON_L.IMPORTANT_ICON, true) --20s baseline on AC but delayed by 1s on each SMASH and SWEEP
+local timerNextSmash			= mod:NewCDTimer(14, 64003, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON) -- 8s first, then 14s on AC
+local timerNextEyebeam			= mod:NewCDTimer(20, 63346, nil, nil, nil, 3, nil, DBM_COMMON_L.IMPORTANT_ICON, true) -- 10s first, then 20s on AC
 
-mod:AddSetIconOption("SetIconOnEyebeamTarget", 63346, true, false, {8})
+mod:AddSetIconOption("SetIconOnEyebeamTarget", 63346, true, false, {5})
 
 -- Right Arm
 mod:AddTimerLine(L.Health_Right_Arm)
 local warnGrip					= mod:NewTargetNoFilterAnnounce(64292, 2)
 
-local timerNextGrip				= mod:NewNextTimer(25, 62166, nil, nil, nil, 3) -- (2022/07/05 log review || 25m Lordaeron 2022/10/30) - 25.0 || 25.0, 25.1, 25.0
+local timerNextGrip				= mod:NewNextTimer(25, 62166, nil, nil, nil, 3) -- 15s first, then 25s on AC
 local timerRespawnRightArm		= mod:NewTimer(50, "timerRightArm", nil, nil, nil, 1) --50s on AC
 
 mod:AddSetIconOption("SetIconOnGripTarget", 64292, true, false, {7, 6, 5})
 
 -- Left Arm
 mod:AddTimerLine(L.Health_Left_Arm)
-local timerNextShockwave		= mod:NewNextTimer(17, 63982, nil, nil, nil, 2) -- 17s
+local timerNextShockwave		= mod:NewNextTimer(17, 63982, nil, nil, nil, 2) -- 17s first, then 17s on AC
 local timerRespawnLeftArm		= mod:NewTimer(50, "timerLeftArm", nil, nil, nil, 1) --50s on AC
 
 -- 5/23 00:33:48.648  SPELL_AURA_APPLIED,0x0000000000000000,nil,0x80000000,0x0480000001860FAC,"Hâzzad",0x4000512,63355,"Crunch Armor",0x1,DEBUFF
@@ -73,6 +74,20 @@ local function armReset(self)
 	self.vb.disarmActive = false
 end
 
+-- AC: Smash and Sweep delay every other pending event by 1s
+local function delayOthers(skip)
+	for _, timer in ipairs({timerNextSmash, timerNextEyebeam, timerNextGrip, timerNextShockwave}) do
+		if timer ~= skip and timer:GetRemaining() > 0 then timer:AddTime(1) end -- AddTime starts a stopped bar
+	end
+end
+
+local function smash(self)
+	if self:AntiSpam(3, 4) then
+		timerNextSmash:Start()
+		delayOthers(timerNextSmash)
+	end
+end
+
 local function GripAnnounce(self)
 	warnGrip:Show(table.concat(gripTargets, "<, >"))
 	table.wipe(gripTargets)
@@ -80,16 +95,16 @@ end
 
 function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
-	timerNextSmash:Start(5-delay) -- 2s variance (2022/07/05 log review) - [5-7]
-	timerNextEyebeam:Start(10-delay) -- 10s on AC
-	timerNextShockwave:Start(17-delay) -- (2022/07/05 log review || 25m Lordaeron 2022/10/30) - 19 || 18.2
-	timerNextGrip:Start(24.2-delay) --  (25m Lordaeron 2022/10/30) - 24.2
+	timerNextSmash:Start(8-delay)
+	timerNextEyebeam:Start(10-delay)
+	timerNextShockwave:Start(17-delay)
+	timerNextGrip:Start(15-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 64003 then
-		timerNextSmash:Start()
-	elseif args.IsSpellID(62166, 63981) then -- Stone Grip
+		smash(self)
+	elseif args:IsSpellID(62166, 63981) then -- Stone Grip
 		timerNextGrip:Start()
 	end
 end
@@ -147,6 +162,7 @@ function mod:UNIT_DIED(args)
 		end
 	elseif self:GetCIDFromGUID(args.destGUID) == 32933 then		-- left arm
 		timerRespawnLeftArm:Start()
+		timerNextShockwave:Cancel()
 		if not self.vb.disarmActive then
 			self.vb.disarmActive = true
 			if self:IsDifficulty("normal10") then
@@ -161,7 +177,9 @@ function mod:UNIT_DIED(args)
 end
 
 function mod:SPELL_DAMAGE(_, _, _, destGUID, destName, _, spellId)
-	if (spellId == 63346 or spellId == 63976) and self:AntiSpam(2, 2) then
+	if spellId == 63356 or spellId == 64003 then -- AC logs the two-armed Smash only as its hit
+		smash(self)
+	elseif (spellId == 63346 or spellId == 63976) and self:AntiSpam(2, 2) then
 		if destGUID == UnitGUID("player") then
 			specWarnEyebeam:Show()
 		else
@@ -184,6 +202,12 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	end
 end
 
+function mod:CHAT_MSG_RAID_BOSS_WHISPER(msg)
+	if msg:find(L.FocusedEyebeam) then
+		self:SendSync("EyeBeamOn", UnitName("player"))
+	end
+end
+
 function mod:OnSync(msg, target)
 	if msg == "EyeBeamOn" and self:AntiSpam(2, 1) then
 		warnFocusedEyebeam:Show(target)
@@ -193,20 +217,20 @@ function mod:OnSync(msg, target)
 			specWarnEyebeam:ScheduleVoice(1, "keepmove")
 			yellBeam:Yell()
 		end
-		warnFocusedEyebeam:Show(target)
 		if self.Options.SetIconOnEyebeamTarget then
-			self:SetIcon(target, 5, 8)
+			self:SetIcon(target, 5, 8) -- 8-6 are taken by Stone Grip
 		end
 	end
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(63983) then--Arm Sweep
+	if spellName == GetSpellInfo(63983) and self:AntiSpam(3, 5) then--Arm Sweep
 		timerNextShockwave:Start()
+		delayOthers(timerNextShockwave)
 	elseif spellName == GetSpellInfo(63342) and self:AntiSpam(3, 3) then --Focused Eyebeam Summon Trigger
 		timerNextEyebeam:Start()
 	elseif spellName == GetSpellInfo(63573) then  -- One-Armed Overhead Smash
-		timerNextSmash:Start()
+		smash(self)
 	elseif spellName == GetSpellInfo(63726) then -- Pacify Self (End Combat, since there isn't a UNIT_DIED for OnMobKill to run)
 		DBM:EndCombat(self)
 	end
