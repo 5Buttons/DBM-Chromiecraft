@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Algalon", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260912000000")
+mod:SetRevision("20261025000000")
 mod:SetCreatureID(32871)
 mod:SetEncounterID(757)
 mod:RegisterCombat("yell", L.YellPull)
@@ -9,20 +9,18 @@ mod:RegisterKill("yell", L.YellKill)
 mod:SetWipeTime(20)
 
 mod:RegisterEvents(
-	"CHAT_MSG_MONSTER_YELL",
-	"UPDATE_WORLD_STATES"
+	"CHAT_MSG_MONSTER_YELL"
 )
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 64584 64443",
-	"SPELL_CAST_SUCCESS 65108 64122 64598 62301 64412 64592 65184",
+	"SPELL_CAST_SUCCESS 65108 64122 64598 62301 64412 64592",
 	"SPELL_AURA_APPLIED 64412",
 	"SPELL_AURA_APPLIED_DOSE 64412",
 	"SPELL_AURA_REMOVED 64412",
 	"SPELL_DAMAGE 65108 64122",
 	"SPELL_MISSED 65108 64122",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
-	"UNIT_SPELLCAST_SUCCEEDED",
 	"UNIT_HEALTH"
 )
 
@@ -90,10 +88,10 @@ function mod:OnCombatStart(delay)
 	star_num = 1
 	self.vb.warned_preP2 = false
 	local minutes = getDespawnMinutes()
-	local rpTime = (not minutes or minutes == 0 or minutes >= 60) and 26 or 8
+	local rpTime = (not minutes or minutes == 0 or minutes >= 60) and 26 or 8.5
 	local remaining = rpTime - delay
 	if remaining > 0 then
-		timerCombatStart:Start(remaining)	-- 26 seconds roleplaying on the first pull, else 8
+		timerCombatStart:Start(remaining)	-- 26 seconds roleplaying on the first pull, else 8.5
 		self:ScheduleMethod(remaining, "startTimers")
 	else
 		self:startTimers()
@@ -191,12 +189,6 @@ function mod:UNIT_HEALTH(uId)
 	end
 end
 
-function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(65184) then
-		DBM:EndCombat(self)
-	end
-end
-
 mod:RegisterOnUpdateHandler(function(self)
 	if not self:IsInCombat() then return end
 		for uId in DBM:GetGroupMembers() do
@@ -234,24 +226,3 @@ mod:RegisterOnUpdateHandler(function(self)
 			end
 		end
 end, 0.1)
-local wsWasActive = false
-
-function mod:UPDATE_WORLD_STATES()
-	if not self.inCombat then return end
-	local anyActive = false
-	for i = 1, GetNumWorldStateUI() do
-		local _, state = GetWorldStateUIInfo(i)
-		if state == 1 then
-			anyActive = true
-			break
-		end
-	end
-	if anyActive then
-		wsWasActive = true
-	elseif wsWasActive then
-		wsWasActive = false
-		if self.vb.phase == 2 then
-			DBM:EndCombat(self)
-		end
-	end
-end
