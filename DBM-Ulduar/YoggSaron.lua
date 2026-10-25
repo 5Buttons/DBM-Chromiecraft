@@ -1,10 +1,11 @@
 local mod	= DBM:NewMod("YoggSaron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261003220131")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(33288)
 mod:SetEncounterID(756)
 mod:RegisterCombat("combat_yell", L.YellPull)
+mod:SetWipeTime(18.5) -- the raid can drop combat during Sara's 18.5s transform before P2
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
 mod:SetBossHealthInfo(33134, L.Sara) -- Health frame: Sara (P1) -> Brain (P2) -> Yogg-Saron (P3)
 

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Sindragosa", "DBM-Icecrown", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251101201015")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(36853)
 mod:SetEncounterID(855)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6)
@@ -221,7 +221,7 @@ end
 function mod:OnCombatEnd()
 	self:UnregisterShortTermEvents()
 	if self.Options.RangeFrame then
-		DBM.RangeCheck:Hide()
+		DBM.RangeCheck:Hide(true)	-- AC: force, else restoreRange left by SetBossRange re-shows the frame
 	end
 end
 

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("XT002", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260502220131")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(33293)
 mod:SetEncounterID(747)
 mod:SetUsedIcons(1, 2)
@@ -40,8 +40,8 @@ local timerTympanicTantrumCD		= mod:NewCDTimer(60, 62776, nil, nil, nil, 2, nil,
 local timerLightBomb				= mod:NewTargetTimer(9, 65121, nil, nil, nil, 3)
 local timerGravityBomb				= mod:NewTargetTimer(9, 64234, nil, nil, nil, 3)
 
-mod:AddSetIconOption("SetIconOnLightBombTarget", 65121, true, true, {1})
-mod:AddSetIconOption("SetIconOnGravityBombTarget", 64234, true, true, {2})
+mod:AddSetIconOption("SetIconOnLightBombTarget", 65121, true, false, {1})
+mod:AddSetIconOption("SetIconOnGravityBombTarget", 64234, true, false, {2})
 
 -- Stage Two
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2))
