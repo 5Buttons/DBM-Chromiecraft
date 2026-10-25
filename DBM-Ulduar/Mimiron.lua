@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Mimiron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261011180000")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(33432)
 mod:SetEncounterID(754)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -242,7 +242,7 @@ function mod:OnCombatEnd()
 		DBM.BossHealth:Hide()
 	end
 	if self.Options.RangeFrame then
-		DBM.RangeCheck:Hide()
+		DBM.RangeCheck:Hide(true)	-- AC: force, else restoreRange left by SetBossRange re-shows the frame
 	end
 	-- Don't change loot if it was manually changed away from ffa
 	if self.Options.AutoChangeLootToFFA and DBM:GetRaidRank() == 2 and GetLootMethod() == "freeforall" and cachedLootmethod then

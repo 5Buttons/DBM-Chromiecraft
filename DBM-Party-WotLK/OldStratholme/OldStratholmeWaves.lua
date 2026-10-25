@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("StratWaves", "DBM-Party-WotLK", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220729232625")
+mod:SetRevision("20261022120000")
 
 mod:RegisterEvents(
 	"UPDATE_WORLD_STATES",
@@ -100,8 +100,17 @@ end]]
 
 function mod:CHAT_MSG_MONSTER_SAY(msg)
 	if msg == L.Roleplay or msg:find(L.Roleplay) then
-		timerRoleplay:Start()--Arthas preaches to uther and jaina
+		self:SendSync("Roleplay")--Arthas preaches to uther and jaina
 	elseif msg == L.Roleplay2 or msg:find(L.Roleplay2) then
-		timerRoleplay:Start(106)--Arthas prances around blabbing with malganis
+		self:SendSync("Roleplay2")--Arthas prances around blabbing with malganis
+	end
+end
+
+--monster say only reaches players standing near Arthas, so the timer is synced to the whole group
+function mod:OnSync(event)
+	if event == "Roleplay" then
+		timerRoleplay:Start()
+	elseif event == "Roleplay2" then
+		timerRoleplay:Start(106)
 	end
 end

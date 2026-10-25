@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IronCouncil", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260621220131")
+mod:SetRevision("20261022120000")
 mod:SetCreatureID(32867, 32927, 32857)
 mod:SetEncounterID(748)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -42,7 +42,6 @@ local specWarnLightningWhirl	= mod:NewSpecialWarningInterrupt(63483, "HasInterru
 local timerOverload				= mod:NewCastTimer(6, 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON)
 local timerOverloadCD			= mod:NewCDTimer("v25-40", 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON, nil, 1) --25-40s variance on AC
 local timerLightningWhirl		= mod:NewCastTimer(5, 63483, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
-local timerLightningWhirlCD		= mod:NewCDTimer(32, 63483)
 local timerLightningTendrils	= mod:NewBuffActiveTimer(35, 63486, nil, nil, nil, 6)
 mod:AddBoolOption("AlwaysWarnOnOverload", false, "announce", nil, nil, nil, 63481)
 
@@ -72,6 +71,7 @@ local warnOverwhelmingPower		= mod:NewTargetAnnounce(61888, 2)
 local warnStaticDisruption		= mod:NewTargetAnnounce(63494, 3)
 
 local timerOverwhelmingPower	= mod:NewTargetTimer(25, 61888, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.DEADLY_ICON, nil, 3)
+local timerFusionPunchCD		= mod:NewCDTimer("v15-20", 61903, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.MAGIC_ICON) --AC: 15s first, then 15-20s cast-to-cast
 local timerFusionPunchCast		= mod:NewCastTimer(3, 61903, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.MAGIC_ICON)
 local timerFusionPunchActive	= mod:NewTargetTimer(4, 61903, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.MAGIC_ICON)
 mod:AddSetIconOption("SetIconOnOverwhelmingPower", 61888, false, false, {8})
@@ -100,6 +100,7 @@ function mod:OnCombatStart(delay)
 	timerRuneofPowerCD:Start(30-delay) -- 30s on AC
 	timerOverloadCD:Start(-delay) -- 20-40s variance on AC
 	timerRuneofShieldsCD:Start(20-delay)
+	timerFusionPunchCD:Start(15-delay) -- 15s on AC
 	table.wipe(disruptTargets)
 	self.vb.disruptIcon = 7
 	runemasterAlive = true
@@ -109,7 +110,7 @@ end
 
 function mod:OnCombatEnd()
 	if self.Options.RangeFrame then
-		DBM.RangeCheck:Hide()
+		DBM.RangeCheck:Hide(true)	-- AC: force, else restoreRange left by SetBossRange re-shows the frame
 	end
 end
 
@@ -133,6 +134,7 @@ function mod:SPELL_CAST_START(args)
 	elseif args:IsSpellID(61903, 63493) then	-- Fusion Punch
 		warnFusionPunch:Show()
 		timerFusionPunchCast:Start()
+		timerFusionPunchCD:Start()
 	elseif args:IsSpellID(62274, 63489) then	-- Shield of Runes
 		warnShieldofRunes:Show()
 		timerRuneofShieldsCD:Start()
@@ -218,7 +220,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		self:Schedule(0.3, warnStaticDisruptionTargets, self)
 	elseif args:IsSpellID(63483, 61915) then	-- Lightning Whirl
 		timerLightningWhirl:Start()
-		timerLightningWhirlCD:Start()
 		if self:CheckInterruptFilter(args.destGUID, false, true) then
 			specWarnLightningWhirl:Show(args.destName)
 			specWarnLightningWhirl:Play("kickcast")
@@ -253,16 +254,13 @@ function mod:UNIT_DIED(args)
 		if runemasterAlive and brundirAlive then
 			timerRuneofDeath:Start(35)
 			warnRuneofDeathIn10Sec:Schedule(20)
-			timerLightningWhirlCD:Start()
 		elseif runemasterAlive then
 			timerRuneofSummoning:Start(25)
 		end
 		timerFusionPunchCast:Cancel()
+		timerFusionPunchCD:Cancel()
 	elseif cid == 32927 then	--Runemaster Molgeim
 		runemasterAlive = false
-		if brundirAlive and steelbreakerAlive then
-			timerLightningWhirlCD:Start()
-		end
 		timerRuneofDeath:Cancel()
 		warnRuneofDeathIn10Sec:Cancel()
 		timerRuneofPowerCD:Cancel()
