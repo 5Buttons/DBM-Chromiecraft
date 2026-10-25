@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Thorim", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260823220131")
+mod:SetRevision("20261025120000")
 mod:SetCreatureID(32865)
 mod:SetEncounterID(752)
 mod:SetUsedIcons(7)
@@ -67,6 +67,8 @@ mod:GroupSpells(62526, 62527) -- Rune of Detonation
 mod:GroupSpells("at3183", 62507) -- Lose Your Illusion (25 player), Touch of Dominion
 
 local lastcharge = {}
+-- AC: Sif's Frost Nova starts 2.5s before its cast, every 25s, and delays the pending Volley by 5s
+local nextNovaStart, volleyDelayed = 0, false
 mod.vb.isHardMode = false
 
 function mod:OnCombatStart()
@@ -78,6 +80,7 @@ function mod:OnCombatStart()
 		DBM.RangeCheck:Show(10)
 	end
 	table.wipe(lastcharge)
+	nextNovaStart, volleyDelayed = 0, false
 end
 
 local sortedFailsC = {}
@@ -112,7 +115,11 @@ function mod:SPELL_CAST_START(args)
 		timerFrostNovaCast:Start()
 		timerFrostNova:Start()
 		if self:AntiSpam(5, 2) then
-			timerFBVolley:AddTime(5) --Frostnova delays volley by 5s on AC
+			nextNovaStart = GetTime() - 2.5 + 25
+			if not volleyDelayed and timerFBVolley:GetRemaining() > 0 then -- AddTime would start a stopped bar
+				timerFBVolley:AddTime(5) -- only if the Volley bar didn't already include this Nova
+			end
+			volleyDelayed = true
 		end
 	elseif args:IsSpellID(64390, 62131) then	-- Chain Lightning by Thorim
 		timerChainLightning:Start()
@@ -131,7 +138,8 @@ function mod:SPELL_CAST_SUCCESS(args)
 	elseif spellId == 62130 then	-- Unbalancing Strike
 		timerUnbalancingStrike:Start()
 	elseif args:IsSpellID(62580, 62604) then	-- Frostbolt Volley by Sif
-		timerFBVolley:Start()
+		volleyDelayed = nextNovaStart < GetTime() + 13 -- the next Nova comes first, so the next Volley comes 5s later
+		timerFBVolley:Start(volleyDelayed and 18 or 13)
 	end
 end
 
