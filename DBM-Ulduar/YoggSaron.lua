@@ -40,7 +40,6 @@ mod:AddSetIconOption("SetIconOnFervorTarget", 63138, false, false, {7})
 -- Guardian of Yogg-Saron
 -- mod:AddTimerLine(L.GuardianofYoggSaron)
 local warnGuardianSpawned			= mod:NewAnnounce("WarningGuardianSpawned", 3, 62979, nil, nil, nil, 62979)
-local timerNextGuardian				= mod:NewCDCountTimer(10, 62979, nil, nil, nil, 1)
 
 local specWarnGuardianLow			= mod:NewSpecialWarning("SpecWarnGuardianLow", false, nil, nil, nil, nil, nil, 62979, 62979)
 
@@ -143,16 +142,12 @@ local SanityBuff = DBM:GetSpellInfoNew(63050)
 mod.vb.brainLinkIcon = 2
 mod.vb.beaconIcon = 8
 mod.vb.Guardians = 0
-mod.vb.guardianWave = 1
-local guardianGaps = {20, 18, 16, 14, 12} -- AC: 2s shorter per wave, 10s from wave 6 on
 
 function mod:OnCombatStart()
 	self:SetStage(1)
 	self.vb.brainLinkIcon = 2
 	self.vb.beaconIcon = 8
 	self.vb.Guardians = 0
-	self.vb.guardianWave = 1
-	timerNextGuardian:Start(10, 1) -- AC: first wave at pull, its cloud summons 10s later
 	enrageTimer:Start()
 	timerAchieve:Start()
 	table.wipe(targetWarningsShown)
@@ -227,12 +222,6 @@ function mod:SPELL_SUMMON(args)
 	if args.spellId == 62979 then
 		self.vb.Guardians = self.vb.Guardians + 1
 		warnGuardianSpawned:Show(self.vb.Guardians)
-		-- an earlier spawn is a player walking into a cloud, not Sara's wave
-		if self.vb.phase == 1 and timerNextGuardian:GetRemaining(self.vb.guardianWave) < 5 then
-			local gap = guardianGaps[self.vb.guardianWave] or 10
-			self.vb.guardianWave = self.vb.guardianWave + 1
-			timerNextGuardian:Start(("v%d-%d"):format(gap, gap + 4), self.vb.guardianWave) -- Sara's 4s casts can hold a wave
-		end
 	end
 end
 
@@ -298,7 +287,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	elseif args:IsSpellID(63894, 64775) and self.vb.phase < 2 then	-- Shadowy Barrier of Yogg-Saron (this is happens when p2 starts, ~1s after IEEU, so correction factor is needed). Bugged on Warmane, 63894 is never applied (only removed), instead 64775 is applied to Sara
 		self:SetStage(2)
-		timerNextGuardian:Stop()
 		timerMaladyCD:Start(12)	-- 12s AC
 		timerBrainLinkCD:Start(18)	--  18s AC
 		timerBrainPortal:Start(60)	-- 60s AC
