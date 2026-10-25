@@ -16,7 +16,6 @@ mod:RegisterEventsInCombat(
 	"SPELL_DAMAGE 63356 64003 63783 63982 63346 63976",
 	"SPELL_MISSED 63356 64003 63783 63982 63346 63976",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
-	"CHAT_MSG_RAID_BOSS_WHISPER",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED"
 )
@@ -195,12 +194,6 @@ mod.SPELL_MISSED = mod.SPELL_DAMAGE
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
 	if msg == L.FocusedEyebeam or msg:find(L.FocusedEyebeam) then
 		self:SendSync("EyeBeamOn", target)
-	end
-end
-
-function mod:CHAT_MSG_RAID_BOSS_WHISPER(msg)
-	if msg:find(L.FocusedEyebeam) then
-		self:SendSync("EyeBeamOn", UnitName("player"))
 	end
 end
 
