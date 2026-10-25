@@ -27,8 +27,6 @@ local specWarnBitingCold	= mod:NewSpecialWarningMove(62188, nil, nil, nil, 1, 2)
 local enrageTimer			= mod:NewBerserkTimer(475)
 local timerFlashFreeze		= mod:NewCastTimer(9, 61968, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON..DBM_COMMON_L.DEADLY_ICON)
 local timerFrozenBlows		= mod:NewBuffActiveTimer(20, 63512, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.HEALER_ICON)
--- Frozen Blows has no cooldown of its own: the Flash Freeze handler is the only thing that arms it,
--- unconditionally 15s out, so the cast we already hook is an exact lead-in for tanks and healers.
 local timerFrozenBlowsCD	= mod:NewNextTimer(15, 63512, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON..DBM_COMMON_L.HEALER_ICON)
 local timerFlashFrCD		= mod:NewCDTimer(48, 61968, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON..DBM_COMMON_L.DEADLY_ICON)
 local timerAchieve			= mod:NewAchievementTimer(179, 3182)
@@ -50,7 +48,7 @@ function mod:SPELL_CAST_START(args)
 		specWarnFlashFreeze:Show()
 		specWarnFlashFreeze:Play("findshelter")
 		timerFlashFrCD:Start()
-		timerFrozenBlowsCD:Start()
+		timerFrozenBlowsCD:Start() --15seconds after Flash Freezce CAST_START
 	end
 end
 

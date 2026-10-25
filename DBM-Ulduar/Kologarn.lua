@@ -9,12 +9,12 @@ mod:SetUsedIcons(5, 6, 7, 8)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 64003 62166 63981",
+	"SPELL_CAST_SUCCESS 62166 63981",
 	"SPELL_AURA_APPLIED 64290 64292 64002 63355",
 	"SPELL_AURA_APPLIED_DOSE 64002 63355",
 	"SPELL_AURA_REMOVED 64290 64292",
-	"SPELL_DAMAGE 63356 64003 63783 63982 63346 63976",
-	"SPELL_MISSED 63356 64003 63783 63982 63346 63976",
+	"SPELL_DAMAGE 63356 64003 63573 64006 63783 63982 63346 63976",
+	"SPELL_MISSED 63356 64003 63573 64006 63783 63982 63346 63976",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED"
@@ -73,16 +73,6 @@ local function armReset(self)
 	self.vb.disarmActive = false
 end
 
--- AC: Smash and Sweep delay all other events by 1s. Grip/Shockwave bars are stopped while their arm is dead
-local function smash(self)
-	if self:AntiSpam(3, 4) then
-		timerNextSmash:Start()
-		timerNextEyebeam:AddTime(1)
-		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
-		if timerNextShockwave:GetRemaining() > 0 then timerNextShockwave:AddTime(1) end
-	end
-end
-
 local function GripAnnounce(self)
 	warnGrip:Show(table.concat(gripTargets, "<, >"))
 	table.wipe(gripTargets)
@@ -97,9 +87,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 64003 then
-		smash(self)
-	elseif args:IsSpellID(62166, 63981) then -- Stone Grip
+	if args:IsSpellID(62166, 63981) then -- Stone Grip
 		timerNextGrip:Start()
 	end
 end
@@ -172,8 +160,12 @@ function mod:UNIT_DIED(args)
 end
 
 function mod:SPELL_DAMAGE(_, _, _, destGUID, destName, _, spellId)
-	if spellId == 63356 or spellId == 64003 then -- AC logs the two-armed Smash only as its hit
-		smash(self)
+	if spellId == 63356 or spellId == 64003 or spellId == 63573 or spellId == 64006 then -- Overhead Smash (two-/one-armed) lands on his next swing, only the hit is logged reliably
+		timerNextSmash:Start()
+		-- AC: Smash and Sweep delay all other events by 1s. Grip/Shockwave bars are stopped while their arm is dead
+		timerNextEyebeam:AddTime(1)
+		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
+		if timerNextShockwave:GetRemaining() > 0 then timerNextShockwave:AddTime(1) end
 	elseif (spellId == 63346 or spellId == 63976) and self:AntiSpam(2, 2) then
 		if destGUID == UnitGUID("player") then
 			specWarnEyebeam:Show()
@@ -220,8 +212,6 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
 	elseif spellName == GetSpellInfo(63342) and self:AntiSpam(3, 3) then --Focused Eyebeam Summon Trigger
 		timerNextEyebeam:Start()
-	elseif spellName == GetSpellInfo(63573) then  -- One-Armed Overhead Smash
-		smash(self)
 	elseif spellName == GetSpellInfo(63726) then -- Pacify Self (End Combat, since there isn't a UNIT_DIED for OnMobKill to run)
 		DBM:EndCombat(self)
 	end
