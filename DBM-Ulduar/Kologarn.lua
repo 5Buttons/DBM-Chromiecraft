@@ -28,7 +28,7 @@ mod:SetBossHealthInfo(
 )
 
 -- General
-local enrageTimer				= mod:NewBerserkTimer(600)
+local enrageTimer				= mod:NewBerserkTimer(480)
 local timerTimeForDisarmed		= mod:NewTimer(10, "achievementDisarmed")	-- 10 HC / 12 nonHC
 
 --NOTE: Two crunch armors are setup to appear in gui twice on purpose, because they are very different mechanically. One is meant to be ignored and one is meant to be tank swap
@@ -74,17 +74,13 @@ local function armReset(self)
 	self.vb.disarmActive = false
 end
 
--- AC: Smash and Sweep delay every other pending event by 1s
-local function delayOthers(skip)
-	for _, timer in ipairs({timerNextSmash, timerNextEyebeam, timerNextGrip, timerNextShockwave}) do
-		if timer ~= skip and timer:GetRemaining() > 0 then timer:AddTime(1) end -- AddTime starts a stopped bar
-	end
-end
-
+-- AC: Smash and Sweep delay all other events by 1s. Grip/Shockwave bars are stopped while their arm is dead
 local function smash(self)
 	if self:AntiSpam(3, 4) then
 		timerNextSmash:Start()
-		delayOthers(timerNextSmash)
+		timerNextEyebeam:AddTime(1)
+		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
+		if timerNextShockwave:GetRemaining() > 0 then timerNextShockwave:AddTime(1) end
 	end
 end
 
@@ -226,7 +222,9 @@ end
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	if spellName == GetSpellInfo(63983) and self:AntiSpam(3, 5) then--Arm Sweep
 		timerNextShockwave:Start()
-		delayOthers(timerNextShockwave)
+		timerNextSmash:AddTime(1)
+		timerNextEyebeam:AddTime(1)
+		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
 	elseif spellName == GetSpellInfo(63342) and self:AntiSpam(3, 3) then --Focused Eyebeam Summon Trigger
 		timerNextEyebeam:Start()
 	elseif spellName == GetSpellInfo(63573) then  -- One-Armed Overhead Smash

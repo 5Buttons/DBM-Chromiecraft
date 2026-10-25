@@ -42,7 +42,6 @@ local specWarnLightningWhirl	= mod:NewSpecialWarningInterrupt(63483, "HasInterru
 local timerOverload				= mod:NewCastTimer(6, 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON)
 local timerOverloadCD			= mod:NewCDTimer("v25-40", 63481, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON, nil, 1) --25-40s variance on AC
 local timerLightningWhirl		= mod:NewCastTimer(5, 63483, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
-local timerLightningWhirlCD		= mod:NewCDTimer("v10-25", 63483, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON) -- AC: first 20-40s after the first council death, then 10-25s
 local timerLightningTendrils	= mod:NewBuffActiveTimer(35, 63486, nil, nil, nil, 6)
 mod:AddBoolOption("AlwaysWarnOnOverload", false, "announce", nil, nil, nil, 63481)
 
@@ -221,7 +220,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		self:Schedule(0.3, warnStaticDisruptionTargets, self)
 	elseif args:IsSpellID(63483, 61915) then	-- Lightning Whirl
 		timerLightningWhirl:Start()
-		timerLightningWhirlCD:Start()
 		if self:CheckInterruptFilter(args.destGUID, false, true) then
 			specWarnLightningWhirl:Show(args.destName)
 			specWarnLightningWhirl:Play("kickcast")
@@ -256,7 +254,6 @@ function mod:UNIT_DIED(args)
 		if runemasterAlive and brundirAlive then
 			timerRuneofDeath:Start(35)
 			warnRuneofDeathIn10Sec:Schedule(20)
-			timerLightningWhirlCD:Start("v20-40")
 		elseif runemasterAlive then
 			timerRuneofSummoning:Start(25)
 		end
@@ -264,9 +261,6 @@ function mod:UNIT_DIED(args)
 		timerFusionPunchCD:Cancel()
 	elseif cid == 32927 then	--Runemaster Molgeim
 		runemasterAlive = false
-		if brundirAlive and steelbreakerAlive then
-			timerLightningWhirlCD:Start("v20-40")
-		end
 		timerRuneofDeath:Cancel()
 		warnRuneofDeathIn10Sec:Cancel()
 		timerRuneofPowerCD:Cancel()
@@ -283,7 +277,6 @@ function mod:UNIT_DIED(args)
 		timerOverload:Cancel()
 		timerOverloadCD:Cancel()
 		timerLightningWhirl:Cancel()
-		timerLightningWhirlCD:Cancel()
 	end
 end
 
