@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Mimiron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261022120000")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(33432)
 mod:SetEncounterID(754)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -359,17 +359,10 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
 	if spellName == GetSpellInfo(64402) or spellName == GetSpellInfo(65034) then	--P2, P4 Rocket Strike (Warmane)
-		if self:AntiSpam(3, 3) then
-			specWarnRocketStrike:Show()
-			specWarnRocketStrike:Play("watchstep")
-			timerRocketStrikeCD:Start()
-		end
+		self:SendSync("RocketStrike")
 	elseif spellName == GetSpellInfo(63811) then	--Bomb Bot
 		if cidFromGUID(UnitGUID(uId)) ~= 33670 then return end --to avoid double trigger
-		if self:AntiSpam(3, 5) then
-			warnBombBotSpawn:Show()
-			timerBombBotSpawn:Start()
-		end
+		self:SendSync("BombBot")
 	end
 end
 function mod:CHAT_MSG_MONSTER_YELL(msg)
@@ -424,5 +417,14 @@ function mod:OnSync(event, args)
 		specWarnP3Wx2LaserBarrage:Cancel()
 	elseif event == "LootMsg" and args and self:AntiSpam(2, 1) then
 		warnLootMagneticCore:Show(args)
+	elseif not self:IsInCombat() then
+		return
+	elseif event == "RocketStrike" then
+		specWarnRocketStrike:Show()
+		specWarnRocketStrike:Play("watchstep")
+		timerRocketStrikeCD:Start()
+	elseif event == "BombBot" then
+		warnBombBotSpawn:Show()
+		timerBombBotSpawn:Start()
 	end
 end

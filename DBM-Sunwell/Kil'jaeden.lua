@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kil", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250921103545")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(25315, 25588)
 mod:SetEncounterID(729)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
@@ -186,12 +186,19 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(unitId, spellName, rank) --not very reliable. Only the one player shows in the Combatlog, but three are targeted. 
     if spellName == "Armageddon" and self:AntiSpam(5, 1) then -- Check by NAME, not ID; UNIT_SPELLCAST_SUCCEEDED did not support SpellID before CATA: https://warcraft.wiki.gg/wiki/UNIT_SPELLCAST_SUCCEEDED
-		warnArmageddon:Show()
         local targetName = UnitName(unitId .. "target")
-        if targetName then
-            self:ArmageddonTarget(targetName)
-        else
+        if not targetName then
             DBM:AddMsg("Armageddon target name not found for caster: " .. unitId)
+        end
+        self:SendSync("Armageddon", targetName)
+    end
+end
+
+function mod:OnSync(msg, targetName)
+    if msg == "Armageddon" and self:IsInCombat() then
+        warnArmageddon:Show()
+        if targetName ~= "nil" then
+            self:ArmageddonTarget(targetName)
         end
     end
 end

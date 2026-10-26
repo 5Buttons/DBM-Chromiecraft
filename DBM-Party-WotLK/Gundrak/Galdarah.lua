@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20251221224131")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(29306)
 mod:SetEncounterID(390)
 
@@ -44,7 +44,13 @@ if args.spellId == 59824 or args.spellId == 55250 then
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == "Transform" and self:AntiSpam(2, 1) then
+	if spellName == "Transform" then
+		self:SendSync("Transform")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Transform" and self:IsInCombat() then
 		if self.vb.phase == 1 then
 			self:SetStage(2) --rhino phase
 			warnPhase2:Show()

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Felmyst", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250608110528") --based on cafe&yars20250416v25
+mod:SetRevision("20261026180406") --based on cafe&yars20250416v25
 mod:SetCreatureID(25038)
 mod:SetUsedIcons(8, 7)
 mod:SetEncounterID(726)
@@ -179,7 +179,13 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(45661) and self:AntiSpam(2, 1) then
+	if spellName == GetSpellInfo(45661) then
+		self:SendSync("Encapsulate")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Encapsulate" and self:IsInCombat() then
 		self:BossTargetScanner(25038, "EncapsulateTarget", 0.05, 10)
 	end
 end

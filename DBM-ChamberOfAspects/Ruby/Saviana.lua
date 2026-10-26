@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Saviana", "DBM-ChamberOfAspects", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(39747)
 mod:SetEncounterID(891)
 mod:SetUsedIcons(8, 7, 6, 5, 4)
@@ -12,7 +12,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 74403 74404",
 	"SPELL_AURA_APPLIED 78722 74453",
 	"SPELL_AURA_REMOVED 78722",
-	"UNIT_SPELLCAST_SUCCEEDED boss1"
+	"UNIT_SPELLCAST_SUCCEEDED"
 )
 
 local warningWarnBeacon		= mod:NewTargetNoFilterAnnounce(74453, 4)--Will change to a target announce if possible. need to do encounter
@@ -45,7 +45,7 @@ end
 
 local function savianaPhaseCatcher(self)
 	self:RegisterShortTermEvents(
-		"UNIT_TARGET boss1"
+		"UNIT_TARGET"
 	)
 end
 
@@ -123,14 +123,12 @@ end
 
 function mod: UNIT_SPELLCAST_SUCCEEDED(_, spellName) -- UNIT_SPELLCAST_START/CLEU fires and stops right after, and only gets SUCCEEDED one second after, one time only, which is better to optimize some calls
 	if spellName == GetSpellInfo(74454) then -- Conflagration
-		timerConflagCD:Restart() -- This will always be prone to bad timers, since it doesn't account for travel time, which can be different!
-		timerLanding:Start()
-		self:Schedule(7, savianaPhaseCatcher, self)
-		self:Schedule(7.89, savianaLanding, self) -- Lowest 7.88
+		self:SendSync("SavianaConflag")
 	end
 end
 
 function mod:UNIT_TARGET(uId)
+	if self:GetUnitCreatureId(uId) ~= 39747 then return end
 	local unitTarget = UnitExists(uId.."target")
 	if not unitTarget and  self.vb.phase == 1 then
 		self:SendSync("SavianaAired") -- Sync airphase with raid since UNIT_TARGET:boss1 event requires boss to be target/focus, which not all members do
@@ -141,7 +139,12 @@ end
 
 function mod:OnSync(msg)
 	if not self:IsInCombat() then return end
-	if msg == "SavianaAired" and self.vb.phase == 1 then
+	if msg == "SavianaConflag" then
+		timerConflagCD:Restart() -- This will always be prone to bad timers, since it doesn't account for travel time, which can be different!
+		timerLanding:Start()
+		self:Schedule(7, savianaPhaseCatcher, self)
+		self:Schedule(7.89, savianaLanding, self) -- Lowest 7.88
+	elseif msg == "SavianaAired" and self.vb.phase == 1 then
 		self:Unschedule(savianaAirphase)
 		savianaAirphase(self)
 	elseif msg == "SavianaLanded" and self.vb.phase == 1.5 then

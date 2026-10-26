@@ -5,7 +5,7 @@ local UnitExists, UnitGUID, UnitName = UnitExists, UnitGUID, UnitName
 local GetSpellInfo = GetSpellInfo
 local GetPlayerMapPosition, SetMapToCurrentZone = GetPlayerMapPosition, SetMapToCurrentZone
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(34796, 35144, 34799, 34797)
 mod:SetEncounterID(629)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -512,9 +512,17 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
 	if spellName == GetSpellInfo(66948) then -- Submerge
-		local npcId = self:GetUnitCreatureId(uId)
-		if not self:AntiSpam(3, "Submerge"..tostring(npcId)) then return end
-		local unitName = UnitName(uId) or UNKNOWN
+		self:SendSync("Submerge", self:GetUnitCreatureId(uId))
+	elseif spellName == GetSpellInfo(66947) then -- Emerge
+		self:SendSync("Emerge", self:GetUnitCreatureId(uId))
+	end
+end
+
+function mod:OnSync(msg, npcId)
+	if not self:IsInCombat() then return end
+	npcId = tonumber(npcId)
+	if msg == "Submerge" then
+		local unitName = npcId == 35144 and acidmaw or dreadscale
 		DBM:Debug("Submerge casted by " .. unitName.. ": " .. tostring(npcId), 2)
 		if npcId == 35144 then -- Acidmaw
 			acidmawSubmerged = true -- this workaround is necessary since I had one log (25H Lordaeron 2022/09/24) that Emerged fired 1.0s after IEEU, so enforce submerge/emerge conditional logic
@@ -532,10 +540,8 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, spellName)
 			timerSweepCD:Stop(dreadscale)
 			timerEmerge:Start(6.5, unitName)
 		end
-	elseif spellName == GetSpellInfo(66947) then -- Emerge
-		local npcId = self:GetUnitCreatureId(uId)
-		if not self:AntiSpam(3, "Emerge"..tostring(npcId)) then return end
-		local unitName = UnitName(uId) or UNKNOWN
+	elseif msg == "Emerge" then
+		local unitName = npcId == 35144 and acidmaw or dreadscale
 		DBM:Debug("Emerge casted by " .. unitName.. ": " .. tostring(npcId), 2)
 		if npcId == 35144 and acidmawSubmerged then -- Acidmaw
 			self.vb.AcidmawMobile = not self.vb.AcidmawMobile

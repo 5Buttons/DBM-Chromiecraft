@@ -3,7 +3,7 @@ local L = mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(24664)
 
 mod:SetModelID(22906)
@@ -82,7 +82,13 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(47109) and self.vb.phase < 2 then--Power Feedback
+	if spellName == GetSpellInfo(47109) then--Power Feedback
+		self:SendSync("PowerFeedback")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "PowerFeedback" and self.vb.phase < 2 and self:IsInCombat() then
 		self:SetStage(2)
 		timerShockBarrior:Stop()
 		timerPhoenix:Stop()

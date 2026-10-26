@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Gluth", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260213210603")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(15932)
 mod:SetEncounterID(1108)
 mod:RegisterCombat("combat")
@@ -56,7 +56,13 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if (spellName == GetSpellInfo(28374) or spellName == GetSpellInfo(54426)) and self:AntiSpam(5, 1) then
+	if spellName == GetSpellInfo(28374) or spellName == GetSpellInfo(54426) then
+		self:SendSync("Decimate")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Decimate" and self:IsInCombat() then
 		local decimateTime = getDecimateTimer()
 		warnDecimateNow:Show()
 		timerDecimate:Start(decimateTime)

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Magtheridon", "DBM-Magtheridon")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250120150020")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(17257)
 mod:SetEncounterID(651)
 mod:SetModelID(18527)
@@ -70,6 +70,12 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	if spellName == quakeName then
+		self:SendSync("Quake")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Quake" and self:IsInCombat() then
 		timerBlastNovaCD:AddTime(7, self.vb.blastNovaCounter)
 		timerQuakeCD:Start()
 	end

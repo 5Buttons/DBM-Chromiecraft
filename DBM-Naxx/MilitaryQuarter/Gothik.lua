@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Gothik", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260408175536")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(16060)
 mod:SetEncounterID(1109)
 mod:RegisterCombat("yell", L.yell)
@@ -156,6 +156,12 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(unit, spellName)
     if spellName == GetSpellInfo(28025) or spellName == GetSpellInfo(28026) then
+        self:SendSync("Teleport")
+    end
+end
+
+function mod:OnSync(msg)
+    if msg == "Teleport" and self:IsInCombat() then
         timerTeleport:Start(20)
     end
 end

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IronCouncil", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261022120000")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(32867, 32927, 32857)
 mod:SetEncounterID(748)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -281,7 +281,13 @@ function mod:UNIT_DIED(args)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(61973) and self:AntiSpam(3, 3) then	-- Rune of Power
+	if spellName == GetSpellInfo(61973) then	-- Rune of Power
+		self:SendSync("RuneOfPower")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "RuneOfPower" and self:IsInCombat() then
 		warnRuneofPower:Show()
 		timerRuneofPowerCD:Start()
 	end

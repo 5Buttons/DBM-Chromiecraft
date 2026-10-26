@@ -4,7 +4,7 @@ local L		= mod:GetLocalizedStrings()
 local CancelUnitBuff = CancelUnitBuff
 local GetSpellInfo = GetSpellInfo
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(34564)
 mod:SetEncounterID(645)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 8)
@@ -20,7 +20,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED 66013 67700 68509 68510 10278",
 	"CHAT_MSG_MONSTER_YELL",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
-	"UNIT_SPELLCAST_SUCCEEDED boss1"
+	"UNIT_SPELLCAST_SUCCEEDED"
 )
 
 -- General
@@ -268,6 +268,12 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	if spellName == GetSpellInfo(66332) then -- Nerubian Borrower
+		self:SendSync("Adds")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Adds" and self:IsInCombat() then
 		warnAdds:Show()
 		timerAdds:Start()
 	end

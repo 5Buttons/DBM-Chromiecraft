@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Akama", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250519171000") --based on Cafe20241023v3
+mod:SetRevision("20261026180406") --based on Cafe20241023v3
 mod:SetCreatureID(22841, 23191, 23215, 23216, 23523, 23318, 23524, 23319)
 
 mod:SetModelID(21357)
@@ -141,7 +141,13 @@ mod.SWING_MISSED = mod.SWING_DAMAGE
 --[[
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 --	if (spellName == GetSpellInfo(40607) or spellName == GetSpellInfo(40955)) and self.vb.phase == 1 and self:AntiSpam(3, 1) then--Fixate/Summon Shade of Akama Trigger
-	if args.spellId == 40607 then
+	if (spellName == GetSpellInfo(40607) or spellName == GetSpellInfo(40955)) then
+		self:SendSync("Phase2")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Phase2" and self.vb.phase == 1 and self:IsInCombat() then
 		self:UnregisterShortTermEvents()
 		self:SetStage(2)
 		warnPhase2:Show()

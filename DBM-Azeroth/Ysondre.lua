@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ysondre", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(14887)--121912 TW ID, 14887 classic ID
 --mod:SetModelID(17887)
 mod:EnableWBEngageSync()--Enable syncing engage in outdoors
@@ -65,7 +65,13 @@ mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 --Probably won't work in classic, unit_spellcast events disabled there for all but "player"
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(24819) and self:AntiSpam(5, 2) then--Lightning Wave
+	if spellName == GetSpellInfo(24819) then--Lightning Wave
+		self:SendSync("LightningWave")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "LightningWave" and self:IsInCombat() then
 		warningLightningWave:Show()
 		timerLightningWaveCD:Start()
 	end

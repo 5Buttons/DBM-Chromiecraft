@@ -3,7 +3,7 @@ local L = mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20251017120000")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(19219)
 mod:SetModelID(19162)
 mod:RegisterCombat("combat")
@@ -43,7 +43,13 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(unitId, spellName)
-	if spellName == "Polarity Shift" and self:AntiSpam(5, 1) then
+	if spellName == "Polarity Shift" then
+		self:SendSync("PolarityShift")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "PolarityShift" and self:IsInCombat() then
 		warnPolarity:Show()
 		timerNextShift:Start()
 		yellCount = 0  -- Reset yell count for each new shift

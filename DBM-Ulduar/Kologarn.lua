@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kologarn", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261022120000")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(32930)
 mod:SetEncounterID(749)
 mod:SetUsedIcons(5, 6, 7, 8)
@@ -60,9 +60,6 @@ mod:AddSetIconOption("SetIconOnGripTarget", 64292, true, false, {7, 6, 5})
 mod:AddTimerLine(L.Health_Left_Arm)
 local timerNextShockwave		= mod:NewNextTimer(17, 63982, nil, nil, nil, 2) -- 17s first, then 17s on AC
 local timerRespawnLeftArm		= mod:NewTimer(50, "timerLeftArm", nil, nil, nil, 1) --50s on AC
-
--- 5/23 00:33:48.648  SPELL_AURA_APPLIED,0x0000000000000000,nil,0x80000000,0x0480000001860FAC,"Hâzzad",0x4000512,63355,"Crunch Armor",0x1,DEBUFF
--- 6/3 21:41:56.140 UNIT_DIED,0x0000000000000000,nil,0x80000000,0xF1500080A60274A0,"Rechter Arm",0xa48
 
 mod:GroupSpells(64292, 62166) -- Stone Grip aura and cast
 
@@ -166,6 +163,11 @@ function mod:SPELL_DAMAGE(_, _, _, destGUID, destName, _, spellId)
 		timerNextEyebeam:AddTime(1)
 		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
 		if timerNextShockwave:GetRemaining() > 0 then timerNextShockwave:AddTime(1) end
+	elseif (spellId == 63783 or spellId == 63982) and self:AntiSpam(3, 5) then -- Shockwave, Arm Sweep cast only visible with the arm targeted
+		timerNextShockwave:Start()
+		timerNextSmash:AddTime(1)
+		timerNextEyebeam:AddTime(1)
+		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
 	elseif (spellId == 63346 or spellId == 63976) and self:AntiSpam(2, 2) then
 		if destGUID == UnitGUID("player") then
 			specWarnEyebeam:Show()
@@ -201,18 +203,15 @@ function mod:OnSync(msg, target)
 		if self.Options.SetIconOnEyebeamTarget then
 			self:SetIcon(target, 5, 8) -- 8-6 are taken by Stone Grip
 		end
+	elseif not self:IsInCombat() then
+		return
+	elseif msg == "EyebeamSummon" then
+		timerNextEyebeam:Start()
 	end
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(63983) and self:AntiSpam(3, 5) then--Arm Sweep
-		timerNextShockwave:Start()
-		timerNextSmash:AddTime(1)
-		timerNextEyebeam:AddTime(1)
-		if timerNextGrip:GetRemaining() > 0 then timerNextGrip:AddTime(1) end
-	elseif spellName == GetSpellInfo(63342) and self:AntiSpam(3, 3) then --Focused Eyebeam Summon Trigger
-		timerNextEyebeam:Start()
-	elseif spellName == GetSpellInfo(63726) then -- Pacify Self (End Combat, since there isn't a UNIT_DIED for OnMobKill to run)
-		DBM:EndCombat(self)
+	if spellName == GetSpellInfo(63342) then --Focused Eyebeam Summon Trigger
+		self:SendSync("EyebeamSummon")
 	end
 end
