@@ -5,7 +5,7 @@ local UnitExists, UnitGUID, UnitName = UnitExists, UnitGUID, UnitName
 local GetSpellInfo = GetSpellInfo
 local GetPlayerMapPosition, SetMapToCurrentZone = GetPlayerMapPosition, SetMapToCurrentZone
 
-mod:SetRevision("20261028200000")
+mod:SetRevision("20261028211808")
 mod:SetCreatureID(34796, 35144, 34799, 34797)
 mod:SetEncounterID(629)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -36,10 +36,13 @@ local dreadscale = L.Dreadscale
 local acidmaw = L.Acidmaw
 local icehowl = L.Icehowl
 
+local GetTime = GetTime
+local introTime = 0 -- AC heroic: Dreadscale, Icehowl and enrage are timed from the Gormok intro yell
+
 -- General
-local enrageTimer			= mod:NewBerserkTimer(223)
+local enrageTimer			= mod:NewBerserkTimer(520) -- AC heroic: 520s after Gormok intro yell
 local timerCombatStart		= mod:NewCombatTimer(23)
-local timerNextBoss			= mod:NewTimer(150, "TimerNextBoss", 2457, nil, nil, 1) -- 2min 30s, as per TC.
+local timerNextBoss			= mod:NewTimer(150, "TimerNextBoss", 2457, nil, nil, 1) -- AC heroic: 150s / 340s after Gormok intro yell
 
 mod:AddRangeFrameOption("10")
 
@@ -71,7 +74,7 @@ local warnEnrageWorm		= mod:NewSpellAnnounce(68335, 3)
 local specWarnToxin			= mod:NewSpecialWarningMoveTo(66823, nil, nil, nil, 1, 2)
 local specWarnBile			= mod:NewSpecialWarningYou(66869, nil, nil, nil, 1, 2)
 
-local timerSubmerge			= mod:NewCDTimer("v45-50", 66948, nil, nil, nil, 6, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp") -- AC: 45-50s
+local timerSubmerge			= mod:NewCDTimer(45, 66948, nil, nil, nil, 6, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp") --AC 45-50s, but no event at all, therefore no variance
 local timerEmerge			= mod:NewNextTimer(10, 66947, nil, nil, nil, 6, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp")
 local timerSweepCD			= mod:NewCDTimer("v15-30", 66794, nil, "Melee", nil, 3, nil, nil, true) -- AC: 15-30s
 local timerAcidicSpewCD		= mod:NewCDTimer(22, 66819, nil, "Tank", 2, 5, nil, DBM_COMMON_L.TANK_ICON, true) -- AC: 22s
@@ -157,7 +160,9 @@ function mod:OnCombatStart(delay)
 		specWarnStompPreWarn:ScheduleVoice(12-delay, "silencesoon")
 	end
 	if self:IsHeroic() then
-		timerNextBoss:Start(-delay)
+		local elapsed = introTime > 0 and GetTime() - introTime or delay
+		timerNextBoss:Start(150 - elapsed)
+		enrageTimer:Start(520 - elapsed)
 	end
 	timerRisingAnger:Start("v18-26") -- REVIEW! AC: 16-24s plus Jump to Hand (10N AC [2026-10-11]) - 22.8
 	timerNextStomp:Start(15-delay)
@@ -173,6 +178,7 @@ end
 
 --These remain methods since they can't reverse schedule each other as local functions
 function mod:WormsEmerge()
+	timerEmerge:Cancel()
 	timerSubmerge:Start()
 	if not self.vb.AcidmawDead then
 		if self.vb.DreadscaleActive then
@@ -198,6 +204,7 @@ function mod:WormsEmerge()
 end
 
 function mod:WormsSubmerge()
+	timerSubmerge:Cancel()
 	timerEmerge:Start()
 	timerSweepCD:Cancel()
 	timerSlimePoolCD:Cancel()
@@ -384,6 +391,7 @@ end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.CombatStart or msg:find(L.CombatStart) then
+		introTime = GetTime()
 		timerCombatStart:Start()
 	elseif msg == L.Phase2 or msg:find(L.Phase2) then
 		self:SetStage(2)
@@ -391,6 +399,9 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self:ScheduleMethod(17, "WormsEmerge")
 		timerCombatStart:Start(17) -- (10N AC [2026-10-11]) - Acidmaw Emerge 18.0, Dreadscale first melee 16.7
 		timerNextBoss:Cancel()
+		if self:IsHeroic() and introTime > 0 then
+			timerNextBoss:Start(340 - (GetTime() - introTime))
+		end
 		updateHealthFrame(2)
 		if self.Options.RangeFrame then
 			DBM.RangeCheck:Show(10)
@@ -398,14 +409,11 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	elseif msg == L.Phase3 or msg:find(L.Phase3) then
 		updateHealthFrame(3)
 		self:SetStage(3)
-		if self:IsHeroic() then
-			enrageTimer:Start()
-		end
-		timerBreathCD:Start(20) -- (10N AC [2026-10-11]) - 20.0
-		timerNextCrash:Start(43.3) -- (10N AC [2026-10-11]) - 43.3
+		timerBreathCD:Start("v30-33") -- AC: engage 13s after yell, Arctic Breath 17-20s after engage
+		timerNextCrash:Start(50.2) -- AC: engage 13s after yell, Jump to middle 35s after engage, Massive Crash ~2.2s later
 		self:UnscheduleMethod("WormsSubmerge")
 		self:UnscheduleMethod("WormsEmerge")
-		timerCombatStart:Start(10)
+		timerCombatStart:Start(13) -- AC: summon 3s after yell, attack 10s later
 		timerNextBoss:Cancel()
 		timerSubmerge:Cancel()
 		timerEmerge:Cancel()
@@ -469,5 +477,6 @@ end
 function mod:OnSync(msg)
 	if msg == "MassiveCrash" and self:IsInCombat() then
 		timerBreathCD:Cancel()
+		timerNextCrash:Cancel()
 	end
 end
