@@ -111,9 +111,9 @@ L:SetMiscLocalization({
 
 	AllianceVictory		= "¡GLORIA A LA ALIANZA!",
 	--AllianceVictory	= "¡GLORIA PARA LA ALIANZA!" -- esMX
-	HordeVictory		= "Eso solo ha sido una muestra de lo que depara el futuro. ¡POR LA HORDA!"
+	HordeVictory		= "Eso solo ha sido una muestra de lo que depara el futuro. ¡POR LA HORDA!",
 	--HordeVictory		= "Eso es sólo una probada de lo que traerá el futuro. ¡POR LA HORDA!" -- esMX
-	--YellKill			= "Una victoria trágica y fútil. Hoy somos menos por las pérdidas que hemos sufrido. ¿Quién podría beneficiarse de tal insensatez además del Rey Exánime? Grandes guerreros han perdido la vida. ¿Y para qué? La verdadera amenaza aguarda, el Rey Exánime nos espera a todos en la muerte."
+	YellKill			= "Una victoria trágica y fútil. Hoy somos menos por las pérdidas que hemos sufrido. ¿Quién podría beneficiarse de tal insensatez además del Rey Exánime? Grandes guerreros han perdido la vida. ¿Y para qué? La verdadera amenaza aguarda, el Rey Exánime nos espera a todos en la muerte."
 	--YellKill			= "Una victoria trágica y superficial. Nuestra integridad se vio debilitada por las pérdidas que hoy sufrimos. ¿Quién más que el Rey Exánime puede haberse beneficiado de tal insensatez? Grandes guerreros han perdido sus vidas. ¿Y para qué? La verdadera amenaza se entreteje en el futuro: el Rey Exánime nos espera en la muerte." -- esMX
 })
 
