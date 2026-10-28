@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Jaraxxus", "DBM-Coliseum")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261004220131")
+mod:SetRevision("20261028210000")
 mod:SetCreatureID(34780)
 mod:SetEncounterID(633)
 --mod:SetMinCombatTime(30)
@@ -158,11 +158,11 @@ function mod:SPELL_CAST_SUCCESS(args)
 			self:Unschedule(warnVolcanoSoon.Show, warnVolcanoSoon)
 			warnVolcanoSoon:Schedule(timerVolcanoCD:GetRemaining() + 5 - 10)
 		end
-		timerPortalCD:AddTime(5)
-		timerVolcanoCD:AddTime(5)
-		timerFlameCD:AddTime(5)
-		timerFleshCD:AddTime(5)
-		timerFelLightning:AddTime(5)
+		for _, timer in ipairs({timerPortalCD, timerVolcanoCD, timerFlameCD, timerFleshCD, timerFelLightning}) do
+			if timer:GetRemaining() > 0 then
+				timer:AddTime(5)
+			end
+		end
 	elseif args:IsSpellID(67901, 67902, 67903, 66258) then		-- Infernal Eruption
 		timerVolcanoCD:Start()
 		warnVolcanoSoon:Schedule(110)
