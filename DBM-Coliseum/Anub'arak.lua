@@ -18,13 +18,12 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 67574 66013 67700 68509 68510 66012 10278",
 	"SPELL_AURA_REFRESH 67574 66013 67700 68509 68510 66012",
 	"SPELL_AURA_REMOVED 66013 67700 68509 68510 10278",
-	"CHAT_MSG_MONSTER_YELL",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_SPELLCAST_SUCCEEDED"
 )
 
 -- General
-local enrageTimer			= mod:NewBerserkTimer(570)
+local enrageTimer			= mod:NewBerserkTimer(600)
 
 -- Stage One: Emerge
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(1)..": "..GetSpellInfo(65982))
@@ -38,10 +37,10 @@ local warnFreezingSlash		= mod:NewTargetNoFilterAnnounce(66012, 2, nil, "Tank|He
 local specWarnShadowStrike	= mod:NewSpecialWarningSpell(66134, "Tank", nil, 2, 1) --Don't have a good voice for this. Need a "stun mob now"
 local specWarnPCold			= mod:NewSpecialWarningYou(66013, false, nil, nil, 1, 2)
 
-local timerEmerge			= mod:NewNextTimer(65, 65982, nil, nil, nil, 6, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", DBM_COMMON_L.IMPORTANT_ICON, nil, 1) -- Time to Emerge, related to Phase 2, but it's here for better Grouping
-local timerAdds				= mod:NewNextTimer(45, 66332, nil, nil, nil, 1, 45419, DBM_COMMON_L.TANK_ICON) -- (25H Lordaeron 2022/09/03) - Stage 1/45.1, Stage 2/24.9, Stage 1/65.0, 10.0/75.0/99.9, 45.0, Stage 3/1.9, 43.1/45.0, 45.0
+local timerEmerge			= mod:NewNextTimer(62, 65982, nil, nil, nil, 6, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", DBM_COMMON_L.IMPORTANT_ICON, nil, 1) -- AC: 60s + 2s. Time to Emerge, related to Phase 2, but it's here for better Grouping
+local timerAdds				= mod:NewNextTimer(45, 66332, nil, nil, nil, 1, 45419, DBM_COMMON_L.TANK_ICON) -- AC: 5-8s after pull/emerge, then 45s
 local timerShadowStrike		= mod:NewNextTimer(30, 66134, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON, nil, 3)
-local timerFreezingSlash	= mod:NewNextTimer(20, 66012, nil, "Tank|Healer", nil, 5, nil, DBM_COMMON_L.TANK_ICON) -- (25H Lordaeron 2022/09/03) - Stage 1/20.0, 20.0, 20.0, Stage 2/4.9, Stage 1/65.0, 15.1/80.1/85.0, 20.0, 20.1, Stage 3/1.8, 18.2/20.0, 20.0, 20.0, 20.0
+local timerFreezingSlash	= mod:NewCDTimer("v15-20", 66012, nil, "Tank|Healer", nil, 5, nil, DBM_COMMON_L.TANK_ICON) -- AC: 7-15s after pull/emerge, then 15-20s
 local timerPCold			= mod:NewBuffActiveTimer(15, 66013, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
 
 mod:AddSetIconOption("SetIconsOnPCold", 66013, true, 7, {1, 2, 3, 4, 5})
@@ -95,22 +94,6 @@ local function ShadowStrike(self)
 	end
 end
 
--- Warmane workaround, since emerge boss emote is not being fired
-local function EmergeFix(self)
-	self:SetStage(1)
-	self.vb.Burrowed = false
-	timerEmerge:Cancel()
-	timerAdds:Start(5)
---	warnAdds:Schedule(5)
---	self:Schedule(5, Adds, self)
-	warnEmerge:Show()
-	warnSubmergeSoon:Schedule(70)
-	timerSubmerge:Start()
-	if self:IsHeroic() then
-		ShadowStrike(self)
-	end
-end
-
 function mod:AnnouncePcoldIcons(uId, icon)
 	if self.Options.AnnouncePColdIcons and DBM:IsInGroup() and DBM:GetRaidRank() > 1 then
 		SendChatMessage(L.PcoldIconSet:format(icon, DBM:GetUnitFullName(uId)), DBM:IsInRaid() and "RAID" or "PARTY")
@@ -127,13 +110,13 @@ end
 function mod:OnCombatStart(delay)
 	self:SetStage(1)
 	self.vb.Burrowed = false
-	timerAdds:Start(10-delay) -- (25H Lordaeron 2022/09/03) - pull:10.0
+	timerAdds:Start("v5-8")
 --	warnAdds:Schedule(10-delay)
 --	self:Schedule(10-delay, Adds, self)
 	warnSubmergeSoon:Schedule(70-delay)
-	timerSubmerge:Start(-delay) -- EMOTE 2s earlier than Submerge Anub'arak unit cast. (25H Lordaeron 2022/09/03) - pull:79.9
+	timerSubmerge:Start(-delay)
 	enrageTimer:Start(-delay)
-	timerFreezingSlash:Start(15-delay) -- (25H Lordaeron 2022/09/03) - pull:15.0
+	timerFreezingSlash:Start("v7-15")
 	if self:IsHeroic() then
 		timerShadowStrike:Start()
 		preWarnShadowStrike:Schedule(25.5-delay)
@@ -219,14 +202,14 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-function mod:CHAT_MSG_MONSTER_YELL(msg) -- Warmane workaround since submerge emote sometimes is not being fired
-	if msg and msg == L.YellBurrow then
+function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
+	if msg and msg:find(L.Burrow) then
 		self:SetStage(2)
 		self.vb.Burrowed = true
 		timerAdds:Cancel()
 		warnAdds:Cancel()
 		warnSubmerge:Show()
-		warnEmergeSoon:Schedule(58.5)
+		warnEmergeSoon:Schedule(52)
 		timerEmerge:Start()
 		timerFreezingSlash:Stop()
 		if self:IsHeroic() then
@@ -234,32 +217,15 @@ function mod:CHAT_MSG_MONSTER_YELL(msg) -- Warmane workaround since submerge emo
 			timerShadowStrike:Cancel()
 			preWarnShadowStrike:Cancel()
 		end
-		self:Schedule(65, EmergeFix, self)	-- Warmane workaround, since emerge boss emote is not being fired
-	end
-end
-
-function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
-	-- if msg and msg:find(L.Burrow) then
-	--	self:SetStage(2)
-	--	self.vb.Burrowed = true
-	--	timerAdds:Cancel()
-	--	warnAdds:Cancel()
-	--	warnSubmerge:Show()
-	--	warnEmergeSoon:Schedule(58.5)
-	--	timerEmerge:Start()
-	--	timerFreezingSlash:Stop()
-	--	self:Schedule(65, EmergeFix, self)	-- Warmane workaround, since emerge boss emote is not being fired
-	if msg and msg:find(L.Emerge) then
-		self:Unschedule(EmergeFix)		-- Warmane workaround: failsafe if script gets fixed eventually
+	elseif msg and msg:find(L.Emerge) then
 		self:SetStage(1)
 		self.vb.Burrowed = false
 		timerEmerge:Cancel()
-		timerAdds:Start(5)
---		warnAdds:Schedule(5)
---		self:Schedule(5, Adds, self)
+		timerAdds:Start("v5-8")
 		warnEmerge:Show()
 		warnSubmergeSoon:Schedule(70)
 		timerSubmerge:Start()
+		timerFreezingSlash:Start("v7-15")
 		if self:IsHeroic() then
 			ShadowStrike(self)
 		end

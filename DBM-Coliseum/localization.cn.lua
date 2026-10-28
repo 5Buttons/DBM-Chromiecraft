@@ -183,7 +183,6 @@ L:SetWarningLocalization({
 L:SetMiscLocalization({
 	Emerge				= "从地面上升起来了！",
 	Burrow				= "钻入了地下！",
-	YellBurrow			= "Auum na-l ak-k-k-k, isshhh。起来，奴仆们，吃吧……",
 	PcoldIconSet		= "刺骨之寒{rt%d} -> %s",
 	PcoldIconRemoved	= "移除标记 -> %s"
 })
