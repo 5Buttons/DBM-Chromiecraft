@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kologarn", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261026180406")
+mod:SetRevision("20261029213519")
 mod:SetCreatureID(32930)
 mod:SetEncounterID(749)
 mod:SetUsedIcons(5, 6, 7, 8)
@@ -15,7 +15,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED 64290 64292",
 	"SPELL_DAMAGE 63356 64003 63573 64006 63783 63982 63346 63976",
 	"SPELL_MISSED 63356 64003 63573 64006 63783 63982 63346 63976",
-	"CHAT_MSG_RAID_BOSS_EMOTE",
+	"CHAT_MSG_RAID_BOSS_WHISPER",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED"
 )
@@ -185,9 +185,9 @@ function mod:SPELL_DAMAGE(_, _, _, destGUID, destName, _, spellId)
 end
 mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
-function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
-	if msg == L.FocusedEyebeam or msg:find(L.FocusedEyebeam) then
-		self:SendSync("EyeBeamOn", target)
+function mod:CHAT_MSG_RAID_BOSS_WHISPER(msg)
+	if msg:find(L.FocusedEyebeam) then
+		self:SendSync("EyeBeamOn", UnitName("player"))
 	end
 end
 
