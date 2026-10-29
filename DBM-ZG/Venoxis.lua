@@ -79,7 +79,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerFire:Start(args.destName)
 	elseif args.spellId == 23865 then
 		warnSerpent:Show(args.destName)
-	elseif args.spellId == 23861 and args.IsPlayer() then
+	elseif args.spellId == 23861 and args:IsPlayer() then
 		specWarnGTFO:Show(args.spellName)
 		specWarnGTFO:Play("watchfeet")
 	end
