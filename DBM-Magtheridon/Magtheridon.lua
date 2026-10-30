@@ -32,7 +32,7 @@ local timerPhase2			= mod:NewTimer(120+3, "timerP2", "135566", nil, nil, 6)
 local timerBlastNovaCD		= mod:NewCDCountTimer(54+0.35, 30616, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerDebris			= mod:NewNextTimer(15, 36449, nil, nil, nil, 2, nil, DBM_COMMON_L.HEALER_ICON..DBM_COMMON_L.TANK_ICON)--Only happens once per fight, after the phase 3 yell.
 
-local timerQuakeCD			= mod:NewCDTimer(53+2.65, 30657, nil, nil, nil, 2)
+local timerQuakeCD			= mod:NewCDTimer(56.3, 30657, nil, nil, nil, 2)
 local specWarnGTFO			= mod:NewSpecialWarningGTFO(30757, nil, nil, nil, 1, 8)
 
 mod.vb.blastNovaCounter = 1
