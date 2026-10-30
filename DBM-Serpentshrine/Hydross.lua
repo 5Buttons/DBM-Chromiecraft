@@ -12,13 +12,12 @@ mod:RegisterCombat("combat_yell", L.YellPull)
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 38235 38246 37935",
 	"SPELL_AURA_REMOVED 38246 37935",
-	"SPELL_CAST_SUCCESS 38215 38216 38217 38219 38220 38221 38218 38231 40584 38222 38230 40583 25035"
+	"SPELL_CAST_SUCCESS 38215 38216 38217 38219 38220 38221 38218 38231 40584 38222 38230 40583"
 )
 
 --[[
 (ability.id = 38215 or ability.id = 38216 or ability.id = 38217 or ability.id = 38219 or ability.id = 38220 or ability.id = 38221
- or ability.id = 38218 or ability.id = 38231 or ability.id = 40584 or ability.id = 38222 or ability.id = 38230 or ability.id = 40583
- or ability.id = 25035) and type = "cast"
+ or ability.id = 38218 or ability.id = 38231 or ability.id = 40584 or ability.id = 38222 or ability.id = 38230 or ability.id = 40583) and type = "cast"
 --]]
 local warnMark		= mod:NewAnnounce("WarnMark", 3, 38215)
 local warnPhase		= mod:NewAnnounce("WarnPhase", 4)
@@ -46,7 +45,7 @@ local damageNext = {
 }
 
 function mod:OnCombatStart(delay)
-	timerMark:Start(14.5-delay, markOfH, "10%")
+	timerMark:Start(15-delay, markOfH, "10%")
 	berserkTimer:Start(-delay)
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show()
@@ -68,6 +67,8 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerSludge:Start(args.destName)
 	elseif spellId == 37935 and args:GetDestCreatureID() == 21216 then -- Cleansing Field - Water form -
 		warnPhase:Show(L.Frost)
+		timerMark:Cancel()
+		timerMark:Start(15, markOfH, "10%")
 	end
 end
 
@@ -77,6 +78,8 @@ function mod:SPELL_AURA_REMOVED(args)
 		timerSludge:Stop(args.destName)
 	elseif spellId == 37935 and args:GetDestCreatureID() == 21216 then -- Cleansing Field - Poison form -
 		warnPhase:Show(L.Nature)
+		timerMark:Cancel()
+		timerMark:Start(15, markOfC, "10%")
 	end
 end
 
@@ -90,15 +93,5 @@ function mod:SPELL_CAST_SUCCESS(args)
 		specWarnMark:Show(args.spellName, damage[args.spellId] or "10%")
 		timerMark:Cancel()
 		timerMark:Show(args.spellName, damageNext[args.spellId] or "10%")
-	elseif args.spellId == 25035 and self:AntiSpam(2) then
-		DBM:AddMsg("Elemental Spawn-in unhidden from combat log. Notify Zidras on Discord or GitHub")
-		timerMark:Cancel()
-		if args:GetSrcCreatureID() == 22035 then
-			warnPhase:Show(L.Frost)
-			timerMark:Start(15.4, markOfH, "10%")
-		elseif args:GetSrcCreatureID() == 22036 then
-			warnPhase:Show(L.Nature)
-			timerMark:Start(15.4, markOfC, "10%")
-		end
 	end
 end
