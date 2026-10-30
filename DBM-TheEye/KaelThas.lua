@@ -132,7 +132,7 @@ function mod:OnCombatStart()
 	table.wipe(warnMCTargets)
 	self.vb.mcIcon = 8
 	self:SetStage(1)
-	timerPhase1mob:Start(32-2, L.Thaladred)
+	timerPhase1mob:Start(28, L.Thaladred)
 	if self.Options.HealthFrame then
 		DBM.BossHealth:Clear()
 		DBM.BossHealth:Show(L.name)
@@ -186,9 +186,9 @@ end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_AURA_REFRESH(args)
-	if args.spellID == 37027 then
+	if args.spellId == 37027 then
 		timerToy:Restart(args.destName)
-		if args.IsPlayer() then
+		if args:IsPlayer() then
 			specWarnToy:Show()
 		else
 			warnToy:Show(args.destName)
@@ -326,7 +326,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self:SetStage(2)
 		timerPhase:Start(120+6-30) --new adjustment for CC 2024.07.10
 		warnPhase2:Show()
-		warnPhase3:Schedule(120+6)
+		warnPhase3:Schedule(96)
 		DBM.BossHealth:AddBoss(21268, L.Bow)
 		DBM.BossHealth:AddBoss(21269, L.Axe)
 		DBM.BossHealth:AddBoss(21270, L.Mace)
@@ -347,7 +347,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 			DBM.BossHealth:AddBoss(20060, L.Sanguinar)
 			DBM.BossHealth:AddBoss(20062, L.Capernian)
 			DBM.BossHealth:AddBoss(20063, L.Telonicus)
-			timerPhase:Start(180+12)
+			timerPhase:Start(182)
 			timerConflagCD:Start(7)
 		end)
 	elseif msg == L.YellPhase4 or msg:find(L.YellPhase4) then
