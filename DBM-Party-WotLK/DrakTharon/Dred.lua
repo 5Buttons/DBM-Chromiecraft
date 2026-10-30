@@ -22,10 +22,10 @@ local timerRaptorCallCD  = mod:NewCDTimer(30, 59416, nil, nil, nil, 2)
 
 --local timerFearCD	= mod:NewCDTimer(15, 22686, nil, nil, nil, 2)  -- HP based on AC. 67% and 34%
 local timerSlash	= mod:NewTargetTimer(10, 48873)
-local timerSlashCD	= mod:NewCDTimer(20, 48873, nil, "Tank|Healer", nil, 5)
+local timerSlashCD	= mod:NewCDTimer("v18-35", 48873, nil, "Tank|Healer", nil, 5)
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 22686 and args.sourceGUID == 27483 then
+	if args.spellId == 22686 and self:GetCIDFromGUID(args.sourceGUID) == 27483 then
 		warningFear:Show()
 --		timerFearCD:Start()
 	elseif args.spellId == 59416 then
@@ -42,8 +42,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerSlash:Start(15, args.destName)
 		timerSlashCD:Start()
 	elseif args.spellId == 48878 then
-		warningSlash:Show()
 		timerSlash:Start(10, args.destName)
-		timerSlashCD:Start()
 	end
 end
