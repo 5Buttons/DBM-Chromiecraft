@@ -1,12 +1,12 @@
 local mod	= DBM:NewMod("Leotheras", "DBM-Serpentshrine")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250103133412")
+mod:SetRevision("20261030165953")
 mod:SetCreatureID(21215)
 mod:SetEncounterID(625)
 
 --mod:SetModelID(20514)
-mod:SetUsedIcons(5, 6, 7, 8)
+mod:SetUsedIcons(4, 5, 6, 7, 8)
 mod:SetHotfixNoticeRev(20220812000000)
 mod:SetMinSyncRevision(20220812000000)
 
@@ -33,10 +33,11 @@ local timerInsidiousWhisper		= mod:NewBuffFadesTimer(30, 37676, nil, nil, nil, 6
 
 local berserkTimer				= mod:NewBerserkTimer(600)
 
-mod:AddSetIconOption("DemonIcon", 37676, false, false, {8, 7, 6, 5})
+mod:AddSetIconOption("DemonIcon", 37676, false, false, {8, 7, 6, 5, 4})
 
 local warnDemonTargets = {}
 local warnMCTargets = {}
+local whirlNext, demonStart = 0, 0
 --mod.vb.binderKill = 0
 mod.vb.demonIcon = 8
 mod.vb.whirlCount = 0
@@ -46,7 +47,8 @@ local function humanWarns(self)
 	self.vb.whirlCount = 0
 	warnPhase:Show(L.Human)
 	self.vb.isHuman = 1
-	timerWhirlCD:Start(30.25) -- AC: 30250ms - 34900ms
+	whirlNext = GetTime() + 25.05
+	timerWhirlCD:Start(25.05) -- AC: 25050ms - 32550ms
 	timerPhase:Start(nil, L.Demon)
 end
 
@@ -69,6 +71,7 @@ function mod:OnCombatStart()
 	self:SetStage(1)
 	table.wipe(warnMCTargets)
 	table.wipe(warnDemonTargets)
+	whirlNext = GetTime() + 25.05
 	timerWhirlCD:Start(25.05) -- AC: 25050ms - 32550ms
 	timerPhase:Start(60, L.Demon)
 	berserkTimer:Start()
@@ -83,9 +86,10 @@ function mod:SPELL_AURA_APPLIED(args)
 		specWarnWhirl:Show()
 		specWarnWhirl:Play("justrun")
 		timerWhirl:Start()
+		whirlNext = GetTime() + 30.25
 		if self.vb.phase ~= 2 then
 			self.vb.whirlCount = self.vb.whirlCount + 1
-			if self.vb.whirlCount < 3 then
+			if self.vb.whirlCount < 2 then
 				timerWhirlCD:Start()
 			end
 		else
@@ -118,6 +122,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.YellDemon or msg:find(L.YellDemon) then
 		warnPhase:Show(L.Demon)
 		self.vb.isHuman = 0
+		demonStart = GetTime()
 		timerWhirl:Cancel()
 		timerWhirlCD:Cancel()
 		timerPhase:Cancel()
@@ -133,10 +138,11 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		timerWhirlCD:Cancel()
 		timerInsidiousWhisperCD:Cancel()
 		warnPhase2:Show()
+		-- AC: DelayAll(10s); in demon form whirl resumes 25.05s after the delayed return to human
 		if self.vb.isHuman == 1 then
-			timerWhirlCD:Start(30.25) -- review 
+			timerWhirlCD:Start(math.max(whirlNext - GetTime(), 0) + 10)
 		else
-			timerWhirlCD:Start(30.25)
+			timerWhirlCD:Start(math.max(60 - (GetTime() - demonStart), 0) + 10 + 25.05)
 		end
 	end
 end
