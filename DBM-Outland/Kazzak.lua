@@ -52,7 +52,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif args.spellId == 32964 then
 		warningFrenzy:Show()
 		timerFrenzy:Show()
-		timerFrenzyCD:Start()
+		timerFrenzyCD:Start(30)
 	elseif args.spellId == 21063 then
 		if self.Options.SpecWarn21063dispel then
 			specWarnTwisted:Show(args.destName)
