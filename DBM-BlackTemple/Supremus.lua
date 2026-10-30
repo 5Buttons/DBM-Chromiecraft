@@ -27,10 +27,10 @@ mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(1)..": "..L.name)
 local specWarnMolten		= mod:NewSpecialWarningMove(40265, nil, nil, nil, 1, 2)
 -- Stage Two: Kite Phase
 mod:AddTimerLine(DBM_CORE_L.SCENARIO_STAGE:format(2)..": "..DBM:GetSpellInfo(68987))
-local warnFixate			= mod:NewTargetNoFilterAnnounce(41976, 3)
+local warnFixate			= mod:NewTargetNoFilterAnnounce(41295, 3)
 
 local specWarnVolcano		= mod:NewSpecialWarningMove(42052, nil, nil, nil, 1, 2)
-local specWarnFixate		= mod:NewSpecialWarningRun(41976, nil, nil, nil, 4, 2)
+local specWarnFixate		= mod:NewSpecialWarningRun(41295,nil, nil, nil, 4, 2)
 
 mod:AddBoolOption("KiteIcon", true)
 
