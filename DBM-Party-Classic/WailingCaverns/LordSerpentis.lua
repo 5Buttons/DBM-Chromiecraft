@@ -1,24 +1,24 @@
 local mod	= DBM:NewMod(479, "DBM-Party-Classic", 19, 240)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(3673)
 mod:SetEncounterID(590)
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START 8040 23381",
+	"SPELL_CAST_START 8040 6778",
 	"SPELL_AURA_APPLIED 8040"
 )
 
 local warningDruidSlumber			= mod:NewTargetNoFilterAnnounce(8040, 2)
-local warningHealingTouch			= mod:NewCastAnnounce(23381, 2)
+local warningHealingTouch			= mod:NewCastAnnounce(6778, 2)
 
 local specWarnDruidsSlumber			= mod:NewSpecialWarningInterrupt(8040, "HasInterrupt", nil, nil, 1, 2)
 
 local timerDruidsSlumberCD			= mod:NewAITimer(180, 8040, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON..DBM_COMMON_L.MAGIC_ICON)
-local timerHealingTouchCD			= mod:NewAITimer(180, 23381, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
+local timerHealingTouchCD			= mod:NewAITimer(180, 6778, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
 
 function mod:OnCombatStart(delay)
 	timerDruidsSlumberCD:Start(1-delay)
@@ -31,7 +31,7 @@ function mod:SPELL_CAST_START(args)
 			specWarnDruidsSlumber:Show(args.sourceName)
 			specWarnDruidsSlumber:Play("kickcast")
 		end
-	elseif args.spellId == 23381 and args:IsSrcTypeHostile() then
+	elseif args.spellId == 6778 and args:IsSrcTypeHostile() then
 		warningHealingTouch:Show()
 		timerHealingTouchCD:Start()
 	end

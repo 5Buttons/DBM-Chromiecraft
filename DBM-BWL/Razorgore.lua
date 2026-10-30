@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Razorgore", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20240210155715")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(12435, 99999)--Bogus detection to prevent invalid kill detection if razorgore happens to die in phase 1
 --mod:DisableEEKillDetection()--So disable only EE
 mod:SetModelID(12435)
@@ -30,23 +30,23 @@ local timerAddsSpawn		= mod:NewTimer(47-2, "TimerAddsSpawn", 19879, nil, nil, 1)
 
 local timerConflagCD		= mod:NewCDTimer(30, 23023, nil, false)
 
-mod:AddSpeedClearOption("BWL", true)
+--mod:AddSpeedClearOption("BWL", true)
 
 mod.vb.eggsLeft = 30 --review its not just 30 on CC
-mod.vb.firstEngageTime = nil
+--mod.vb.firstEngageTime = nil
 local destroyEggName = DBM:GetSpellInfo(19873)
 
 function mod:OnCombatStart(delay)
 	self:SetStage(1)
 	timerAddsSpawn:Start(-delay)
 	self.vb.eggsLeft = 30
-	if not self.vb.firstEngageTime then
+--[[	if not self.vb.firstEngageTime then
 		self.vb.firstEngageTime = time()
 		if self.Options.FastestClear and self.Options.SpeedClearTimer then
 			--Custom bar creation that's bound to core, not mod, so timer doesn't stop when mod stops it's own timers
 			DBT:CreateBar(self.Options.FastestClear, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, "Interface\\Icons\\Spell_Nature_TimeStop")
 		end
-	end
+	end--]]
 end
 
 function mod:SPELL_CAST_START(args)

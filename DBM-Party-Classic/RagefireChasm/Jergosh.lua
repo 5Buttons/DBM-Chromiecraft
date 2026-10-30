@@ -1,15 +1,15 @@
 local mod	= DBM:NewMod("Jergosh", "DBM-Party-Classic", 9)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(11518)
 mod:SetEncounterID(432)
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 6304 20800",
-	"SPELL_AURA_APPLIED 6304 20800"
+	"SPELL_CAST_SUCCESS 18267 20800",
+	"SPELL_AURA_APPLIED 18267 20800"
 )
 
 local warningCurseofWeakness			= mod:NewTargetNoFilterAnnounce(18267, 2)

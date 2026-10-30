@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("CThun", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(15589, 15727)
 
 mod:SetUsedIcons(1)
@@ -42,7 +42,7 @@ mod:AddRangeFrameOption("12") -- Blizz 10, AzerothCore +2 for regular chars, or 
 mod:AddSetIconOption("SetIconOnEyeBeam", 26134, true, false, {1})
 mod:AddInfoFrameOption(nil, true)
 
-local firstBossMod = DBM:GetModByName("AQ40Trash")
+--local firstBossMod = DBM:GetModByName("AQ40Trash")
 local playersInStomach = {}
 local fleshTentacles, diedTentacles = {}, {}
 
@@ -114,11 +114,11 @@ function mod:OnCombatEnd(wipe, isSecondRun)
 		DBM.InfoFrame:Hide()
 	end
 	--Only run on second run, to ensure trash mod has had enough time to update requiredBosses
-	if not wipe and isSecondRun and firstBossMod.vb.firstEngageTime and firstBossMod.Options.SpeedClearTimer then
+--[[	if not wipe and isSecondRun and firstBossMod.vb.firstEngageTime and firstBossMod.Options.SpeedClearTimer then
 		if firstBossMod.vb.requiredBosses < 5 then
 			DBM:AddMsg(L.NotValid:format(5 - firstBossMod.vb.requiredBosses .. "/4"))
 		end
-	end
+	end--]]
 end
 
 function mod:DarkGlare()

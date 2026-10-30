@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Hydross", "DBM-Serpentshrine")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220811225006")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(21216)
 mod:SetEncounterID(623)
 
@@ -91,7 +91,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerMark:Cancel()
 		timerMark:Show(args.spellName, damageNext[args.spellId] or "10%")
 	elseif args.spellId == 25035 and self:AntiSpam(2) then
-		DBM:Addsg("Elemental Spawn-in unhidden from combat log. Notify Zidras on Discord or GitHub")
+		DBM:AddMsg("Elemental Spawn-in unhidden from combat log. Notify Zidras on Discord or GitHub")
 		timerMark:Cancel()
 		if args:GetSrcCreatureID() == 22035 then
 			warnPhase:Show(L.Frost)

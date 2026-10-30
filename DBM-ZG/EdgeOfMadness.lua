@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("EdgeOfMadness", "DBM-ZG", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(15083)
 
 mod:RegisterCombat("combat")
@@ -35,10 +35,10 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args.spellId == 24684 and args:IsDestTypePlayer() and  self:AntiSpam(3, 1) then
+	if args.spellId == 24664 and args:IsDestTypePlayer() and  self:AntiSpam(3, 1) then
 		warnSleep:Show()
 		timerSleep:Start()
-	elseif args.spellId == 24699 and args:IsDestTypeHostile() then
+	elseif args.spellId == 8269 and args:IsDestTypeHostile() then
 		warnFrenzy:Show()
 	end
 end

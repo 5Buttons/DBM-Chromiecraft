@@ -1,14 +1,14 @@
 local mod	= DBM:NewMod("ArchmageArugal", "DBM-Party-Classic", 14)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(4275)
 mod:SetEncounterID(471)
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 7621 7587",
+	"SPELL_CAST_SUCCESS 7621 7136 7586 7587",
 	"SPELL_AURA_APPLIED 7621"
 )
 
@@ -26,7 +26,7 @@ end
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 7621 then
 		timerArugalsCurseCD:Start()
-	elseif args.spellId == 7587 then
+	elseif args:IsSpellID(7136, 7586, 7587) then
 		warningShadowPort:Show()
 		timerShadowPortCD:Start()
 	end

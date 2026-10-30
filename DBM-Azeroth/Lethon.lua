@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lethon", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(14888)--121821 TW ID, 14888 classic ID
 --mod:SetModelID(17887)
 mod:EnableWBEngageSync()--Enable syncing engage in outdoors
@@ -11,9 +11,9 @@ mod:RegisterCombat("yell", L.Pull)
 
 mod:RegisterEventsInCombat(
 --	"SPELL_CAST_START 24818 243468",
-	"SPELL_CAST_SUCCESS 24814 24813"
---	"SPELL_AURA_APPLIED 243401",
---	"SPELL_AURA_APPLIED_DOSE 243401"
+	"SPELL_CAST_SUCCESS 24814 24813",
+	"SPELL_AURA_APPLIED 24818",
+	"SPELL_AURA_APPLIED_DOSE 24818"
 )
 
 --TODO, maybe taunt special warnings for classic version when it matters more.

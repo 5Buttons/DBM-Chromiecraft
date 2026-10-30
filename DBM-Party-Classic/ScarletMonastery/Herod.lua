@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Herod", "DBM-Party-Classic", 12)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(3975)
 mod:SetEncounterID(448)
 
@@ -22,7 +22,7 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args.spellId == 8269 and args:IsDestTypeHostile() then
+	if args.spellId == 8989 and args:IsDestTypeHostile() then
 		specWarnWhirlwind:Show()
 		specWarnWhirlwind:Play("justrun")
 		timerWhirlwindCD:Start()

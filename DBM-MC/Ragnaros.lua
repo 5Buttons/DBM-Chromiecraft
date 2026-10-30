@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ragnaros-Classic", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20240212180252")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(11502)
 mod:SetModelID(11121)
 mod:SetHotfixNoticeRev(20231219000000)--2023, 12, 19
@@ -38,7 +38,7 @@ mod:AddRangeFrameOption("20") -- Blizz 18, AzerothCore +2 for regular chars, or 
 mod.vb.addLeft = 0
 mod.vb.ragnarosEmerged = true
 --local addsGuidCheck = {}
-local firstBossMod = DBM:GetModByName("MCTrash")
+--local firstBossMod = DBM:GetModByName("MCTrash")
 
 
 local function emerged(self)
@@ -66,7 +66,7 @@ function mod:OnCombatEnd(wipe)
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Hide()
 	end
-	if not wipe then
+--[[	if not wipe then
 		DBT:CancelBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT)
 		if firstBossMod.vb.firstEngageTime then
 			local thisTime = time() - firstBossMod.vb.firstEngageTime
@@ -86,7 +86,7 @@ function mod:OnCombatEnd(wipe)
 			end
 			firstBossMod.vb.firstEngageTime = nil
 		end
-	end
+	end--]]
 end
 
 function mod:SPELL_CAST_START(args)

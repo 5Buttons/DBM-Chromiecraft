@@ -1,12 +1,13 @@
 local mod	= DBM:NewMod("MCTrash", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 --mod:SetModelID(47785)
 
 
 mod.isTrashMod = true
 
+--[[ speed clear disabled, no ENCOUNTER_END on 3.3.5
 mod:AddSpeedClearOption("MC", true)
 
 --Speed Clear variables
@@ -33,7 +34,7 @@ do
 		local cid = self:GetCIDFromGUID(GUID)
 		if startCreatureIds[cid] then
 			if not self.vb.firstEngageTime then
-				self.vb.firstEngageTime = GetServerTime()
+				self.vb.firstEngageTime = time()
 				if self.Options.FastestClear2 and self.Options.SpeedClearTimer then
 					--Custom bar creation that's bound to core, not mod, so timer doesn't stop when mod stops it's own timers
 					DBT:CreateBar(self.Options.FastestClear2, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, "Interface\\Icons\\Spell_Nature_TimeStop")
@@ -77,3 +78,4 @@ do
 		end
 	end
 end
+--]]

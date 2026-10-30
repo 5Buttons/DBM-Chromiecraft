@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malygos", "DBM-EyeOfEternity")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260810025043")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(28859)
 
 mod:RegisterCombat("yell", L.YellPull)
@@ -176,7 +176,6 @@ function mod:SPELL_CAST_SUCCESS(args)
 --			timerSummonPowerSpark:Update(18, 30)
 --		end
 	if spellId == 57430 then
-		self:ScheduleMethod(0.1, "StaticFieldTarget")
 		--warnStaticField:Show()
 		timerStaticFieldCD:Start()
 	end

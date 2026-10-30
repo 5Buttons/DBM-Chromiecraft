@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Nefarian-Classic", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20240208235105")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(11583)
 mod:SetModelID(11380)
 mod:RegisterCombat("combat_yell", L.YellP1)--ENCOUNTER_START appears to fire when he lands, so start of phase 2, ignoring all of phase 1
@@ -44,7 +44,7 @@ local timerSBVolleyCD		= mod:NewCDTimer(19, 22665, nil, nil)
 
 mod.vb.addLeft = 42
 local addsGuidCheck = {}
-local firstBossMod = DBM:GetModByName("Razorgore")
+--local firstBossMod = DBM:GetModByName("Razorgore")
 
 function mod:OnCombatStart()
 	table.wipe(addsGuidCheck)
@@ -59,7 +59,7 @@ function mod:OnCombatEnd(wipe)
 	timerSBVolleyCD:Stop()
 	timerMindControlCD:Stop()
 	timerClassCall:Stop()
-	if not wipe then
+--[[	if not wipe then
 		DBT:CancelBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT)
 		if firstBossMod.vb.firstEngageTime then
 			local thisTime = time() - firstBossMod.vb.firstEngageTime
@@ -79,7 +79,7 @@ function mod:OnCombatEnd(wipe)
 			end
 			firstBossMod.vb.firstEngageTime = nil
 		end
-	end
+	end--]]
 end
 
 function mod:SPELL_CAST_START(args)
