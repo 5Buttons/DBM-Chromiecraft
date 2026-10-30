@@ -12,7 +12,7 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 40243 40251",
 	"SPELL_AURA_REMOVED 40243 40251",
-	"SPELL_CAST_SUCCESS 40239"
+	"SPELL_CAST_SUCCESS 40239 40251"
 )
 
 --Incinerate useful?
@@ -28,7 +28,7 @@ local timerDeathCD			= mod:NewCDTimer(32, 40251, nil, nil, nil, 3)--32-40 (small
 local timerDeath			= mod:NewTargetTimer(55, 40251, nil, nil, nil, 3)
 local timerVengefulSpirit		= mod:NewTimer(60, "TimerVengefulSpirit", 40325, nil, nil, 1)
 
-local berserkTimer			= mod:NewBerserkTimer(300)
+local berserkTimer			= mod:NewBerserkTimer(600)
 
 mod:AddSetIconOption("CrushIcon", 40243, false, false, {1, 2, 3, 4, 5})
 
