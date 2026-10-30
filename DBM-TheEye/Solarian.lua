@@ -42,7 +42,7 @@ mod:AddSetIconOption("WrathIcon", 42783, true, false, {8})
 --mod:AddInfoFrameOption(33044)
 
 function mod:OnCombatStart(delay)
-	timerSplit:Start(50+2.1-delay)
+	timerSplit:Start(54.1-delay)
 	berserkTimer:Start(-delay)
 	timerWrathCD:Start(-delay)
 --	if self.Options.InfoFrame then
@@ -116,7 +116,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		timerPriest:Start()
 		warnPriest:Schedule(20)
 		timerSplit:Start()
-		timerWrathCD:AddTime(22-2)
+		timerWrathCD:AddTime(22)
 	elseif msg == L.YellPhase2 or msg:find(L.YellPhase2) or msg:find(L.YellPhase2CC) then
 		warnPhase2:Show()
 		timerAgent:Cancel()
