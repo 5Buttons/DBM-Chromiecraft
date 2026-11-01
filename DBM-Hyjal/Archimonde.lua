@@ -102,8 +102,8 @@ end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 
-	if msg == L.ArchimondeDoomfire1
-		or msg == L.ArchimondeDoomfire2
+	if msg == L.ArchimondeDoomfireYell1
+		or msg == L.ArchimondeDoomfireYell2
 	then
 		warnDoomfire:Show()
 		timerNextDoomfire:Start()
