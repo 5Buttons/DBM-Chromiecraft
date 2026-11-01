@@ -39,6 +39,7 @@ function mod:Emerged()
 	warnEmerge:Show()
 	timerSubmerge:Start()
 	timerSpoutCD:Start()
+	timerWhirlCD:Start(18.15)
 	self:ScheduleMethod(90.75, "Submerged")
 end
 
@@ -82,7 +83,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(_, source)
 		timerSpoutCast:Start()
 		timerSpout:Schedule(3) -- takes 3 seconds to start Spout (from EMOTE to UNIT_SPELLCAST_SUCCEEDED)
 		timerSpoutCD:Start(60)
-		timerWhirlCD:Restart(18)
+		timerWhirlCD:Restart(20)
 	end
 end
 
