@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("IronCouncil", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261026180406")
+mod:SetRevision("20261101183018")
 mod:SetCreatureID(32867, 32927, 32857)
 mod:SetEncounterID(748)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -11,7 +11,7 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 61920 63479 61879 61903 63493 62274 63489 62273 61973",
 	"SPELL_CAST_SUCCESS 63490 62269 61869 63481",
-	"SPELL_AURA_APPLIED 61903 63489 61920 63493 62269 63490 62277 63967 64637 61888 63486 61887 61912 63494 63483 61915",
+	"SPELL_AURA_APPLIED 61903 62274 63489 61920 63493 62269 63490 64637 61888 63486 61887 61912 63494 63483 61915",
 	"SPELL_AURA_APPLIED_DOSE 61920",
 	"SPELL_AURA_REMOVED 64637 61888 63483 61915 61912 63494",
 	"UNIT_DIED",
@@ -61,7 +61,7 @@ local timerRuneofShieldsCD		= mod:NewCDTimer("v27-34", 62274, nil, nil, nil, 5, 
 local timerRuneofDeath			= mod:NewCDTimer("v30-40", 63490, nil, nil, nil, 3)
 local timerRuneofPowerCast		= mod:NewCastTimer(1.5, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 local timerRuneofPowerCD		= mod:NewCDTimer(60, 61973, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
-local timerRuneofSummoning		= mod:NewCDTimer(30, 62273, nil, nil, nil, 1)
+local timerRuneofSummoning		= mod:NewCDTimer("v30-45", 62273, nil, nil, nil, 1)
 
 -- Steelbreaker
 -- High Voltage ... don't know what to show here - 63498
@@ -182,7 +182,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			specwarnRuneofDeath:Show()
 			specwarnRuneofDeath:Play("runaway")
 		end
-	elseif args:IsSpellID(62277, 63967, 63489) and not args:IsDestTypePlayer() then		-- Shield of Runes
+	elseif args:IsSpellID(62274, 63489) and not args:IsDestTypePlayer() then		-- Shield of Runes
 		specWarnRuneofShields:Show(args.destName)
 		specWarnRuneofShields:Play("dispelboss")
 	elseif args:IsSpellID(61920) and self:AntiSpam(3, 2) then --Supercharge (first stack)
@@ -255,7 +255,7 @@ function mod:UNIT_DIED(args)
 			timerRuneofDeath:Start(35)
 			warnRuneofDeathIn10Sec:Schedule(20)
 		elseif runemasterAlive then
-			timerRuneofSummoning:Start(25)
+			timerRuneofSummoning:Start("v20-30")
 		end
 		timerFusionPunchCast:Cancel()
 		timerFusionPunchCD:Cancel()
@@ -272,7 +272,7 @@ function mod:UNIT_DIED(args)
 			timerRuneofDeath:Start(35)
 			warnRuneofDeathIn10Sec:Schedule(20)
 		elseif runemasterAlive then
-			timerRuneofSummoning:Start(25)
+			timerRuneofSummoning:Start("v20-30")
 		end
 		timerOverload:Cancel()
 		timerOverloadCD:Cancel()
