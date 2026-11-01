@@ -11,7 +11,7 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 33238 33054 33147",
 	"SPELL_CAST_START 33152 33144",
-	"SPELL_CAST_SUCCESS 33131 16508",
+	"SPELL_CAST_SUCCESS 16508",
 	"SPELL_SUMMON 33131"
 )
 
@@ -80,10 +80,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 33131 then
-		warningFelHunter:Show()
-		timerFelhunter:Start()
-	elseif args.spellId == 16508 then
+	if args.spellId == 16508 then
 		timerRoarCD:Start()
 	end
 end
