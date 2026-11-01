@@ -87,12 +87,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		end
 	elseif spellId == 40491 then
 		self.vb.strikeCount = self.vb.strikeCount + 1
-		if self.vb.strikeCount == 3 then
-			self.vb.strikeCount = 0
-			timerStrikeCD:Start(50, 1)
-		else
-			timerStrikeCD:Start(nil, self.vb.strikeCount+1)
-		end
+		timerStrikeCD:Start(nil, self.vb.strikeCount+1)
 	end	
 end
 
