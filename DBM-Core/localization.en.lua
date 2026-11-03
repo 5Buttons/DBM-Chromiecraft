@@ -19,7 +19,7 @@ L.SILENT_REMINDER						= "Reminder: " .. L.DBM .. " is still in silent mode."
 
 L.COPY_URL_DIALOG_NEWS					= "To read latest news, visit link below"
 
-L.UPDATEREMINDER_URL					= "https://github.com/5Buttons/DBM-Chromiecraft"
+L.UPDATEREMINDER_URL					= "https://github.com/Zidras/DBM-Warmane/"
 
 L.LOAD_MOD_ERROR						= "Error while loading boss mods for %s: %s"
 L.LOAD_MOD_SUCCESS						= "Loaded '%s' mods. For more options such as custom alert sounds and personalized warning notes, type /dbm."
@@ -300,11 +300,13 @@ L.BREAK_MIN								= "Break ends in %s minute(s)!"
 L.BREAK_SEC								= "Break ends in %s seconds!"
 L.TIMER_BREAK							= "Break time!"
 L.ANNOUNCE_BREAK_OVER					= "Break has ended at %s"
+L.ANNOUNCE_BREAK_CANCEL					= "Break timer canceled by %s"
 
 L.TIMER_PULL							= "Pull in"
 L.ANNOUNCE_PULL_MODE					= "Pull mode: %s"
 L.ANNOUNCE_PULL							= "Pull in %d sec. (Sent by %s)"
 L.ANNOUNCE_PULL_NOW						= "Pull now!"
+L.ANNOUNCE_PULL_CANCEL					= "Pull timer canceled by %s"
 L.ANNOUNCE_PULL_TARGET					= "Pulling %s in %d sec. (Sent by %s)"
 L.ANNOUNCE_PULL_NOW_TARGET				= "Pulling %s now!"
 L.GEAR_WARNING							= "Warning: Check gear. Your equipped ilvl is %d lower than bag ilvl"
