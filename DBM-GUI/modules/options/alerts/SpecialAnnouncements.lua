@@ -523,6 +523,12 @@ resetbutton:SetScript("OnClick", function()
 	DBM.Options.SpecialWarningFlashCount4 = DBM.DefaultOptions.SpecialWarningFlashCount4
 	DBM.Options.SpecialWarningFlashCount5 = DBM.DefaultOptions.SpecialWarningFlashCount5
 	DBM.Options.SpecialWarningFontSize2 = DBM.DefaultOptions.SpecialWarningFontSize2
+	DBM.Options.SpecialWarningFontStyle = DBM.DefaultOptions.SpecialWarningFontStyle
+	DBM.Options.SpecialWarningFontShadow = DBM.DefaultOptions.SpecialWarningFontShadow
+	DBM.Options.SpecialWarningDuration2 = DBM.DefaultOptions.SpecialWarningDuration2
+	DBM.Options.SpecialWarningFontCol[1] = DBM.DefaultOptions.SpecialWarningFontCol[1]
+	DBM.Options.SpecialWarningFontCol[2] = DBM.DefaultOptions.SpecialWarningFontCol[2]
+	DBM.Options.SpecialWarningFontCol[3] = DBM.DefaultOptions.SpecialWarningFontCol[3]
 	DBM.Options.SpecialWarningFlashCol1[1] = DBM.DefaultOptions.SpecialWarningFlashCol1[1]
 	DBM.Options.SpecialWarningFlashCol1[2] = DBM.DefaultOptions.SpecialWarningFlashCol1[2]
 	DBM.Options.SpecialWarningFlashCol1[3] = DBM.DefaultOptions.SpecialWarningFlashCol1[3]
@@ -565,6 +571,9 @@ resetbutton:SetScript("OnClick", function()
 	SpecialWarnSoundDropDown4:SetSelectedValue(DBM.Options.SpecialWarningSound4)
 	SpecialWarnSoundDropDown5:SetSelectedValue(DBM.Options.SpecialWarningSound5)
 	fontSizeSlider:SetValue(DBM.DefaultOptions.SpecialWarningFontSize2)
+	FontStyleDropDown:SetSelectedValue(DBM.Options.SpecialWarningFontStyle)
+	FontShadow:SetChecked(DBM.Options.SpecialWarningFontShadow)
+	durationSlider:SetValue(DBM.Options.SpecialWarningDuration2)
 	color0:SetColorRGB(DBM.Options.SpecialWarningFontCol[1], DBM.Options.SpecialWarningFontCol[2], DBM.Options.SpecialWarningFontCol[3])
 	color1:SetColorRGB(DBM.Options.SpecialWarningFlashCol1[1], DBM.Options.SpecialWarningFlashCol1[2], DBM.Options.SpecialWarningFlashCol1[3])
 	color2:SetColorRGB(DBM.Options.SpecialWarningFlashCol2[1], DBM.Options.SpecialWarningFlashCol2[2], DBM.Options.SpecialWarningFlashCol2[3])

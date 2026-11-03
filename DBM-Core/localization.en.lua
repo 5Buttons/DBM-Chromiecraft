@@ -300,11 +300,13 @@ L.BREAK_MIN								= "Break ends in %s minute(s)!"
 L.BREAK_SEC								= "Break ends in %s seconds!"
 L.TIMER_BREAK							= "Break time!"
 L.ANNOUNCE_BREAK_OVER					= "Break has ended at %s"
+L.ANNOUNCE_BREAK_CANCEL					= "Break timer canceled by %s"
 
 L.TIMER_PULL							= "Pull in"
 L.ANNOUNCE_PULL_MODE					= "Pull mode: %s"
 L.ANNOUNCE_PULL							= "Pull in %d sec. (Sent by %s)"
 L.ANNOUNCE_PULL_NOW						= "Pull now!"
+L.ANNOUNCE_PULL_CANCEL					= "Pull timer canceled by %s"
 L.ANNOUNCE_PULL_TARGET					= "Pulling %s in %d sec. (Sent by %s)"
 L.ANNOUNCE_PULL_NOW_TARGET				= "Pulling %s now!"
 L.GEAR_WARNING							= "Warning: Check gear. Your equipped ilvl is %d lower than bag ilvl"
@@ -563,6 +565,8 @@ L.AUTO_TIMER_OPTIONS = {
 	addscustom							= "Show timer for incoming adds (%ss)",
 	roleplay							= "Show timer for roleplay duration (%ss)"--This does need localizing though.
 }
+L.AUTO_TIMER_OPTIONS.cdcountnp			= L.AUTO_TIMER_OPTIONS.cdnpcount
+L.AUTO_TIMER_OPTIONS.nextcountnp		= L.AUTO_TIMER_OPTIONS.nextnpcount
 
 L.AUTO_ICONS_OPTION_TARGETS				= "Set icons on $spell:%s targets"--Usually used for player targets with no specific sorting
 L.AUTO_ICONS_OPTION_TARGETS_TANK_A		= "Set icons on $spell:%s targets with tank over melee over ranged priority and alphabetical fallback"

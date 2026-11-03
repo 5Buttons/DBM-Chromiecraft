@@ -272,9 +272,13 @@ do
 		spark:SetSize(32, 64)
 		spark:SetTexture("Interface\\AddOns\\DBM-StatusBarTimers\\textures\\Spark.blp")
 		spark:SetBlendMode("ADD")
-		local timer = bar:CreateFontString("$parentTimer", "OVERLAY", "GameFontHighlightSmall")
+		-- Text lives outside bar so bar alpha is not applied twice: inline |T icons ignore parent alpha and only take the text color alpha
+		local text = CreateFrame("Frame", nil, frame)
+		text:SetAllPoints(bar)
+		text:SetFrameLevel(bar:GetFrameLevel() + 1)
+		local timer = text:CreateFontString("DBT_Bar_" .. fCounter .. "BarTimer", "OVERLAY", "GameFontHighlightSmall")
 		timer:SetPoint("RIGHT", bar, "RIGHT", -1, 0.5)
-		local name = bar:CreateFontString("$parentName", "OVERLAY", "GameFontHighlightSmall")
+		local name = text:CreateFontString("DBT_Bar_" .. fCounter .. "BarName", "OVERLAY", "GameFontHighlightSmall")
 		name:SetPoint("LEFT", bar, "LEFT", 7, 0.5)
 		name:SetPoint("RIGHT", timer, "LEFT", -7, 0)
 		name:SetWordWrap(false)
@@ -344,7 +348,7 @@ do
 		else
 			timer = varianceMinTimer or varianceMaxTimer -- varianceMaxTimer here could be just normal number timer, so check for varianceMinTimer, which only exists if it's a variant timer
 		end
-		if not timer or (self.numBars >= 15 and not isDummy) then
+		if not timer then
 			return
 		end
 		-- Most efficient place to block it, nil colorType instead of checking option every update
@@ -372,6 +376,9 @@ do
 			newBar:SetText(id)
 			newBar:SetIcon(icon)
 		else -- Create a new bar
+			if self.numBars >= 15 and not isDummy then
+				return
+			end
 			newBar = next(unusedBarObjects)
 			if newBar then
 				newBar.lastUpdate = GetTime()
@@ -542,7 +549,11 @@ do
 		if not DBT_AllPersistentOptions[name] then
 			DBT_AllPersistentOptions[name] = {}
 		end
-		DBT_AllPersistentOptions[DBM_UsedProfile][id] = DBT_AllPersistentOptions[name][id] or {}
+		local copy = {}
+		for k, v in pairs(DBT_AllPersistentOptions[name][id] or {}) do
+			copy[k] = v
+		end
+		DBT_AllPersistentOptions[DBM_UsedProfile][id] = copy
 		self:AddDefaultOptions(DBT_AllPersistentOptions[DBM_UsedProfile][id], self.DefaultOptions)
 		self.Options = DBT_AllPersistentOptions[DBM_UsedProfile][id]
 		self:Rearrange()
@@ -597,10 +608,12 @@ do
 
 	function DBT:ShowMovableBar(small, large)
 		if small or small == nil then
-			self:CreateBar(20, "Move1", "Interface\\Icons\\Spell_Nature_WispSplode", nil, true):SetText(DBM_CORE_L.MOVABLE_BAR)
+			local bar = self:CreateBar(20, "Move1", "Interface\\Icons\\Spell_Nature_WispSplode", nil, true)
+			if bar then bar:SetText(DBM_CORE_L.MOVABLE_BAR) end
 		end
 		if large or large == nil then
-			self:CreateBar(20, "Move2", "Interface\\Icons\\Spell_Nature_WispSplode", true):SetText(DBM_CORE_L.MOVABLE_BAR)
+			local bar = self:CreateBar(20, "Move2", "Interface\\Icons\\Spell_Nature_WispSplode", true)
+			if bar then bar:SetText(DBM_CORE_L.MOVABLE_BAR) end
 		end
 		updateClickThrough(self, false)
 		self.movable = true
@@ -719,7 +732,7 @@ function DBT:UpdateBar(id, elapsed, totalTime)
 				bar:ApplyStyle()
 			end
 			bar:SetTimer(totalTime or bar.totalTime)
-			bar:SetElapsed(elapsed or self.totalTime - self.timer)
+			bar:SetElapsed(elapsed or bar.totalTime - bar.timer)
 			return true
 		end
 	end
@@ -1099,8 +1112,8 @@ function barPrototype:Update(elapsed)
 	if not paused and ((barOptions.VarianceEnabled and timerLowestValueFromVariance or timerValue) <= enlargeTime) and not self.small and not isEnlarged and isMoving ~= "enlarge" and enlargeEnabled then
 		self:RemoveFromList()
 		self:Enlarge()
+		DBT:UpdateBars(true)
 	end
-	DBT:UpdateBars()
 end
 
 function barPrototype:RemoveFromList()
@@ -1110,6 +1123,7 @@ function barPrototype:RemoveFromList()
 end
 
 function barPrototype:Cancel()
+	if self.dead then return end
 	self.frame:Hide()
 	self:RemoveFromList()
 	DBT.bars[self] = nil
@@ -1117,6 +1131,7 @@ function barPrototype:Cancel()
 	self.dead = true
 	self.paused = nil
 	DBT.numBars = DBT.numBars - 1
+	DBT:UpdateBars(true)
 end
 
 function barPrototype:ApplyStyle()
@@ -1166,26 +1181,22 @@ function barPrototype:ApplyStyle()
 	end
 	local barTextColorRed, barTextColorGreen, barTextColorBlue = barOptions.TextColorR, barOptions.TextColorG, barOptions.TextColorB
 	local barHeight, barHugeHeight, barWidth, barHugeWidth = barOptions.Height, barOptions.HugeHeight, barOptions.Width, barOptions.HugeWidth
-	name:SetTextColor(barTextColorRed, barTextColorGreen, barTextColorBlue)
-	timer:SetTextColor(barTextColorRed, barTextColorGreen, barTextColorBlue)
+	local barAlpha = enlarged and barOptions.HugeAlpha or barOptions.Alpha
+	if barOptions.FadeBars and self.fade then
+		barAlpha = barAlpha / 2
+	end
+	frame:SetAlpha(1)
+	bar:SetAlpha(barAlpha)
+	name:SetTextColor(barTextColorRed, barTextColorGreen, barTextColorBlue, barAlpha)
+	timer:SetTextColor(barTextColorRed, barTextColorGreen, barTextColorBlue, barAlpha)
 	if barOptions.IconLeft then icon1:Show() else icon1:Hide() end
 	if barOptions.IconRight then icon2:Show() else icon2:Hide() end
 	if enlarged then
 		bar:SetSize(barHugeWidth, barHugeHeight)
 		frame:SetScale(barOptions.HugeScale)
-		if barOptions.FadeBars and self.fade then
-			frame:SetAlpha(barOptions.HugeAlpha / 2)
-		else
-			frame:SetAlpha(barOptions.HugeAlpha)
-		end
 	else
 		bar:SetSize(barWidth, barHeight)
 		frame:SetScale(barOptions.Scale)
-		if barOptions.FadeBars and self.fade and barOptions.Alpha ~= 0 then
-			frame:SetAlpha(barOptions.Alpha / 2)
-		else
-			frame:SetAlpha(barOptions.Alpha)
-		end
 	end
 	if barOptions.IconLocked then
 		local sizeHeight = enlarged and barHugeHeight or barHeight
@@ -1292,15 +1303,16 @@ function barPrototype:AnimateEnlarge(elapsed)
 		local calc = melapsed / 1
 		local newX = self.moveOffsetX + (DBT.Options.HugeBarXOffset - self.moveOffsetX) * calc
 		local newY = self.moveOffsetY + (DBT.Options.HugeBarYOffset - self.moveOffsetY) * calc
-		local newWidth = DBT.Options.HugeWidth + (DBT.Options.Width - DBT.Options.HugeWidth) * calc
-		local newHeight = DBT.Options.HugeHeight + (DBT.Options.Height - DBT.Options.HugeHeight) * calc
-		local newScale = DBT.Options.HugeScale + (DBT.Options.Scale - DBT.Options.HugeScale) * calc
+		local newWidth = DBT.Options.Width + (DBT.Options.HugeWidth - DBT.Options.Width) * calc
+		local newHeight = DBT.Options.Height + (DBT.Options.HugeHeight - DBT.Options.Height) * calc
+		local newScale = DBT.Options.Scale + (DBT.Options.HugeScale - DBT.Options.Scale) * calc
 		self.frame:ClearAllPoints()
 		self.frame:SetPoint(self.movePoint, self.moveAnchor, self.movePoint, newX, newY)
 		self.frame:SetScale(newScale)
 		self.frame:SetSize(newWidth, newHeight)
 		_G[self.frame:GetName().."Bar"]:SetWidth(newWidth)
 	else
+		barIsAnimating = false
 		self.moving = nil
 		self.enlarged = true
 		tinsert(largeBars, self)

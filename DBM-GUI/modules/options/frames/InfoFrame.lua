@@ -83,7 +83,7 @@ local columns = {
 	}
 }
 
-local columnsDropdown = general:CreateDropdown(CL.INFOFRAME_SETCOLS, columns, "DBM", "InfoFrameLines", function(value)
+local columnsDropdown = general:CreateDropdown(CL.INFOFRAME_SETCOLS, columns, "DBM", "InfoFrameCols", function(value)
 	DBM.Options.InfoFrameCols = value
 	DBM.InfoFrame:UpdateStyle()
 end)
@@ -187,8 +187,8 @@ resetbutton:SetScript("OnClick", function()
 	dontShow:SetChecked(DBM.Options.DontShowInfoFrame)
 	locked:SetChecked(true)
 	showSelf:SetChecked(DBM.Options.InfoFrameShowSelf)
-	FontDropDown:SetSelectedValue(DBM.Options.WarningFont)
-	FontStyleDropDown:SetSelectedValue(DBM.Options.FontStyles)
-	fontSizeSlider:SetValue(DBM.DefaultOptions.WarningFontSize)
+	FontDropDown:SetSelectedValue(DBM.Options.InfoFrameFont)
+	FontStyleDropDown:SetSelectedValue(DBM.Options.InfoFrameFontStyle)
+	fontSizeSlider:SetValue(DBM.Options.InfoFrameFontSize)
 	DBM.InfoFrame:UpdateStyle()
 end)

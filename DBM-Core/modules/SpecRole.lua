@@ -208,10 +208,10 @@ function DBMExtraGlobal:rebuildSpecTable()
 			["MagicDispeller"] = true,
 			["RemoveEnrage"] = true,
 		},
-		[255] = {	--Survival Hunter (Legion+)
+		[255] = {	--Survival Hunter (ranged in WotLK)
 			["Dps"] = true,
-			["Melee"] = true,
-			["MeleeDps"] = true,
+			["Ranged"] = true,
+			["RangedDps"] = true,
 			["Physical"] = true,
 			["MagicDispeller"] = true,
 			["RemoveEnrage"] = true,

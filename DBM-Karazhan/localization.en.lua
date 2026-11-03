@@ -42,6 +42,8 @@ L:SetMiscLocalization({
 	Event				= "Tonight... we explore a tale of forbidden love!",
 	RJ_Pull				= "What devil art thou, that dost torment me thus?",
 	DBM_RJ_PHASE2_YELL	= "Come, gentle night; and give me back my Romulo!",
+	JulianneFakeDeath	= "Romulo, I come! Oh... this do I drink to thee!",
+	RomuloFakeDeath		= "Thou smilest... upon the stroke that... murders me.",
 	Romulo				= "Romulo",
 	Julianne			= "Julianne"
 })
@@ -199,6 +201,7 @@ L:SetGeneralLocalization({
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "Simple fools! Time is the fire in which you'll burn!",
 	DBM_PRINCE_YELL_P3		= "How can you hope to stand against such overwhelming power?",
+	DBM_PRINCE_YELL_P3_2	= "I see the subtlety of conception is beyond primitives such as you.",
 	DBM_PRINCE_YELL_INF1	= "All realities, all dimensions are open to me!",
 	DBM_PRINCE_YELL_INF2	= "You face not Malchezaar alone, but the legions I command!"
 })

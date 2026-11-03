@@ -68,9 +68,9 @@ dualProfile:SetChecked(DBM_UseDualProfile)
 dualProfileArea:CreateCheckButton(L.PerCharacterSettings, true, nil, "PerCharacterSettings")
 
 local function actuallyImport(importTable)
-	DBM.Options = importTable.DBM -- Cached options
 	DBM_AllSavedOptions[_G["DBM_UsedProfile"]] = importTable.DBM
 	DBT_AllPersistentOptions[_G["DBM_UsedProfile"]] = importTable.DBT
+	DBM:ApplyProfile(_G["DBM_UsedProfile"]) -- re-points DBM/DBT options to the imported tables and fills new defaults
 	DBM_MinimapIcon = importTable.minimap
 	if importTable.minimap.hide then
 		LibStub("LibDBIcon-1.0"):Hide("DBM")

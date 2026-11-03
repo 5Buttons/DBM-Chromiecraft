@@ -82,7 +82,7 @@ local function currentFullDate()
 end
 
 DBM = {
-	Revision = parseCurseDate("20261101183223"),
+	Revision = parseCurseDate("20261102222555"),
 	DisplayVersion = "10.1.13 alpha", -- the string that is shown as version
 	ReleaseRevision = releaseDate(2026, 11, 01) -- the date of the latest stable version that is available, optionally pass hours, minutes, and seconds for multiple releases in one day
 }
@@ -828,7 +828,7 @@ do
 			-- Register valid units for retail-like mod:RegisterEvents("UNIT_SPELLCAST_START boss1")
 			mod.registeredUnitEvents = mod.registeredUnitEvents or {}
 			if next(uIds) then
-				registeredUnitEventIds[event] = (registeredUnitEventIds[event] or 0) + 1
+				registeredUnitEventIds[event] = (registeredUnitEventIds[event] or 0) + #uIds
 				mod.registeredUnitEvents[event] = uIds
 			end
 			unitMainFrame:RegisterEvent(event)
@@ -1056,7 +1056,7 @@ do
 						match = true
 					end
 				end
-				if #mods == 0 or (match and event:sub(0, 5) == "UNIT_" and event:sub(0, -10) ~= "_UNFILTERED" and event ~= "UNIT_DIED" and event ~= "UNIT_DESTROYED") then -- unit events have their own reference count
+				if #mods == 0 or (match and event:sub(0, 5) == "UNIT_" and event:sub(-11) ~= "_UNFILTERED" and event ~= "UNIT_DIED" and event ~= "UNIT_DESTROYED") then -- unit events have their own reference count
 					unregisterUEvent(self, event)
 				end
 				if #mods == 0 then
@@ -1122,7 +1122,7 @@ do
 							end
 						end
 					end
-					if #mods == 0 or (match and event:sub(0, 5) == "UNIT_" and event:sub(0, -10) ~= "_UNFILTERED" and event ~= "UNIT_DIED" and event ~= "UNIT_DESTROYED") then
+					if #mods == 0 or (match and event:sub(0, 5) == "UNIT_" and event:sub(-11) ~= "_UNFILTERED" and event ~= "UNIT_DIED" and event ~= "UNIT_DESTROYED") then
 						unregisterUEvent(self, event)
 						DBM:Debug("unregisterUEvent for unit event "..event.." unregistered", 3)
 					end
@@ -1648,6 +1648,14 @@ function DBM:ApplyProfile(name)
 	self:AddMsg(L.PROFILE_APPLIED:format(name))
 end
 
+local function copyTable(t)
+	local copy = {}
+	for k, v in pairs(t) do
+		copy[k] = type(v) == "table" and copyTable(v) or v
+	end
+	return copy
+end
+
 function DBM:CopyProfile(name)
 	if not name or not DBM_AllSavedOptions[name] then
 		self:AddMsg(L.PROFILE_COPY_ERROR:format(name or CL.UNKNOWN))
@@ -1656,7 +1664,7 @@ function DBM:CopyProfile(name)
 		self:AddMsg(L.PROFILE_COPY_ERROR_SELF)
 		return
 	end
-	DBM_AllSavedOptions[usedProfile] = DBM_AllSavedOptions[name]
+	DBM_AllSavedOptions[usedProfile] = copyTable(DBM_AllSavedOptions[name])
 	self:AddDefaultOptions(DBM_AllSavedOptions[usedProfile], self.DefaultOptions)
 	self.Options = DBM_AllSavedOptions[usedProfile]
 	-- rearrange position
@@ -1983,7 +1991,7 @@ do
 				--Initiate backups that at least have latest version, in case the main elect doesn't have icons enabled
 				for i = 2, 3 do--Allow top 3 revisions in raid to set icons, instead of just top one
 					local electedBackup = iconSeter[i]
-					if updateNotificationDisplayed == 0 and electedBackup and playerName == electedBackup:sub(elected:find(" ") + 1) then
+					if updateNotificationDisplayed == 0 and electedBackup and playerName == electedBackup:sub(electedBackup:find(" ") + 1) then
 						private.enableIcons = true
 						DBM:Debug("You have been elected as one of 2 backup icon setters in raid that have assist/lead", 2)
 					end
@@ -2572,6 +2580,7 @@ function DBM:LoadAllModDefaultOption(modId)
 	local profileNum = playerLevel > 9 and DBM_UseDualProfile and currentSpecGroup or 0
 	-- prevent nil table error
 	if not _G[savedVarsName] then _G[savedVarsName] = {} end
+	if not _G[savedVarsName][fullname] then _G[savedVarsName][fullname] = {} end
 	for _, id in ipairs(self.ModLists[modId]) do
 		-- prevent nil table error
 		if not _G[savedVarsName][fullname][id] then _G[savedVarsName][fullname][id] = {} end
@@ -2670,7 +2679,9 @@ function DBM:CopyAllModOption(modId, sourceName, sourceProfile)
 			return
 		end
 		-- prevent nil table error
+		if not _G[savedVarsName][targetName] then _G[savedVarsName][targetName] = {} end
 		if not _G[savedVarsName][targetName][id] then _G[savedVarsName][targetName][id] = {} end
+		if not _G[savedVarsName][targetName][id][targetProfile] then _G[savedVarsName][targetName][id][targetProfile] = {} end
 		-- copy table
 		_G[savedVarsName][targetName][id][targetProfile] = {}--clear before copy
 		_G[savedVarsName][targetName][id][targetProfile] = _G[savedVarsName][sourceName][id][sourceProfile]
@@ -2730,7 +2741,9 @@ function DBM:CopyAllModTypeOption(modId, sourceName, sourceProfile, Type)
 			return
 		end
 		-- prevent nil table error
+		if not _G[savedVarsName][targetName] then _G[savedVarsName][targetName] = {} end
 		if not _G[savedVarsName][targetName][id] then _G[savedVarsName][targetName][id] = {} end
+		if not _G[savedVarsName][targetName][id][targetProfile] then _G[savedVarsName][targetName][id][targetProfile] = {} end
 		-- copy table
 		for option, optionValue in pairs(_G[savedVarsName][sourceName][id][sourceProfile]) do
 			if option:find(Type) then
@@ -3024,7 +3037,7 @@ function DBM:UPDATE_BATTLEFIELD_STATUS(queueID)
 		if GetBattlefieldStatus(i) == "confirm" then
 			local timerEnabled = self.Options.ShowQueuePop and not self.Options.DontShowEventTimers
 			queuedBattlefield[i] = select(2, GetBattlefieldStatus(i))
-			local expiration = GetBattlefieldPortExpiration(queueID)
+			local expiration = GetBattlefieldPortExpiration(i)
 			local timerIcon = GetBattlefieldFaction("player") == "Alliance" and "Interface\\Icons\\INV_BannerPVP_02" or "Interface\\Icons\\INV_BannerPVP_01"
 			if timerEnabled then
 				DBT:CreateBar(expiration or 85, queuedBattlefield[i], timerIcon)
@@ -3404,7 +3417,7 @@ do
 		local ability = abilityName or CL.UNKNOWN
 		if mod and modvar and text and text ~= "" then
 			if DBM:AntiSpam(5, modvar) then--Don't allow calling same note more than once per 5 seconds
-				DBM:AddMsg(L.NOTE_SHARE_SUCCESS:format(sender, abilityName))
+				DBM:AddMsg(L.NOTE_SHARE_SUCCESS:format(sender, ability))
 				DBM:ShowNoteEditor(mod, modvar, ability, text, sender)
 			else
 				DBM:Debug(sender.." is attempting to send too many notes so notes are being throttled")
@@ -3480,12 +3493,13 @@ do
 			private.chatBubblesDisabled = true
 		end
 		if activated then
-			AddMsg(L.OVERRIDE_ACTIVATED)
+			AddMsg(DBM, L.OVERRIDE_ACTIVATED)
 		end
 	end
 
 	syncHandlers["DBMv4-IS"] = function(_, guid, ver, optionName)
-		DBM:Debug(("DBMv4-IS received %s %s %s"):format(guid, ver, optionName), 3)
+		if not guid or not optionName then return end
+		DBM:Debug(("DBMv4-IS received %s %s %s"):format(guid, tostring(ver), optionName), 3)
 		ver = tonumber(ver) or 0
 		if ver > (iconSetRevision[optionName] or 0) then--Save first synced version and person, ignore same version. refresh occurs only above version (fastest person)
 			iconSetRevision[optionName] = ver
@@ -3611,7 +3625,7 @@ do
 		end
 		--Abort if mapID filter is enabled and sender actually sent a mapID. if no mapID is sent, it's always passed through (IE BW pull timers)
 		if DBM.Options.DontShowPTNoID and senderMapID and tonumber(senderMapID) ~= LastInstanceMapID then return end
-		timer = tonumber(timer or 0)
+		timer = tonumber(timer) or 0
 		--We want to permit 0 itself, but block anything negative number or anything between 0 and 3
 		if (timer > 0 and timer < 3) or timer < 0 then
 			return
@@ -3626,6 +3640,7 @@ do
 				dummyMod.geartext = dummyMod:NewSpecialWarning("  %s  ", nil, nil, nil, 3)
 				dummyMod.timer = dummyMod:NewTimer(20, "%s", "Interface\\Icons\\Ability_Warrior_OffensiveStance", nil, nil, 0, nil, nil, DBM.Options.DontPlayPTCountdown and 0 or 4, threshold, nil, nil, nil, nil, nil, nil, "pull")
 			end
+			local wasRunning = dummyMod.timer:IsStarted(L.TIMER_PULL)
 			--Cancel any existing pull timers before creating new ones, we don't want double countdowns or mismatching blizz countdown text (cause you can't call another one if one is in progress)
 			if not DBM.Options.DontShowPT2 then--and DBT:GetBar(L.TIMER_PULL)
 				dummyMod.timer:Stop()
@@ -3643,7 +3658,12 @@ do
 				end
 			end
 			dummyMod.text:Cancel()
-			if timer == 0 then return end--"/dbm pull 0" will strictly be used to cancel the pull timer (which is why we let above part of code run but not below)
+			if timer == 0 then--"/dbm pull 0" will strictly be used to cancel the pull timer (which is why we let above part of code run but not below)
+				if wasRunning then
+					DBM:AddMsg(L.ANNOUNCE_PULL_CANCEL:format(sender))
+				end
+				return
+			end
 			DBM:FlashClientIcon()
 			if not DBM.Options.DontShowPT2 then
 				dummyMod.timer:Start(timer, L.TIMER_PULL)
@@ -3709,13 +3729,19 @@ do
 				--timer, name, icon, optionDefault, optionName, colorType, inlineIcon, keep, countdown, countdownMax, r, g, b, spellId, requiresCombat, waCustomName, customType
 				dummyMod2.timer = dummyMod2:NewTimer(20, L.TIMER_BREAK, "Interface\\Icons\\SPELL_HOLY_BORROWEDTIME", nil, nil, 0, nil, nil, DBM.Options.DontPlayPTCountdown and 0 or 1, threshold, nil, nil, nil, nil, nil, nil, "break")
 			end
+			local wasRunning = dummyMod2.timer:IsStarted()
 			--Cancel any existing break timers before creating new ones, we don't want double countdowns or mismatching blizz countdown text (cause you can't call another one if one is in progress)
 			if not DBM.Options.DontShowPT2 then--and DBT:GetBar(L.TIMER_BREAK)
 				dummyMod2.timer:Stop()
 			end
 			dummyMod2.text:Cancel()
 			DBM.Options.RestoreSettingBreakTimer = nil
-			if timer == 0 then return end--"/dbm break 0" will strictly be used to cancel the break timer (which is why we let above part of code run but not below)
+			if timer == 0 then--"/dbm break 0" will strictly be used to cancel the break timer (which is why we let above part of code run but not below)
+				if wasRunning and sender then
+					DBM:AddMsg(L.ANNOUNCE_BREAK_CANCEL:format(sender))
+				end
+				return
+			end
 			self.Options.RestoreSettingBreakTimer = timer.."/"..time()
 			if not self.Options.DontShowPT2 then
 				dummyMod2.timer:Start(timer)
@@ -3745,7 +3771,7 @@ do
 
 	syncHandlers["DBMv4-BT"] = function(sender, timer)
 		if DBM.Options.DontShowUserTimers then return end
-		timer = tonumber(timer or 0)
+		timer = tonumber(timer) or 0
 		if timer > 3600 then return end
 		if (DBM:GetRaidRank(sender) == 0 and IsInGroup()) or select(2, IsInInstance()) == "pvp" then
 			return
@@ -3757,7 +3783,7 @@ do
 
 	whisperSyncHandlers["DBMv4-BTR3"] = function(sender, timer)
 		if DBM.Options.DontShowUserTimers then return end
-		timer = tonumber(timer or 0)
+		timer = tonumber(timer) or 0
 		if timer > 3600 then return end
 		DBM:Unschedule(DBM.RequestTimers)--IF we got BTR3 sync, then we know immediately RequestTimers was successful, so abort others
 		if #inCombat >= 1 then return end
@@ -3883,7 +3909,7 @@ do
 			-- Use Retail "H" syncHandler instead
 			handleSync(nil, sender, "DBMv4-H")
 		else
-			DBM:Debug(("DBMv4-Ver received %s %s %s %s from %s"):format(revision, version, displayVersion, locale, sender), 3)
+			DBM:Debug(("DBMv4-Ver received %s %s %s %s from %s"):format(tostring(revision), tostring(version), tostring(displayVersion), tostring(locale), sender), 3)
 			-- Use Retail "V" syncHandler instead
 			handleSync(nil, sender, "DBMv4-V", revision, version, displayVersion, locale, iconEnabled, VPVersion)
 		end
@@ -4068,6 +4094,12 @@ do
 			end
 		end
 
+		-- senders pass difficultyIndex (175/176 normal, 193/194 heroic); 2-4 kept for old senders
+		local guildDifficultyNames = {
+			[2] = PLAYER_DIFFICULTY2, [3] = RAID_DIFFICULTY3, [4] = RAID_DIFFICULTY4,
+			[175] = RAID_DIFFICULTY1, [176] = RAID_DIFFICULTY2, [193] = RAID_DIFFICULTY3, [194] = RAID_DIFFICULTY4,
+		}
+
 		guildSyncHandlers["DBMv4-GCB"] = function(_, modId, ver, difficulty, name, groupLeader)
 			if not DBM.Options.ShowGuildMessages or not difficulty or DBM:GetRaidRank(groupLeader or "") == 2 then return end
 			if not ver or ver ~= "4" then return end--Ignore old versions
@@ -4077,16 +4109,7 @@ do
 				if not DBM.Options.ShowGuildMessagesPlus then return end
 				modId = tonumber(modId)
 				local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
-				local difficultyName
-				if difficulty == 4 then
-					difficultyName = RAID_DIFFICULTY4
-				elseif difficulty == 3 then
-					difficultyName = RAID_DIFFICULTY3
-				elseif difficulty == 2 then
-					difficultyName = PLAYER_DIFFICULTY2
-				else
-					difficultyName = PLAYER_DIFFICULTY1
-				end
+				local difficultyName = guildDifficultyNames[difficulty] or PLAYER_DIFFICULTY1
 				DBM:AddMsg(L.GUILD_COMBAT_STARTED:format(difficultyName.."-"..bossName, groupLeader))-- "%s has been engaged by %s's guild group"
 			end
 		end
@@ -4100,16 +4123,7 @@ do
 				if not DBM.Options.ShowGuildMessagesPlus then return end
 				modId = tonumber(modId)
 				local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
-				local difficultyName
-				if difficulty == 4 then
-					difficultyName = RAID_DIFFICULTY4
-				elseif difficulty == 3 then
-					difficultyName = RAID_DIFFICULTY3
-				elseif difficulty == 2 then
-					difficultyName = PLAYER_DIFFICULTY2
-				else
-					difficultyName = PLAYER_DIFFICULTY1
-				end
+				local difficultyName = guildDifficultyNames[difficulty] or PLAYER_DIFFICULTY1
 				if wipe == "1" then
 					DBM:AddMsg(L.GUILD_COMBAT_ENDED_AT:format(groupLeader or CL.UNKNOWN, difficultyName.."-"..bossName, wipeHP, time))--"%s's Guild group has wiped on %s (%s) after %s.
 				else
@@ -4325,7 +4339,7 @@ do
 		if not ver or ver ~="8" then return end--Ignore old versions
 		if lastBossEngage[modId..realm] and (GetTime() - lastBossEngage[modId..realm] < 30) then return end--We recently got a sync about this boss on this realm, so do nothing.
 		lastBossEngage[modId..realm] = GetTime()
-		if realm == playerRealm and DBM.Options.WorldBossAlert and not mod.InCombat then
+		if realm == playerRealm and DBM.Options.WorldBossAlert and not DBM:InCombat() then
 			modId = tonumber(modId)--If it fails to convert into number, this makes it nil
 			local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
 			DBM:AddMsg(L.WORLDBOSS_ENGAGED:format(bossName, floor(health), sender))
@@ -4336,7 +4350,7 @@ do
 		if not ver or ver ~="8" then return end--Ignore old versions
 		if lastBossDefeat[modId..realm] and (GetTime() - lastBossDefeat[modId..realm] < 30) then return end
 		lastBossDefeat[modId..realm] = GetTime()
-		if realm == playerRealm and DBM.Options.WorldBossAlert and not mod.InCombat then
+		if realm == playerRealm and DBM.Options.WorldBossAlert and not DBM:InCombat() then
 			modId = tonumber(modId)--If it fails to convert into number, this makes it nil
 			local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
 			DBM:AddMsg(L.WORLDBOSS_DEFEATED:format(bossName, sender))
@@ -4377,7 +4391,7 @@ do
 		if not ver or ver ~="8" then return end--Ignore old versions
 		if lastBossDefeat[modId..realm] and (GetTime() - lastBossDefeat[modId..realm] < 30) then return end
 		lastBossDefeat[modId..realm] = GetTime()
-		if realm == playerRealm and DBM.Options.WorldBossAlert and not mod.InCombat then
+		if realm == playerRealm and DBM.Options.WorldBossAlert and not DBM:InCombat() then
 			local toonName = sender or CL.UNKNOWN
 			modId = tonumber(modId)--If it fails to convert into number, this makes it nil
 			local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
@@ -4401,12 +4415,15 @@ do
 		end
 	end
 
-	whisperSyncHandlers["DBMv4-TimerInfo"] = function(sender, mod, timeLeft, totalTime, id, paused, ...)
+	whisperSyncHandlers["DBMv4-TimerInfo"] = function(sender, mod, timeLeft, totalTime, id, ...)
 		mod = DBM:GetModByName(mod or "")
 		timeLeft = tonumber(timeLeft or 0)
 		totalTime = tonumber(totalTime or 0)
+		-- the sent uId carries the timer args tab separated, so the paused flag is always the last field
+		local args = {...}
+		local paused = tremove(args) == "1"
 		if mod and timeLeft and timeLeft > 0 and totalTime and totalTime > 0 and id then
-			DBM:ReceiveTimerInfo(sender, mod, timeLeft, totalTime, id, paused and paused == "1" and true or false, ...)
+			DBM:ReceiveTimerInfo(sender, mod, timeLeft, totalTime, id, paused, unpack(args))
 		end
 	end
 
@@ -4861,12 +4878,15 @@ end
 
 function DBM:InGuildParty()
 	local guildName = GetGuildInfo("player")
-	local numRaid = GetNumPartyMembers()
+	local numRaid, unit = GetNumRaidMembers(), "raid"
+	if numRaid == 0 then
+		numRaid, unit = GetNumPartyMembers(), "party"
+	end
 
 	if guildName and numRaid > 0 then
 		local guldMatch = 0
 		for i = 1, numRaid do
-			local guild = GetGuildInfo("raid"..i) or ""
+			local guild = GetGuildInfo(unit..i) or ""
 			if guild == guildName then
 				guldMatch = guldMatch + 1
 			end
@@ -4890,7 +4910,7 @@ do
 					sendGuildSync(DBMPrefix.."-GCE", modId.."\t8\t0\t"..thisTime.."\t"..difficultyIndex.."\t"..name.."\t"..lastGroupLeader)
 				end
 			else
-				sendGuildSync(DBMPrefix.."-GCB", modId.."\t3\t"..difficultyIndex.."\t"..name)
+				sendGuildSync(DBMPrefix.."-GCB", modId.."\t4\t"..difficultyIndex.."\t"..name.."\t"..(lastGroupLeader or ""))
 			end
 		end
 	end
@@ -5172,9 +5192,10 @@ do
 				end
 			end
 			if savedDifficulty == "worldboss" and mod.WBEsync then
-				if lastBossEngage[modId..playerRealm] and (GetTime() - lastBossEngage[modId..playerRealm] < 30) then return end--Someone else synced in last 10 seconds so don't send out another sync to avoid needless sync spam.
-				lastBossEngage[modId..playerRealm] = GetTime()--Update last engage time, that way we ignore our own sync
-				SendWorldSync(self, "WBE", modId.."\t"..playerRealm.."\t"..startHp.."\t8\t"..name)
+				if not (lastBossEngage[modId..playerRealm] and (GetTime() - lastBossEngage[modId..playerRealm] < 30)) then--Someone else synced in last 30 seconds so don't send out another sync to avoid needless sync spam.
+					lastBossEngage[modId..playerRealm] = GetTime()--Update last engage time, that way we ignore our own sync
+					SendWorldSync(self, "WBE", modId.."\t"..playerRealm.."\t"..startHp.."\t8\t"..name)
+				end
 			end
 			if self.Options.FixCLEUOnCombatStart then
 				self:Schedule(0.5, CombatLogClearEntries) -- schedule prevents client crash with DBM:StartCombat function (tested on Leotheras)
@@ -5383,9 +5404,10 @@ do
 					BossBanner:OnEvent("BOSS_KILL", modId, encounterName) -- modId is mocked up as encounterID, encounterName is mocked up via mod translation table
 				end
 				if savedDifficulty == "worldboss" and mod.WBEsync then
-					if lastBossDefeat[modId..playerRealm] and (GetTime() - lastBossDefeat[modId..playerRealm] < 30) then return end--Someone else synced in last 10 seconds so don't send out another sync to avoid needless sync spam.
-					lastBossDefeat[modId..playerRealm] = GetTime()--Update last defeat time before we send it, so we don't handle our own sync
-					SendWorldSync(self, "WBD", modId.."\t"..playerRealm.."\t8\t"..name)
+					if not (lastBossDefeat[modId..playerRealm] and (GetTime() - lastBossDefeat[modId..playerRealm] < 30)) then--Someone else synced in last 30 seconds so don't send out another sync to avoid needless sync spam.
+						lastBossDefeat[modId..playerRealm] = GetTime()--Update last defeat time before we send it, so we don't handle our own sync
+						SendWorldSync(self, "WBD", modId.."\t"..playerRealm.."\t8\t"..name)
+					end
 				end
 				if self.Options.EventSoundVictory2 and self.Options.EventSoundVictory2 ~= "None" and self.Options.EventSoundVictory2 ~= "" then
 					if self.Options.EventSoundVictory2 == "Random" then
@@ -6905,7 +6927,7 @@ end
 function bossModPrototype:UnregisterOnUpdateHandler()
 	self.elapsed = nil
 	self.updateInterval = nil
-	twipe(private.updateFunctions)
+	private.updateFunctions[self] = nil
 end
 
 function bossModPrototype:SetStage(stage)
@@ -8502,7 +8524,7 @@ do
 		local catType = "announce"--Default to General announce
 		if not self.NoSortAnnounce then--ALL announce objects will be assigned "announce", usually for mods that sort by phase instead
 			--Change if Personal or Other
-			if announceType == "target" or self.announceType == "targetdistance" or announceType == "targetcount" or self.announceType == "targetcountdistance" or announceType == "stack" then
+			if announceType == "target" or announceType == "targetdistance" or announceType == "targetcount" or announceType == "targetcountdistance" or announceType == "stack" then
 				catType = "announceother"
 			end
 		end
@@ -9196,7 +9218,6 @@ do
 	local specInstructionalRemapTable = {
 		["dispel"] = "target",
 		["interrupt"] = "spell",
-		["interruptcount"] = "count",
 		["defensive"] = "spell",
 		["taunt"] = "target",
 		["soak"] = "spell",
@@ -9523,7 +9544,7 @@ do
 			--Instructional disabled, remap to a less instructional voice line
 			name = specInstructionalRemapVoiceTable[self.announceType]
 		end
-		if ((not self.option or self.mod.Options[self.option]) or always) and self.hasVoice <= SWFilterDisabled then
+		if ((not self.option or self.mod.Options[self.option]) or always) and (self.hasVoice or 0) <= SWFilterDisabled then
 			--Filter tank specific voice alerts for non tanks if tank filter enabled
 			--But still allow AlwaysPlayVoice to play as well.
 			if (name == "changemt" or name == "tauntboss") and DBM.Options.FilterTankSpec and not self.mod:IsTank() and not always then return end
@@ -10065,6 +10086,8 @@ do
 		["cdnp"] = "cdnp",
 		["cdpnp"] = "cdnp",
 		["nextnp"] = "cdnp",
+		["cdcountnp"] = "cdnp",
+		["nextcountnp"] = "cdnp",
 		["nextpnp"] = "cdnp",
 		["castpnp"] = "castnp",
 
@@ -10160,7 +10183,7 @@ do
 				hasVariance = self.hasVariance
 				maxTimer, minTimer = parseVarianceFromTimer(self.timerStringWithVariance) -- use highest possible value as the actual End timer
 				timerStringWithVariance = ("v%s-%s"):format(minTimer + timer, maxTimer + timer) -- rebuild timer string with delay applied
-				timer = (DBT.Options.VarianceEnabled and maxTimer or minTimer) + timer
+				minTimer, timer = minTimer + timer, (DBT.Options.VarianceEnabled and maxTimer or minTimer) + timer
 			end
 		end
 --		if DBM.Options.DebugMode and self.mod.id ~= "TestMod" then
@@ -10447,7 +10470,7 @@ do
 					local countVoice = self.mod.Options[self.option .. "CVoice"] or 0
 					if (type(countVoice) == "string" or countVoice > 0) then--Unfading bar, start countdown
 						DBM:Unschedule(playCountSound, id)
-						playCountdown(id, bar.timer, countVoice, bar.countdownMax, bar.requiresCombat)--timerId, timer, voice, count
+						playCountdown(id, bar.timer, countVoice, bar.countdownMax, self.requiresCombat)--timerId, timer, voice, count
 						DBM:Debug("Re-enabling a countdown on bar ID: "..id.." after a SetFade disable call")
 					end
 				end
@@ -10587,7 +10610,7 @@ do
 	function timerPrototype:Time(...)
 		local id = self.id..pformat((("\t%s"):rep(select("#", ...))), ...)
 		local bar = DBT:GetBar(id)
-		return bar.totalTime or 0
+		return bar and bar.totalTime or 0
 	end
 
 	function timerPrototype:IsStarted(...)
@@ -10629,7 +10652,7 @@ do
 					DBM:Unschedule(playCountSound, id)
 					if not bar.fade then--Don't start countdown voice if it's faded bar
 						if newMinRemaining > 2 then
-							playCountdown(id, newMinRemaining, countVoice, bar.countdownMax, bar.requiresCombat)--timerId, timer, voice, count
+							playCountdown(id, newMinRemaining, countVoice, bar.countdownMax, self.requiresCombat)--timerId, timer, voice, count
 							DBM:Debug("Updating a countdown after a timer Update call for timer ID:"..id)
 						end
 					end
@@ -10661,7 +10684,7 @@ do
 						if (type(countVoice) == "string" or countVoice > 0) then
 							DBM:Unschedule(playCountSound, id)
 							if not bar.fade then--Don't start countdown voice if it's faded bar
-								playCountdown(id, newRemaining, countVoice, bar.countdownMax, bar.requiresCombat)--timerId, timer, voice, count
+								playCountdown(id, newRemaining, countVoice, bar.countdownMax, self.requiresCombat)--timerId, timer, voice, count
 								DBM:Debug("Updating a countdown after a timer AddTime call for timer ID:"..id)
 							end
 						end
@@ -10697,7 +10720,7 @@ do
 							if (type(countVoice) == "string" or countVoice > 0) then
 								if not bar.fade then--Don't start countdown voice if it's faded bar
 									if newRemaining > 2 then
-										playCountdown(id, newRemaining, countVoice, bar.countdownMax, bar.requiresCombat)--timerId, timer, voice, count
+										playCountdown(id, newRemaining, countVoice, bar.countdownMax, self.requiresCombat)--timerId, timer, voice, count
 										DBM:Debug("Updating a countdown after a timer RemoveTime call for timer ID:"..id)
 									end
 								end
@@ -10739,7 +10762,7 @@ do
 				if self.option and not bar.fade then
 					local countVoice = self.mod.Options[self.option .. "CVoice"] or 0
 					if (type(countVoice) == "string" or countVoice > 0) then
-						playCountdown(id, remaining, countVoice, bar.countdownMax, bar.requiresCombat)--timerId, timer, voice, count
+						playCountdown(id, remaining, countVoice, bar.countdownMax, self.requiresCombat)--timerId, timer, voice, count
 						DBM:Debug("Updating a countdown after a timer Resume call for timer ID:"..id)
 					end
 				end
@@ -11018,7 +11041,7 @@ do
 			timer = select(7, DBM:GetSpellInfo(spellId)) or 1000 -- GetSpellInfo takes YOUR spell haste into account...WTF?
 			local spellHaste = select(7, DBM:GetSpellInfo(53142)) / 10000 -- 53142 = Dalaran Portal, should have 10000 ms cast time
 			timer = timer / spellHaste -- calculate the real cast time of the spell...
-			return self:NewCastTimer(timer / 1000, spellId, ...)
+			return self:NewCastCountTimer(timer / 1000, spellId, ...)
 		end
 		return newTimer(self, "castcount", timer, ...)
 	end

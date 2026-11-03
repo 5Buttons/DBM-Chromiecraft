@@ -150,7 +150,7 @@ resetbutton:SetScript("OnClick", function()
 	DBM.Options.WarningAlphabetical = DBM.DefaultOptions.WarningAlphabetical
 	DBM.Options.WarningShortText = DBM.DefaultOptions.WarningShortText
 	DBM.Options.WarningFont = DBM.DefaultOptions.WarningFont
-	DBM.Options.FontStyles = DBM.DefaultOptions.FontStyles
+	DBM.Options.WarningFontStyle = DBM.DefaultOptions.WarningFontStyle
 	DBM.Options.WarningFontSize = DBM.DefaultOptions.WarningFontSize
 	DBM.Options.WarningDuration2 = DBM.DefaultOptions.WarningDuration2
 	DBM.Options.WarningFontShadow = DBM.DefaultOptions.WarningFontShadow
@@ -166,7 +166,7 @@ resetbutton:SetScript("OnClick", function()
 	check5:SetChecked(DBM.Options.WarningAlphabetical)
 	check6:SetChecked(DBM.Options.WarningShortText)
 	FontDropDown:SetSelectedValue(DBM.Options.WarningFont)
-	FontStyleDropDown:SetSelectedValue(DBM.Options.FontStyles)
+	FontStyleDropDown:SetSelectedValue(DBM.Options.WarningFontStyle)
 	fontSizeSlider:SetValue(DBM.DefaultOptions.WarningFontSize)
 	durationSlider:SetValue(DBM.DefaultOptions.WarningDuration2)
 	FontShadow:SetChecked(DBM.Options.WarningFontShadow)

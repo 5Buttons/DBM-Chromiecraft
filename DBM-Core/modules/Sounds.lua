@@ -20,6 +20,7 @@ do
 
 	function DBM:GetCountSounds()
 		if not hasCached then
+			hasCached = true
 			cachedTable = {unpack(counts)}
 		end
 		return cachedTable
@@ -49,6 +50,7 @@ do
 
 	function DBM:GetVictorySounds()
 		if not hasCached then
+			hasCached = true
 			cachedTable = {unpack(victory)}
 		end
 		return cachedTable
@@ -87,6 +89,7 @@ do
 
 	function DBM:GetDefeatSounds()
 		if not hasCached then
+			hasCached = true
 			cachedTable = {unpack(defeat)}
 		end
 		return cachedTable
@@ -118,6 +121,7 @@ do
 
 	function DBM:GetDungeonMusic()
 		if not hasCached then
+			hasCached = true
 			cachedTable = {unpack(dungeonMusic)}
 		end
 		return cachedTable
@@ -149,6 +153,7 @@ do
 
 	function DBM:GetBattleMusic()
 		if not hasCached then
+			hasCached = true
 			cachedTable = {unpack(battleMusic)}
 		end
 		return cachedTable
@@ -182,6 +187,7 @@ do
 
 	function DBM:GetMusic()
 		if not hasCached then
+			hasCached = true
 			cachedTable = {unpack(music)}
 		end
 		return cachedTable

@@ -474,7 +474,7 @@ local function GetSpecializationGroup()
 		for i=1, MAX_TALENT_TABS do
 			if ( i <= numTabs ) then
 				local _, _, pointsSpent = GetTalentTabInfo(i)
-				if pointsSpent > highestPointsSpent then
+				if pointsSpent >= highestPointsSpent then -- same tie rule as core GetSpecialization
 					highestPointsSpent = pointsSpent
 					currentSpecGroup = i
 				end
@@ -610,8 +610,10 @@ do
 			local function actuallyImport(importTable)
 				local profileID = playerLevel > 9 and DBM_UseDualProfile and GetSpecializationGroup() or 0
 				for _, id in ipairs(DBM.ModLists[addon.modId]) do
-					_G[addon.modId:gsub("-", "") .. "_AllSavedVars"][fullname][id][profileID] = importTable[id]
-					DBM:GetModByName(id).Options = importTable[id]
+					if type(importTable[id]) == "table" then -- skip mods missing from the import (e.g. export from another raid)
+						_G[addon.modId:gsub("-", "") .. "_AllSavedVars"][fullname][id][profileID] = importTable[id]
+						DBM:GetModByName(id).Options = importTable[id]
+					end
 				end
 				DBM:AddMsg("Profile imported.")
 			end
@@ -650,7 +652,7 @@ do
 							popup.importFunc = function()
 								local modOptions = {}
 								for _, soundSetting in ipairs(errors) do
-									local modID, settingName = soundSetting:match("([^-]+)-([^-]+)")
+									local modID, settingName = soundSetting:match("^(.+)%-([^-]+)$")
 									if not modOptions[modID] then
 										modOptions[modID] = DBM:GetModByName(modID).DefaultOptions
 									end

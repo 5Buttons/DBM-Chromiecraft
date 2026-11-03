@@ -144,6 +144,7 @@ resizeWidth:SetScript("OnEnterPressed", function(self)
 	end
 	if value > maxWidth then
 		self:SetText(maxWidth)
+		value = maxWidth
 	end
 	DBM.Options.GUIWidth = value
 	optionsFrame:SetSize(DBM.Options.GUIWidth, DBM.Options.GUIHeight)
@@ -163,6 +164,7 @@ resizeHeight:SetScript("OnEnterPressed", function(self)
 	end
 	if value > maxHeight then
 		self:SetText(maxHeight)
+		value = maxHeight
 	end
 	DBM.Options.GUIHeight = value
 	optionsFrame:SetSize(DBM.Options.GUIWidth, DBM.Options.GUIHeight)

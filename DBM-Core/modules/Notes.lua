@@ -107,7 +107,7 @@ local function CreateOurFrame()
 		local syncText = editBox:GetText() or ""
 		if syncText == "" then
 			DBM:AddMsg(L.NOTESHAREERRORBLANK)
-		elseif IsInGroup(2) and IsInInstance() then--For BGs, LFR and LFG (we also check IsInInstance() so if you're in queue but fighting something outside like a world boss, it'll sync in "RAID" instead)
+		elseif IsPartyLFG() and IsInInstance() then--For BGs, LFR and LFG (we also check IsInInstance() so if you're in queue but fighting something outside like a world boss, it'll sync in "RAID" instead)
 			DBM:AddMsg(L.NOTESHAREERRORGROUPFINDER)
 		else
 			local msg = frame.mod.id.."\t"..frame.modvar.."\t"..syncText.."\t"..frame.abilityName

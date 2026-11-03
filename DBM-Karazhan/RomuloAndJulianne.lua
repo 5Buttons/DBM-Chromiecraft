@@ -76,6 +76,12 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if (msg == L.DBM_RJ_PHASE2_YELL or msg:find(L.DBM_RJ_PHASE2_YELL)) and self.vb.phase < 3 then
 		warnPhase3:Show()
 		self:SetStage(3)
+	elseif msg == L.JulianneFakeDeath and self.vb.phase == 1 then
+		warnPhase2:Show()
+		self:SetStage(2)
+	elseif msg == L.RomuloFakeDeath and self.vb.phase == 2 then
+		warnPhase3:Show()
+		self:SetStage(3)
 	elseif msg == L.Event or msg:find(L.Event) then
 		timerCombatStart:Start()
 	end

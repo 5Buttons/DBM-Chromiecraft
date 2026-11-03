@@ -144,7 +144,7 @@ local function GameTooltipCacheName(self)
 		tooltipTextCache = _G["GameTooltipTextLeft1"]:GetText()
 	end
 end
-GameTooltip:SetScript("OnShow", GameTooltipCacheName) -- Tooltip fetching resulting in unreliable results, where on a split frame it would not update the text (either nil or different than expected), so run it always to catch it as fast as possible. Will fail if mouseover another unit, since TT updates before LOOT_OPENED.
+GameTooltip:HookScript("OnShow", GameTooltipCacheName) -- Tooltip fetching resulting in unreliable results, where on a split frame it would not update the text (either nil or different than expected), so run it always to catch it as fast as possible. Will fail if mouseover another unit, since TT updates before LOOT_OPENED.
 
 local encounterLootCache = {}
 local locale = GetLocale()

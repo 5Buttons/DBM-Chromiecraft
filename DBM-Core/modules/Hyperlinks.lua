@@ -58,7 +58,8 @@ local function CreateOurFrame()
 end
 
 local function LinkHook(self, link)
-	local _, linkType, arg1, arg2, arg3, arg4, arg5, arg6 = strsplit(":", link)
+	link = link:gsub("^garrmission:", "") -- links are written both as DBM:... and garrmission:DBM:...
+	local linkType, arg1, arg2, arg3, arg4, arg5, arg6 = strsplit(":", link)
 	if linkType ~= "DBM" then
 		return
 	end

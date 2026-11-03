@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Muru", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250511094200") --based on 20220518110528_cafe20250418v24_public
+mod:SetRevision("20261102221628") --based on 20220518110528_cafe20250418v24_public
 mod:SetCreatureID(25741, 25840)--25741 Muru, 25840 Entropius
 mod:SetEncounterID(728)
 mod:RegisterCombat("combat")
@@ -30,7 +30,7 @@ local timerHuman			= mod:NewTimer(60, "TimerHuman", 27778, nil, nil, 6)
 local timerVoid				= mod:NewTimer(30, "TimerVoid", 46087, nil, nil, 6)
 local timerNextDarkness		= mod:NewNextTimer(45, 45996, nil, nil, nil, 2)
 local timerDarknessDura		= mod:NewBuffActiveTimer(20, 45996)
-local specWarnVB			= mod:NewSpecialWarningInterrupt(46161, "HasInterrupt", nil, 2) --warning for VoidBlast 20250402
+local specWarnVB			= mod:NewSpecialWarningInterrupt(46161, "HasInterrupt", nil, nil, nil, 2) --warning for VoidBlast 20250402
 
 local berserkTimer			= mod:NewBerserkTimer(600) --no timewalking in CC, old code here (mod:IsTimewalking() and 450 or 600)
 
@@ -150,6 +150,8 @@ function mod:SPELL_SUMMON(args)
 		elseif self:GetStage() == 2 then
 			timerP2Darkness:Start() --new timer for next darkness 20250402
 		end
+	elseif args.spellId == 46269 and self:GetStage() == 2 then
+		timerP2Darkness:Start()
 	elseif args.spellId == 46282 then --singularity
 		warnBlackHole:Show()
 		warnBlackHole:Play("scatter")

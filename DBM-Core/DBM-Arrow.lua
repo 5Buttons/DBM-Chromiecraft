@@ -192,7 +192,7 @@ end
 ----------------------
 
 --/run DBM.Arrow:ShowRunTo(50, 50, 1, nil, true, true, "Waypoint", custom local mapID)
-local function show(runAway, x, y, distance, time, _, _, title)
+local function show(runAway, x, y, distance, time, legacy, _, title)
 	if DBM:HasMapRestrictions() then return end
 	local player
 	if type(x) == "string" then
@@ -223,6 +223,9 @@ local function show(runAway, x, y, distance, time, _, _, title)
 		targetPlayer = player
 	else
 		targetType = "fixed"
+		if legacy then -- zone map coordinates (0-100) like /dway
+			x, y = x / 100, y / 100
+		end
 		targetX, targetY = x, y
 	end
 end

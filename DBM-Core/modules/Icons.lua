@@ -365,7 +365,7 @@ do
 		for i = 1, 10 do
 			local unitId = "boss"..i
 			if UnitExists(unitId) and UnitIsVisible(unitId) then--Hopefully enough failsafe against icons failing
-				for _, scanId in ipairs(scanExpires) do
+				for scanId in pairs(scanExpires) do
 					executeMarking(scanId, unitId)
 				end
 			end
@@ -393,7 +393,7 @@ do
 				return
 			end
 			--Initialize icon method variables for event handlers
-			scansActive = scansActive + 1
+			if not iconVariables[scanId] then scansActive = scansActive + 1 end
 			if not addsIcon[scanId] then addsIcon[scanId] = mobIcon or 8 end
 			if not addsIconSet[scanId] then addsIconSet[scanId] = 0 end
 			if not iconVariables[scanId] then iconVariables[scanId] = {} end

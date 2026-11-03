@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Council", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528_cafe20241008v4")
+mod:SetRevision("20261101183055")
 mod:SetCreatureID(22949, 22950, 22951, 22952)
 
 mod:SetModelID(21416)
@@ -10,8 +10,8 @@ mod:SetUsedIcons(1)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START 41455 41472 41541 41481",
-	"SPELL_CAST_SUCCESS 41467 41541 41482 41476",
+	"SPELL_CAST_START 41455 41472 41541 41467",
+	"SPELL_CAST_SUCCESS 41541 41476",
 	"SPELL_AURA_APPLIED 41485 41481 41482 41541 41475 41452 41453 41450 41451",
 	"SPELL_AURA_REMOVED 41479 41485"
 )
@@ -30,8 +30,6 @@ local timerJudgeCD			= mod:NewCDTimer(16, 41467, nil, nil, nil, 1) --new timer
 --High Nethermancer Zerevor
 local specWarnFlame			= mod:NewSpecialWarningMove(41481, nil, nil, nil, 1, 2)
 local specWarnBlizzard			= mod:NewSpecialWarningMove(41482, nil, nil, nil, 1, 2)
-local timerFlamestrikeCD		= mod:NewCDTimer(40, 41481, nil, nil, nil, 1) --new timer
-local timerBlizzardCD			= mod:NewCDTimer(40, 41482, nil, nil, nil, 1) --new timer
 
 --Lady Malande
 local specWarnCoH			= mod:NewSpecialWarningInterrupt(41455, "HasInterrupt", nil, 2, 1, 2)
@@ -59,8 +57,6 @@ function mod:OnCombatStart(delay)
 	berserkTimer:Start(-delay)
 	timerJudgeCD:Start(15-delay) -- new jugdement timer
 	timerConsecrationCD:Start(4-delay) --new Consecration timer
---	timerFlamestrikeCD:Start(25-delay) --new Flamestrike timer, too many timers, removed
---	timerBlizzardCD:Start(5-delay) --new Blizzard timer, too many timers, removed
 	timerNextCoH:Start(20-delay) --new CoH timer
 	timerWrathCD:Start(5-delay) --new Wrath timer
 end
@@ -124,18 +120,14 @@ function mod:SPELL_CAST_START(args)
 	elseif args.spellId == 41472 then
 		timerWrathCD:Start() --new wrath timer
 ]]--too spammy, removed for now
-	elseif args.spellID == 41481 then
-		timerFlamestrike:Start() --newly added CD timer
-	elseif args.spellID == 41467 then
-		timerJudgeCD:Start() --newly added CD timer
+	elseif args.spellId == 41467 then
+		timerJudgeCD:Start()
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 41541 then
 		timerConsecrationCD:Start() --newly added CD timer
-	elseif args.spellID == 41482 then
-		timerBlizzard:Start() --newly added CD timer
 	elseif args.spellId == 41476 then --newly added CD timer
 		warnVanish:Show()
 		timerVanish:Start()

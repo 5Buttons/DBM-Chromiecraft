@@ -47,6 +47,14 @@ frame:SetScript("OnShow", function(self)
 end)
 frame:SetScript("OnHide", function()
 	_G["DBM_GUI_DropDown"]:Hide()
+	if DBM.Options.tempMusicSetting then
+		SetCVar("Sound_EnableMusic", DBM.Options.tempMusicSetting)
+		DBM.Options.tempMusicSetting = nil
+	end
+	if DBM.Options.musicPlaying then
+		StopMusic()
+		DBM.Options.musicPlaying = nil
+	end
 end)
 frame:SetScript("OnDragStart", frame.StartMoving)
 frame:SetScript("OnDragStop", function(self)
@@ -197,14 +205,6 @@ frameOkay:SetPoint("BOTTOMRIGHT", -16, 14)
 frameOkay:SetText(CLOSE)
 frameOkay:SetScript("OnClick", function()
 	frame:Hide()
-	if DBM.Options.tempMusicSetting then
-		SetCVar("Sound_EnableMusic", DBM.Options.tempMusicSetting)
-		DBM.Options.tempMusicSetting = nil
-	end
-	if DBM.Options.musicPlaying then
-		StopMusic()
-		DBM.Options.musicPlaying = nil
-	end
 end)
 
 local frameWebsite = frame:CreateFontString("$parentWebsite", "ARTWORK", "GameFontNormal")

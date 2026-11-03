@@ -142,7 +142,7 @@ do
 		--Do scan
 		if targetname and targetname ~= CL.UNKNOWN and (not targetFilter or (targetFilter and targetFilter ~= targetname)) then
 			if not IsInGroup() then scanTimes = 1 end--Solo, no reason to keep scanning, give faster warning. But only if first scan is actually a valid target, which is why i have this check HERE
-			if (isEnemyScan and UnitIsFriend("player", targetuid) or (onlyPlayers and not UnitIsPlayer("player", targetuid)) or mod:IsTanking(targetuid, bossuid, nil, true)) and not isFinalScan then--On player scan, ignore tanks. On enemy scan, ignore friendly player. On Only player, ignore npcs and pets
+			if (isEnemyScan and UnitIsFriend("player", targetuid) or (onlyPlayers and not UnitIsPlayer(targetuid)) or mod:IsTanking(targetuid, bossuid, nil, true)) and not isFinalScan then--On player scan, ignore tanks. On enemy scan, ignore friendly player. On Only player, ignore npcs and pets
 				if targetScanCount[cidOrGuid] < scanTimes then--Make sure no infinite loop.
 					mod:ScheduleMethod(scanInterval, "BossTargetScanner", cidOrGuid, returnFunc, scanInterval, scanTimes, scanOnlyBoss, isEnemyScan, nil, targetFilter, tankFilter, onlyPlayers)--Scan multiple times to be sure it's not on something other then tank (or friend on enemy scan, or npc/pet on only person)
 				else--Go final scan.
@@ -151,7 +151,7 @@ do
 			else--Scan success. (or failed to detect right target.) But some spells can be used on tanks, anyway warns tank if player scan. (enemy scan block it)
 				targetScanCount[cidOrGuid] = nil--Reset count for later use.
 				mod:UnscheduleMethod("BossTargetScanner", cidOrGuid, returnFunc)--Unschedule all checks just to be sure none are running, we are done.
-				if (tankFilter and mod:IsTanking(targetuid, bossuid, nil, true)) or (isFinalScan and isEnemyScan) or onlyPlayers and not UnitIsPlayer("player", targetuid) then return end--If enemyScan and playerDetected, return nothing
+				if (tankFilter and mod:IsTanking(targetuid, bossuid, nil, true)) or (isFinalScan and isEnemyScan) or onlyPlayers and not UnitIsPlayer(targetuid) then return end--If enemyScan and playerDetected, return nothing
 				local scanningTime = (targetScanCount[cidOrGuid] or 1) * scanInterval
 				mod[returnFunc](mod, targetname, targetuid, bossuid, scanningTime)--Return results to warning function with all variables.
 				DBM:Debug("BossTargetScanner has ended for "..cidOrGuid, 2)
@@ -224,8 +224,10 @@ do
 			DBM:Debug("unitMonitor found a target that probably is a tank", 2)
 			mod[returnFunc](mod, DBM:GetUnitFullName(uId.."target"), uId.."target", uId)--Return results to warning function with all variables.
 		end
-		unitMonitor[uId] = nil
-		unitScanCount = unitScanCount - 1
+		if unitMonitor[uId] then -- already finished scans were counted down on success
+			unitMonitor[uId] = nil
+			unitScanCount = unitScanCount - 1
+		end
 		DBM:Debug("Boss unit target scan should be aborting for "..uId, 2)
 	end
 

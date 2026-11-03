@@ -10,7 +10,7 @@ local DBM = DBM
 local L = DBM_CORE_L
 local UnitClass, GetTime, GetPartyAssignment, UnitGroupRolesAssigned, GetRaidTargetIndex, UnitExists, UnitName, UnitHealth, UnitPower, UnitPowerMax, UnitIsDeadOrGhost, UnitThreatSituation, UnitIsUnit, UIDropDownMenu_CreateInfo, UIDropDownMenu_AddButton = UnitClass, GetTime, GetPartyAssignment, UnitGroupRolesAssigned, GetRaidTargetIndex, UnitExists, UnitName, UnitHealth, UnitPower, UnitPowerMax, UnitIsDeadOrGhost, UnitThreatSituation, UnitIsUnit, UIDropDownMenu_CreateInfo, UIDropDownMenu_AddButton
 local error, tostring, type, pairs, ipairs, select, tonumber, tsort, twipe, mfloor, mmax, mmin, mrandom, schar, ssplit = error, tostring, type, pairs, ipairs, select, tonumber, table.sort, table.wipe, math.floor, math.max, math.min, math.random, string.char, string.split
-local ADDITIONAL_POWER_BAR_INDEX = ADDITIONAL_POWER_BAR_INDEX or 0
+local ADDITIONAL_POWER_BAR_INDEX = ADDITIONAL_POWER_BAR_INDEX -- nil on 3.3.5a, index 0 would be mana
 local NORMAL_FONT_COLOR, SPELL_FAILED_OUT_OF_RANGE = NORMAL_FONT_COLOR, SPELL_FAILED_OUT_OF_RANGE
 local RAID_CLASS_COLORS = _G["CUSTOM_CLASS_COLORS"] or RAID_CLASS_COLORS-- for Phanx' Class Colors
 
@@ -445,7 +445,7 @@ local function updateEnemyPower()
 				end
 				-- Alternate Power
 				local currentAltPower, maxAltPower = UnitPower(specificUnit, ADDITIONAL_POWER_BAR_INDEX), UnitPowerMax(specificUnit, ADDITIONAL_POWER_BAR_INDEX)
-				if maxAltPower and maxAltPower > 0 then
+				if ADDITIONAL_POWER_BAR_INDEX and maxAltPower and maxAltPower > 0 then
 					if currentAltPower / maxAltPower * 100 >= threshold then
 						lines[UnitName(specificUnit)] = L.INFOFRAME_ALT .. currentAltPower
 					end
@@ -463,7 +463,7 @@ local function updateEnemyPower()
 				end
 				-- Alternate Power
 				local currentAltPower, maxAltPower = UnitPower(uId, ADDITIONAL_POWER_BAR_INDEX), UnitPowerMax(uId, ADDITIONAL_POWER_BAR_INDEX)
-				if maxAltPower and maxAltPower > 0 then
+				if ADDITIONAL_POWER_BAR_INDEX and maxAltPower and maxAltPower > 0 then
 					if currentAltPower / maxAltPower * 100 >= threshold then
 						lines[UnitName(uId)] = L.INFOFRAME_ALT .. currentAltPower
 					end
@@ -530,9 +530,12 @@ local function updateMultiEnemyAbsorb()
 	local spellInput = value[1]
 	local totalAbsorb = value[2]
 	local guidTable = value[3]--Multi target by table
-	local guidTracked = {}
+	local guidTracked, found, wanted = {}, 0, 0
+	for _ in pairs(guidTable) do
+		wanted = wanted + 1
+	end
 	for i = 1, 10 do
-		if #guidTable == #guidTracked then--Stop searching, found everything we're looking for.
+		if found == wanted then--Stop searching, found everything we're looking for.
 			break
 		end
 		local uId = "boss" .. i
@@ -540,6 +543,7 @@ local function updateMultiEnemyAbsorb()
 			local targetGUID = UnitGUID(uId)
 			if guidTable[targetGUID] and not guidTracked[targetGUID] then
 				guidTracked[targetGUID] = true
+				found = found + 1
 				local absorbAmount
 				if spellInput then -- Get specific spell absorb
 					absorbAmount = SpecializedAbsorbs:UnitEffect(targetGUID, spellInput)
@@ -557,13 +561,14 @@ local function updateMultiEnemyAbsorb()
 		end
 	end
 	for unitId in DBM:GetGroupMembers() do--Do not use self on this function, because self might be bossModPrototype
-		if #guidTable == #guidTracked then--Stop searching, found everything we're looking for.
+		if found == wanted then--Stop searching, found everything we're looking for.
 			break
 		end
 		local uId = unitId .. "target"
-		local targetGUID = UnitGUID(unitId)
+		local targetGUID = UnitGUID(uId)
 		if guidTable[targetGUID] and not guidTracked[targetGUID] then
 			guidTracked[targetGUID] = true
+			found = found + 1
 			local absorbAmount
 			if spellInput then -- Get specific spell absorb
 				absorbAmount = SpecializedAbsorbs:UnitEffect(UnitGUID(uId), spellInput)
@@ -650,7 +655,7 @@ local function updatePlayerBuffs()
 	local spellName = value[1]
 	local tankIgnored = value[2]
 	for uId in DBM:GetGroupMembers() do
-		if tankIgnored and (UnitGroupRolesAssigned(uId) == "TANK" or GetPartyAssignment("MAINTANK", uId, 1)) then
+		if tankIgnored and (UnitGroupRolesAssigned(uId) or GetPartyAssignment("MAINTANK", uId, 1)) then
 		else
 			if not DBM:UnitBuff(uId, spellName) and not UnitIsDeadOrGhost(uId) then
 				lines[DBM:GetUnitFullName(uId)] = ""
@@ -667,7 +672,7 @@ local function updateGoodPlayerDebuffs()
 	local spellInput = value[1]
 	local tankIgnored = value[2]
 	for uId in DBM:GetGroupMembers() do
-		if tankIgnored and (UnitGroupRolesAssigned(uId) == "TANK" or GetPartyAssignment("MAINTANK", uId, 1)) then
+		if tankIgnored and (UnitGroupRolesAssigned(uId) or GetPartyAssignment("MAINTANK", uId, 1)) then
 		else
 			if not DBM:UnitDebuff(uId, spellInput) and not UnitIsDeadOrGhost(uId) then
 				lines[DBM:GetUnitFullName(uId)] = ""
@@ -685,7 +690,7 @@ local function updateBadPlayerDebuffs()
 	local spellInput = value[1]
 	local tankIgnored = value[2]
 	for uId in DBM:GetGroupMembers() do
-		if tankIgnored and (UnitGroupRolesAssigned(uId) == "TANK" or GetPartyAssignment("MAINTANK", uId, 1)) then
+		if tankIgnored and (UnitGroupRolesAssigned(uId) or GetPartyAssignment("MAINTANK", uId, 1)) then
 		else
 			if DBM:UnitDebuff(uId, spellInput) and not UnitIsDeadOrGhost(uId) then
 				lines[DBM:GetUnitFullName(uId)] = ""
@@ -741,7 +746,7 @@ local function updateReverseBadPlayerDebuffs()
 	local spellInput = value[1]
 	local tankIgnored = value[2]
 	for uId in DBM:GetGroupMembers() do
-		if tankIgnored and (UnitGroupRolesAssigned(uId) == "TANK" or GetPartyAssignment("MAINTANK", uId, 1)) then
+		if tankIgnored and (UnitGroupRolesAssigned(uId) or GetPartyAssignment("MAINTANK", uId, 1)) then
 		else
 			if not DBM:UnitDebuff(uId, spellInput) and not UnitIsDeadOrGhost(uId) and not DBM:UnitBuff(uId, 27827) then--27827 Spirit of Redemption. This particular info frame wants to ignore this
 				lines[DBM:GetUnitFullName(uId)] = ""
@@ -783,7 +788,7 @@ local function updatePlayerAggro()
 	local aggroType = value[1]
 	local tankIgnored = value[2]
 	for uId in DBM:GetGroupMembers() do
-		if tankIgnored and (UnitGroupRolesAssigned(uId) == "TANK" or GetPartyAssignment("MAINTANK", uId, 1)) then
+		if tankIgnored and (UnitGroupRolesAssigned(uId) or GetPartyAssignment("MAINTANK", uId, 1)) then
 		else
 			local currentThreat = UnitThreatSituation(uId) or 0
 			if currentThreat >= aggroType then
@@ -799,7 +804,7 @@ local function updatePlayerTargets()
 	twipe(lines)
 	local cId = value[1]
 	for uId, _ in DBM:GetGroupMembers() do
-		if DBM:GetUnitCreatureId(uId .. "target") ~= cId and (UnitGroupRolesAssigned(uId) == "DAMAGER" or UnitGroupRolesAssigned(uId) == "NONE") then
+		if DBM:GetUnitCreatureId(uId .. "target") ~= cId and not (UnitGroupRolesAssigned(uId) or select(2, UnitGroupRolesAssigned(uId))) then
 			lines[DBM:GetUnitFullName(uId)] = ""
 		end
 	end

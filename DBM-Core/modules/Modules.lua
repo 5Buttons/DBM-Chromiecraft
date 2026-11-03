@@ -31,15 +31,15 @@ function modulePrototype:RegisterEvents(...)
 					local frame = self.unitFrames[unitId]
 					if not frame then
 						frame = CreateFrame("Frame")
-						if unitId == "mouseover" then
-							frame:SetScript("OnEvent", function(_, event, _, ...)
-								HandleEvent(nil, event, "mouseover", ...)
-							end)
-						else
-							frame:SetScript("OnEvent", HandleEvent)
-						end
+						-- no RegisterUnitEvent on 3.3.5a: every unit frame gets all units, so only pass on its own
+						frame:SetScript("OnEvent", function(_, event, uId, ...)
+							if uId == unitId then
+								HandleEvent(nil, event, uId, ...)
+							end
+						end)
 						self.unitFrames[unitId] = frame
 					end
+					frame:RegisterEvent(eventData[1])
 					registeredUnitEvents = registeredUnitEvents or {}
 					registeredUnitEvents[eventData[1]] = unitId
 				end
