@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malacrass", "DBM-ZulAman")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250317112900")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(24239)
 mod:SetEncounterID(1193)
 mod:SetZone()
@@ -9,7 +9,7 @@ mod:SetZone()
 mod:RegisterCombat("yell", L.YellPull)
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START 43548 43451 43431",
+	"SPELL_CAST_START 43548 43451 43575 41372",
 	"SPELL_CAST_SUCCESS 43383 43429",
 	"SPELL_AURA_APPLIED 43501 43421 43429",
 	"SPELL_SUMMON 43436"
@@ -20,14 +20,14 @@ local warnSiphon	= mod:NewTargetNoFilterAnnounce(43501, 3)
 local warnBoltSoon	= mod:NewPreWarnAnnounce(43383, 5, 3)
 local warnHeal1		= mod:NewCastAnnounce(43548, 3)
 local warnHeal2		= mod:NewCastAnnounce(43451, 3)
-local warnHeal3		= mod:NewCastAnnounce(43431, 3)
+local warnHeal3		= mod:NewCastAnnounce(43575, 3)
 local warnHeal4		= mod:NewTargetNoFilterAnnounce(43421, 3)
 local warnPatch		= mod:NewSpecialWarningMove(43429, nil, nil, nil, 1, 2)
 
 local specWarnBolt	= mod:NewSpecialWarningSpell(43383, nil, nil, nil, 2, 2)
 local specWarnHeal1	= mod:NewSpecialWarningInterrupt(43548, "HasInterrupt", nil, nil, 1, 2)
 local specWarnHeal2	= mod:NewSpecialWarningInterrupt(43451, "HasInterrupt", nil, nil, 1, 2)
-local specWarnHeal3	= mod:NewSpecialWarningInterrupt(43431, "HasInterrupt", nil, nil, 1, 2)
+local specWarnHeal3	= mod:NewSpecialWarningInterrupt(43575, "HasInterrupt", nil, nil, 1, 2)
 local specWarnHeal4	= mod:NewSpecialWarningDispel(43421, "MagicDispeller", nil, nil, 1, 2)
 local specWarnTotem	= mod:NewSpecialWarningSwitch(43436, "Dps", nil, nil, 1, 2)
 
@@ -37,7 +37,7 @@ local timerBolt		= mod:NewCastTimer(10, 43383, nil, nil, nil, 5, nil, DBM_COMMON
 local timerPatch	= mod:NewCastTimer(20, 43429, nil, nil, nil, 3)
 
 function mod:OnCombatStart()
-	timerBoltCD:Start(30) -- (10m Frostmourne 2022/10/28) - pull:30.0
+	timerBoltCD:Start(30)
 	warnBoltSoon:Schedule(25)
 end
 
@@ -57,8 +57,8 @@ function mod:SPELL_CAST_START(args)
 		else
 			warnHeal2:Show()
 		end
-	elseif spellId == 43431 then -- Flash Heal
-		if self.Options.SpecWarn43431interrupt and self:CheckInterruptFilter(args.sourceGUID, false, true) then
+	elseif spellId == 43575 or spellId == 41372 then
+		if self.Options.SpecWarn43575interrupt and self:CheckInterruptFilter(args.sourceGUID, false, true) then
 			specWarnHeal3:Show(args.sourceName)
 			specWarnHeal3:Play("kickcast")
 		else
