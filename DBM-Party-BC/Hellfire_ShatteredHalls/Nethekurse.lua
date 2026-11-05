@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(16807)
 
 mod:SetModelID(16628)
@@ -19,10 +19,10 @@ mod:RegisterEventsInCombat(
 --If target scanning works on fissure, special warning and yell
 local warnShadowFissure		= mod:NewSpellAnnounce(30496, 3)
 
-local timerShadowFissureCD	= mod:NewNextTimer(8.5, 30496, nil, nil, nil, 3)--8.5-8.8
+local timerShadowFissureCD	= mod:NewCDTimer(8.45, 30496, nil, nil, nil, 3)--AC: 8.45-9.45
 
 function mod:OnCombatStart(delay)
-	timerShadowFissureCD:Start(8.3-delay)
+	timerShadowFissureCD:Start(8.1-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
