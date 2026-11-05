@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Felmyst", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261026180406") --based on cafe&yars20250416v25
+mod:SetRevision("20261105120000") --based on cafe&yars20250416v25
 mod:SetCreatureID(25038)
 mod:SetUsedIcons(8, 7)
 mod:SetEncounterID(726)
@@ -101,7 +101,7 @@ function mod:EncapsulateTarget(target)
 	end
 	self.vb.encapsAnnounced = false
 	timerEncaps:Start(target)
-	timerEncapsCD:Start(24)
+	timerEncapsCD:Start(26) --AC: 26-53s
 	self:Schedule(22, ScanEncapsulateTarget, self)
 end
 
