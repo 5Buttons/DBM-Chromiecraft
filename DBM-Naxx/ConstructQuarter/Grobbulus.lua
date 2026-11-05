@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Grobbulus", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260223165304")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15931)
 mod:SetUsedIcons(1, 2, 3, 4)
 mod:SetEncounterID(1111)
@@ -62,9 +62,9 @@ function mod:OnCombatStart(delay)
 	table.wipe(mutateIcons)
 	warnedHealth = false
 	if self:IsDifficulty("normal10") then
-		enrageTimer:Start(540 - delay) -- 9 minutes for 10-man
+		enrageTimer:Start(720 - delay) -- 12 minutes for 10-man
 	else
-		enrageTimer:Start(720 - delay) -- 12 minutes for 25-man
+		enrageTimer:Start(540 - delay) -- 9 minutes for 25-man
 	end
 	timerCloud:Start(15 - delay)
 	timerInjectionCD:Start(20 - delay)
