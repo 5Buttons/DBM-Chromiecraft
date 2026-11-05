@@ -379,7 +379,7 @@ local function StartNumbers_OnFinished(self)
 	timer.time = timer.time - 1
 
 	if timer.time > 0 then
-		if timer.time < TIMER_DATA[timer.type].largeMarker and not self.anchorCenter then
+		if timer.time < TIMER_DATA[timer.type].largeMarker and not timer.anchorCenter then
 			TT:SwitchToLargeDisplay(timer)
 		end
 
