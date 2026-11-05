@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("YoggSaron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261022120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(33288)
 mod:SetEncounterID(756)
 mod:RegisterCombat("combat_yell", L.YellPull)
@@ -112,7 +112,7 @@ local warnP3						= mod:NewPhaseAnnounce(3, 2, nil, nil, nil, nil, nil, 2)
 local specWarnLunaticGaze			= mod:NewSpecialWarningLookAway(64163, nil, nil, nil, 1, 2)
 
 local timerLunaticGaze				= mod:NewCastTimer(4, 64163, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON) -- Yogg-Saron's Gaze
-local timerNextLunaticGaze			= mod:NewCDTimer("v8-18", 64163, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON) -- 13-22 on AC = from aura-removed 9–18s
+local timerNextLunaticGaze			= mod:NewCDTimer("v9-18", 64163, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON) -- 13-22 on AC = from aura-removed 9–18s
 
 mod:AddSetIconOption("SetIconOnBeacon", 64465, true, true, {1, 2, 3, 4, 5, 6, 7, 8})
 
@@ -323,7 +323,7 @@ function mod:SPELL_AURA_REMOVED(args)
 		-- "<298.03 19:54:54> [CLEU] SPELL_AURA_REMOVED:0xF150008208000F6B:Yogg-Saron:0xF150008208000F6B:Yogg-Saron:63894:Shadowy Barrier:BUFF:nil:", -- [15528]
 		self:SendSync("Phase3")			-- Sync this because you don't get it in your combat log if you are in brain room.
 	elseif spellId == 64163 then	-- Lunatic Gaze phase 3 ; 64167 Lunatic Gaze is related to Laughing Skulls, which is not important
-		timerNextLunaticGaze:Start() -- 12s interval - 4s cast = 8s for next cast
+		timerNextLunaticGaze:Start() -- AC: 13-22s from cast, minus 4s aura = 9-18s
 	elseif args:IsSpellID(63830, 63881) and self.Options.SetIconOnFearTarget then   -- Malady of the Mind (Death Coil)
 		self:SetIcon(args.destName, 0)
 	elseif spellId == 64465 then -- Shadow Beacon
