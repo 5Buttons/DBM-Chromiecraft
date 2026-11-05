@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ysondre", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261026180406")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(14887)--121912 TW ID, 14887 classic ID
 --mod:SetModelID(17887)
 mod:EnableWBEngageSync()--Enable syncing engage in outdoors
@@ -22,15 +22,15 @@ local warningLightningWave		= mod:NewSpellAnnounce(24819, 3)
 local specWarnSleepingFog		= mod:NewSpecialWarningDodge(24814, nil, nil, nil, 2, 2)
 
 --local timerNoxiousBreathCD		= mod:NewCDTimer(19.4, 24818, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)--Iffy
-local timerSleepingFogCD		= mod:NewCDTimer(16.0, 24814, nil, nil, nil, 3)
-local timerLightningWaveCD		= mod:NewCDTimer(13.4, 24819, nil, nil, nil, 3)
+local timerSleepingFogCD		= mod:NewCDTimer(120, 24814, nil, nil, nil, 3)--AC: 120-150s
+local timerLightningWaveCD		= mod:NewCDTimer(10, 24819, nil, nil, nil, 3)--AC: 10-20s
 
 --mod:AddReadyCheckOption(48620, false)
 
 function mod:OnCombatStart(delay, yellTriggered)
 	if yellTriggered then
 		--timerNoxiousBreathCD:Start(11.9-delay)
-		timerSleepingFogCD:Start(18.4-delay)
+		timerSleepingFogCD:Start(12.5-delay)--AC: 12.5-20s
 --		timerLightningWaveCD:Start(53-delay)--Iffy
 	end
 end
