@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Moroes", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15687)--Moroes
 mod:SetEncounterID(653)
 
@@ -29,7 +29,7 @@ local specWarnGreaterHeal	= mod:NewSpecialWarningInterrupt(35096, "HasInterrupt"
 local specWarnHolyLight		= mod:NewSpecialWarningInterrupt(29562, "HasInterrupt", nil, nil, 1, 2)
 
 local timerVanishCD			= mod:NewCDTimer(35.1-5.1, 29448, nil, nil, nil, 6)--35.1-51.8
-local timerGougeCD			= mod:NewCDTimer(22.6+2.4, 29448, nil, "Tank", nil, 6)--22.6-43.6
+local timerGougeCD			= mod:NewCDTimer(22.6+2.4, 29425, nil, "Tank", nil, 6)--22.6-43.6
 local timerBlindCD			= mod:NewCDTimer(25, 34694, nil, "Tank", nil, 6)
 local timerGouge			= mod:NewTargetTimer(6, 29425, nil, false, nil, 3)
 local timerBlind			= mod:NewTargetTimer(10, 34694, nil, false, nil, 3)
