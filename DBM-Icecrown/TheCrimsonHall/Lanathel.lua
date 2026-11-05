@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lanathel", "DBM-Icecrown", 3)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(37955)
 mod:SetEncounterID(853)
 mod:SetModelID("creature/bloodqueen/bloodqueen.m2")
@@ -78,9 +78,9 @@ end
 function mod:OnCombatStart(delay)
 	berserkTimer:Start(-delay)
 	timerFirstBite:Start(-delay)
-	timerNextPactDarkfallen:Start(15-delay)
-	warnPactDarkfallenSoon:Schedule(10-delay)
-	warnPactDarkfallenSoon:ScheduleVoice(10-delay, "linesoon")
+	timerNextPactDarkfallen:Start(20-delay) -- AC: 20s
+	warnPactDarkfallenSoon:Schedule(15-delay)
+	warnPactDarkfallenSoon:ScheduleVoice(15-delay, "linesoon")
 	timerNextSwarmingShadows:Start(-delay)
 	warnSwarmingShadowsSoon:Schedule(25.5-delay)
 	warnSwarmingShadowsSoon:ScheduleVoice(25.5-delay, "flamessoon")
