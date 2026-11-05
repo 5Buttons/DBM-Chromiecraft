@@ -1,8 +1,9 @@
 local mod = DBM:NewMod(531, "DBM-Party-BC", 16, 249)
+local L = mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(24744)
 
 mod:RegisterCombat("combat")
@@ -13,8 +14,8 @@ mod:RegisterEventsInCombat(
 
 local specWarnEnergy	= mod:NewSpecialWarning("warnEnergy", "-Healer", nil, 3, 1, 2)
 
-function mod:CHAT_MSG_RAID_BOSS_EMOTE()
-	if self:AntiSpam(5, 1) then
+function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
+	if (msg == L.Discharge or msg:find(L.Discharge)) and self:AntiSpam(5, 1) then
 		specWarnEnergy:Show()
 		specWarnEnergy:Play("killmob")
 	end
