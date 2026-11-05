@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Krikthir", "DBM-Party-WotLK", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(28684)
 mod:SetEncounterID(216)
 
@@ -16,7 +16,7 @@ local warnCurse	= mod:NewSpellAnnounce(52592, 2)
 
 local specWarnCurse	= mod:NewSpecialWarningYou(52592, nil, nil, nil, 1, 2)
 
-local timerCurseCD	= mod:NewCDTimer(10, 52592, nil, nil, nil, 2)
+local timerCurseCD	= mod:NewVarTimer("v27-35", 52592, nil, nil, nil, 2)
 
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(52592, 59368) then

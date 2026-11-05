@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ragnaros-Classic", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261030120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(11502)
 mod:SetModelID(11121)
 mod:SetHotfixNoticeRev(20231219000000)--2023, 12, 19
@@ -184,6 +184,6 @@ function mod:OnSync(msg--[[, guid]])
 --			end
 --		end
 	timerCombatStart:Stop()
-	timerCombatStart:Start(7)
+	timerCombatStart:Start(7.5)--AC: Elemental Fire -> 5s intro say -> 2.5s attackable
 	end
 end

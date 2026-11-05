@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Algalon", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261025000000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(32871)
 mod:SetEncounterID(757)
 mod:RegisterCombat("yell", L.YellPull)
@@ -108,6 +108,13 @@ function mod:SPELL_CAST_START(args)
 		timerNextBigBang:Start()
 		announcePreBigBang:Cancel()
 		announcePreBigBang:Schedule(80.5)
+		-- AC: DelayEventsToMax(11s) pushes Phase Punch / Cosmic Smash to at least 11s
+		if timerNextPhasePunch:GetRemaining() < 11 then
+			timerNextPhasePunch:Start(11)
+		end
+		if timerCDCosmicSmash:GetRemaining() < 11 then
+			timerCDCosmicSmash:Start(11)
+		end
 		specWarnBigBang:Show()
 		if self:IsTank() then
 			specWarnBigBang:Play("defensive")

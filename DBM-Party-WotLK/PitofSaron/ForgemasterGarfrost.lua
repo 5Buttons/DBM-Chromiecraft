@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ForgemasterGarfrost", "DBM-Party-WotLK", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(36494)
 mod:SetEncounterID(833)
 mod:SetUsedIcons(8)
@@ -24,8 +24,8 @@ local yellRock					= mod:NewYellMe(68789)
 local specWarnSaroniteRockNear	= mod:NewSpecialWarningClose(68789, nil, nil, nil, 1, 2)
 local specWarnPermafrost		= mod:NewSpecialWarningStack(68786, nil, 9, nil, nil, 1, 2)
 
-local timerSaroniteRockCD		= mod:NewCDTimer(15.5, 68789, nil, nil, nil, 3)--15.5-20
-local timerDeepFreezeCD			= mod:NewCDTimer(19, 70381, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON)
+local timerSaroniteRockCD		= mod:NewVarTimer("v12.5-20", 68789, nil, nil, nil, 3)
+local timerDeepFreezeCD			= mod:NewCDTimer(35, 70381, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON)
 local timerDeepFreeze			= mod:NewTargetTimer(14, 70381, nil, false, 3, 5)
 
 mod:AddSetIconOption("SetIconOnSaroniteRockTarget", 68789, true, false, {8})

@@ -16,7 +16,8 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	ArachnophobiaTimer	= "Arachnophobia",
 	Pull1				= "Yes, run! It makes the blood pump faster!",
-	Pull2				= "Just a little taste..."
+	Pull2				= "Just a little taste...",
+	Pull3				= "There is no way out."
 })
 
 ----------------------------
@@ -37,7 +38,7 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull					= "Kneel before me, worm!"--Not actually pull trigger, but often said on pull
+	Pull					= "Slay them in the master's name!"
 })
 
 ---------------
@@ -98,6 +99,8 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	Pull			= "Die, trespasser!",
+	Pull2			= "Glory to the master!",
+	Pull3			= "Your life is forfeit!",
 	Adds			= "summons forth Skeletal Warriors!",
 	AddsTwo			= "raises more skeletons!",
 	Blink			= "blinks away!",
@@ -130,7 +133,9 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull				= "You are mine now."
+	Pull				= "You are mine now.",
+	Pull2				= "I see you!",
+	Pull3				= "You... are next."
 })
 
 ---------------

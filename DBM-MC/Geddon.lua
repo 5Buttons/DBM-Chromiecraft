@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Geddon", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220925180445")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(12056)
 
 mod:SetModelID(12129)
@@ -30,8 +30,8 @@ local specWarnIgnite	= mod:NewSpecialWarningDispel(19659, "RemoveMagic", nil, ni
 
 local timerInfernoCD	= mod:NewCDTimer(21, 19695, nil, nil, nil, 2)--21-27.9
 local timerInferno		= mod:NewBuffActiveTimer(8, 19695, nil, nil, nil, 2)
-local timerIgniteManaCD	= mod:NewCDTimer(27+3, 19659, nil, nil, nil, 2)--27-33
-local timerBombCD		= mod:NewCDTimer(13.3-0.3, 20475, nil, nil, nil, 3)--13.3-18.3
+local timerIgniteManaCD	= mod:NewCDTimer(27, 19659, nil, nil, nil, 2)--AC: 27-32s
+local timerBombCD		= mod:NewVarTimer("v11-16", 20475, nil, nil, nil, 3)--AC: 11-16s
 local timerBomb			= mod:NewTargetTimer(8, 20475, nil, nil, nil, 3)
 local timerArmageddon	= mod:NewCastTimer(8, 20478, nil, nil, nil, 2)
 
@@ -39,8 +39,8 @@ mod:AddSetIconOption("SetIconOnBombTarget", 20475, false, false, {8})
 
 function mod:OnCombatStart(delay)
 	--timerIgniteManaCD:Start(7-delay)--7-19, too much variation for first
-	timerBombCD:Start(11+2-delay)
-	timerInfernoCD:Start(14-delay)
+	timerBombCD:Start("v11-16")
+	timerInfernoCD:Start(13-delay)--AC: 13-15s
 end
 
 function mod:SPELL_AURA_APPLIED(args)

@@ -677,6 +677,10 @@ L:SetOptionLocalization({
 	warnEnergy	= "Show warning for Pure Energy"
 })
 
+L:SetMiscLocalization({
+	Discharge	= "discharges pure energy"
+})
+
 --------------------------
 --  Priestess Delrissa  --
 --------------------------

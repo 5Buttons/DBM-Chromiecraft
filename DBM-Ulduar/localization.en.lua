@@ -258,7 +258,7 @@ L:SetMiscLocalization({
 	YellPhase2			= "Impertinent whelps, you dare challenge me atop my pedestal? I will crush you myself!",
 	YellKill			= "Stay your arms! I yield!",
 	YellHardModeActive	= "Impossible!  Lord Thorim, I will bring your foes a frigid death!",
-	YellHardModeFailed	= "These pathetic mortals are harmless, beneath my station. Dispose of them!",
+	YellHardModeFailed	= "These pathetic mortals are harmless, beneath my station.  Dispose of them!",
 	ChargeOn			= "Lightning Charge: %s",
 	Charge				= "Lightning Charge fails (this try): %s"
 })

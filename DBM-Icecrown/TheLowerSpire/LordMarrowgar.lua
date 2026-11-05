@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("LordMarrowgar", "DBM-Icecrown", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(36612)
 mod:SetEncounterID(845)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -45,7 +45,7 @@ mod.vb.impaleIcon = 8
 function mod:OnCombatStart(delay)
 	preWarnWhirlwind:Schedule(40-delay)
 	timerWhirlwindCD:Start(45-delay) -- After 16/11/2022, Warmane fixed this timer. (10N Icecrown 2022/08/25 || 25H Lordaeron 2022/09/08 || 25H Lordaeron 2022/09/14 || 25H Lordaeron 2022/09/23 || 25H Lordaeron 2022/11/16 || 25H Lordaeron 2022/11/17 || 25N Lordaeron 2023-02-10 || 25H Lordaeron [2023-02-14]@[19:45:48] || 25H Lordaeron [2023-02-14]@[19:53:17] || 25N Lordaeron [2023-02-14]@[20:08:16] || 25N Icecrown 2023-02-19) - pull:52.2 || pull:48.3 || pull:45.2 || pull:46.9 || 45.0 || 45.0 || 45.1 || 45.0 || 45.0
-	timerBoneSpike:Start(15-delay) -- Fixed timer - 15.0
+	timerBoneSpike:Start(10-delay) -- AC: 10-15s
 	berserkTimer:Start(-delay)
 	self:RegisterShortTermEvents(
 		"SPELL_PERIODIC_DAMAGE 69146 70823 70824 70825",
@@ -61,10 +61,12 @@ function mod:SPELL_AURA_APPLIED(args)
 	if args.spellId == 69076 then						-- Bone Storm (Whirlwind)
 		specWarnWhirlwind:Show()
 		specWarnWhirlwind:Play("justrun")
-		if self:IsHeroic() then
-			timerWhirlwind:Show(30)			-- As of 16/11/2022, Warmane fixed this timer - 30s
+		if self:IsDifficulty("normal25", "heroic25") then
+			timerWhirlwind:Show(30)			-- AC: 30s on 25-man, 20s on 10-man
 		else
-			timerWhirlwind:Show()			-- REVIEW! After 16/11/2022, needs to be rechecked if it's fixed on 20s. || 30 on Norm (10N Icecrown 2022/08/25) - pull:52.2
+			timerWhirlwind:Show()
+		end
+		if self:IsNormal() then
 			timerBoneSpike:Cancel()						-- He doesn't do Bone Spike Graveyard during Bone Storm on normal
 		end
 	end

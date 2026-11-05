@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ScourgelordTyrannus", "DBM-Party-WotLK", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(36658, 36661)
 mod:SetEncounterID(837)
 mod:SetUsedIcons(8)
@@ -39,7 +39,7 @@ local specWarnIcyBlast			= mod:NewSpecialWarningMove(69238, nil, nil, nil, 1, 2)
 local specWarnOverlordsBrand	= mod:NewSpecialWarningReflect(69172, nil, nil, nil, 3, 2)
 local specWarnUnholyPower		= mod:NewSpecialWarningSpell(69167, "Tank", nil, nil, 1, 2) --Spell for now. may change to run away if damage is too high for defensive
 
-local timerCombatStart			= mod:NewCombatTimer(45) -- 2022/08/09 Icecrown log
+local timerCombatStart			= mod:NewCombatTimer(38) -- AC: intro yell -> DoAction(1) after 15+8+15s
 local timerOverlordsBrandCD		= mod:NewCDTimer(11, 69172, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON) -- ~1s variance (2022/08/08 Lordaeron log || 2022/08/09 Icecrown log) - 11.2, 11.3, 11.7, 11.7, 11.8, 11.5, 12.0, 12.0 || 11.1, 11.7, 12.1, 11.3
 local timerOverlordsBrand		= mod:NewTargetTimer(8, 69172, nil, nil, nil, 5)
 local timerUnholyPower			= mod:NewBuffActiveTimer(10, 69167, nil, "Tank|Healer", 2, 5)

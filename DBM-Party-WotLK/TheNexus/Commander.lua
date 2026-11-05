@@ -3,7 +3,7 @@ local L = mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 
 if UnitFactionGroup("player") == "Alliance" then
 	mod:SetCreatureID(26798)
@@ -24,8 +24,13 @@ local warningWhirlwind	= mod:NewSpellAnnounce(38619, 3)
 
 local specWarnWW		= mod:NewSpecialWarningRun(38619, "MeleeDps", nil, nil, 4, 2)
 
-local timerFearCD		= mod:NewCDTimer(20, 19134, nil, nil, nil, 2)--Correct?
-local timerWhirlwindCD	= mod:NewCDTimer(15, 38619, nil, nil, nil, 2)--Correct?
+local timerFearCD		= mod:NewCDTimer("v15-20", 19134, nil, nil, nil, 2)-- AC: 15-20s
+local timerWhirlwindCD	= mod:NewCDTimer(16, 38619, nil, nil, nil, 2)
+
+function mod:OnCombatStart(delay)
+	timerFearCD:Start(10-delay)
+	timerWhirlwindCD:Start(15-delay)
+end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 19134 then

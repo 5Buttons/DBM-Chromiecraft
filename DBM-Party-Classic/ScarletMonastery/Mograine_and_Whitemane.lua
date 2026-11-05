@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Mograine_and_Whitemane", "DBM-Party-Classic", 12)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(3977, 3976, 99999)--Whitemane, Mograine
 mod:SetEncounterID(450)
 
@@ -10,7 +10,8 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 12039",
 	"SPELL_CAST_SUCCESS 9256",
-	"UNIT_DIED"
+	"UNIT_DIED",
+	"CHAT_MSG_MONSTER_YELL"
 )
 
 local warnDeepSleep				= mod:NewSpellAnnounce(9256, 2)
@@ -39,12 +40,17 @@ function mod:SPELL_CAST_SUCCESS(args)
 	end
 end
 
+--Mograine fakes death at 1% (no UNIT_DIED), Whitemane yells when she takes over
+function mod:CHAT_MSG_MONSTER_YELL(msg)
+	if msg == L.YellWhitemane and self.vb.phase == 1 then
+		self:SetStage(2)
+	end
+end
+
 function mod:UNIT_DIED(args)
 	if self:GetCIDFromGUID(args.destGUID) == 3976 then
 		if self.vb.phase == 3 then--Fight is over on 2nd death
 			DBM:EndCombat(self)
-		else--it's first death, he's down and whiteman is taking over
-			self:SetStage(2)
 		end
 	end
 end

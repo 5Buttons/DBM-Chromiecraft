@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lucifron", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(12118)--, 12119
 
 mod:SetModelID(13031)
@@ -26,8 +26,8 @@ local warnMC		= mod:NewTargetNoFilterAnnounce(20604, 4)
 local specWarnMC	= mod:NewSpecialWarningYou(20604, nil, nil, nil, 1, 2)
 local yellMC		= mod:NewYell(20604)
 
-local timerCurseCD	= mod:NewCDTimer(20.5, 19703, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON)--20-25N)
-local timerDoomCD	= mod:NewCDTimer(20, 19702, nil, nil, nil, 3, nil, DBM_COMMON_L.MAGIC_ICON)--20-25
+local timerCurseCD	= mod:NewCDTimer(20, 19703, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON)
+local timerDoomCD	= mod:NewCDTimer(20, 19702, nil, nil, nil, 3, nil, DBM_COMMON_L.MAGIC_ICON)
 --local timerDoom		= mod:NewCastTimer(10, 19702, nil, nil, nil, 3, nil, DBM_COMMON_L.MAGIC_ICON)
 
 mod:AddSetIconOption("SetIconOnMC", 20604, true, false, {1, 2})
@@ -36,8 +36,8 @@ mod.vb.lastIcon = 1
 
 function mod:OnCombatStart(delay)
 	self.vb.lastIcon = 1
-	timerDoomCD:Start(7-delay)--7-8
-	timerCurseCD:Start(12-delay)--12-15
+	timerDoomCD:Start(6-delay)--AC: 6-11s
+	timerCurseCD:Start(11-delay)--AC: 11-14s
 end
 
 function mod:MCTarget(targetname)

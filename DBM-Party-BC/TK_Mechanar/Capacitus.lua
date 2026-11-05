@@ -3,7 +3,7 @@ local L = mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20261026180406")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(19219)
 mod:SetModelID(19162)
 mod:RegisterCombat("combat")
@@ -37,9 +37,7 @@ function mod:OnCombatStart(delay)
 	currentCharge = nil
 	yellCount = 0
 	self.vb.lastShift = nil
-	if self:IsHeroic() then
-		enrageTimer:Start(-delay)
-	end
+	enrageTimer:Start(-delay)
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(unitId, spellName)
