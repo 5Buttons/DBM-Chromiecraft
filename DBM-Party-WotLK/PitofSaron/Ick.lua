@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ick", "DBM-Party-WotLK", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(36476)
 mod:SetEncounterID(835)
 mod:SetUsedIcons(8)
@@ -25,7 +25,7 @@ local specWarnMines				= mod:NewSpecialWarningSpell(69015, nil, nil, nil, 2, 2)
 local specWarnPursuit			= mod:NewSpecialWarningRun(68987, nil, nil, 2, 4, 2)
 local specWarnPoisonNova		= mod:NewSpecialWarningRun(68989, "Melee", nil, 2, 4, 2)
 
-local timerSpecialCD			= mod:NewCDSpecialTimer(20)--Every 20-22 seconds. In rare cases he skips a special though and goes 40 seconds. unsure of cause
+local timerSpecialCD			= mod:NewCDSpecialTimer("v25-30")-- AC: first 25s, then 25-30s
 local timerPursuitCast			= mod:NewCastTimer(5, 68987, nil, nil, nil, 3)
 local timerPursuitConfusion		= mod:NewBuffActiveTimer(12, 69029, nil, nil, nil, 5)
 local timerPoisonNova			= mod:NewCastTimer(5, 68989, nil, "Melee", 2, 2)
@@ -38,7 +38,7 @@ local pursuitTable = {}
 
 function mod:OnCombatStart(delay)
 	table.wipe(pursuitTable)
-	timerSpecialCD:Start(-delay)
+	timerSpecialCD:Start(25-delay)
 end
 
 function mod:SPELL_CAST_START(args)
@@ -54,7 +54,7 @@ function mod:SPELL_CAST_START(args)
 	elseif args.spellId == 69012 then				--Explosive Barrage
 		specWarnMines:Show()
 		specWarnMines:Play("watchstep")
-		timerSpecialCD:Start(22) --Will be 2 seconds longer because of how long barrage lasts
+		timerSpecialCD:Start()
 	end
 end
 
