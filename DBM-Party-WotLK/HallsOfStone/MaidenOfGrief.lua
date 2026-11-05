@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("MaidenOfGrief", "DBM-Party-WotLK", 7)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(27975)
 mod:SetEncounterID(565)
 
@@ -21,8 +21,8 @@ local specWarnSorrow	= mod:NewSpecialWarningMoveTo(50760, nil, nil, nil, 2, 2)
 
 local timerWoe			= mod:NewTargetTimer(10, 50761, nil, "Healer", nil, 5, nil, DBM_COMMON_L.HEALER_ICON..DBM_COMMON_L.MAGIC_ICON)
 local timerSorrow		= mod:NewBuffActiveTimer(6, 50760)
-local timerStormCD		= mod:NewCDTimer(20, 50752, nil, nil, nil, 3)
-local timerSorrowCD		= mod:NewCDTimer(30, 50760, nil, nil, nil, 2)
+local timerStormCD		= mod:NewVarTimer("v16-20", 50752, nil, nil, nil, 3)
+local timerSorrowCD		= mod:NewVarTimer("v19-33", 50760, nil, nil, nil, 2)
 local timerAchieve		= mod:NewAchievementTimer(60, 1866)
 
 local stormName = DBM:GetSpellInfo(50752)
