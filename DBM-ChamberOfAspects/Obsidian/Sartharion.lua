@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,normal25"
 
-mod:SetRevision("20260503220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(28860)
 mod:SetEncounterID(742)
 
@@ -44,7 +44,7 @@ local yellFissure           = mod:NewYellMe(59127)
 --Drake and Portals timings
 local timerTenebron       = mod:NewTimer(28, "TimerTenebron", 61248, nil, nil, 1)
 local timerShadron        = mod:NewTimer (68, "TimerShadron", 58105, nil, nil, 1)
-local timerVesperon       = mod:NewTimer(122, "TimerVesperon", 61251, nil, nil, 1)
+local timerVesperon       = mod:NewTimer(128, "TimerVesperon", 61251, nil, nil, 1)
 local timerTenebronWhelps = mod:NewTimer(51, "TimerTenebronWhelps", 1022)
 local timerShadronPortal  = mod:NewTimer(23, "TimerShadronPortal", 11420)
 local timerVesperonPortal = mod:NewTimer(36, "TimerVesperonPortal", 57988)
@@ -92,7 +92,7 @@ local function CheckDrakes(self, delay)
     end
     if isunitdebuffed(DBM:GetSpellInfo(61251)) then    -- Power of Vesperon
         timerVesperon:Start(-delay)
-        warnVesperon:Schedule(115-delay)
+        warnVesperon:Schedule(121-delay)
 --        timerVesperonPortal:Start(-delay)
 --        warnVesperonPortalSoon:Schedule(-delay)
         if self.Options.HealthFrame then
@@ -207,7 +207,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, mob)
         elseif mob == L.NameShadron then
             self:SendSync("ShadronPortal")
         end
-    elseif L.TenebronHatch and msg:find(L.TenebronHatch, 1, true) then
+    elseif L.TenebronHatch and msg:find(L.TenebronHatch, 1, true) and self:AntiSpam(5, "TenebronHatch") then -- same emote is sent again 2s later (AC)
         timerTenebronWhelps:Start(27)
         warnTenebronWhelpsSoon:Schedule(23)
     end
