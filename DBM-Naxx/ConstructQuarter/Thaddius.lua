@@ -2,7 +2,7 @@
 local mod	= DBM:NewMod("Thaddius", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260502210600")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15928)
 mod:SetEncounterID(1120)
 
@@ -10,7 +10,7 @@ mod:RegisterCombat("combat_yell", L.Yell)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 28089",
-	"SPELL_CAST_SUCCESS 28134",
+	"SPELL_CAST_SUCCESS 28134 54529",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_AURA player"
 )
@@ -49,17 +49,17 @@ local function TankThrow(self)
 		return
 	end
 	timerThrow:Start()
-	warnThrowSoon:Schedule(17.6)
-	self:Schedule(20.6, TankThrow, self)
+	warnThrowSoon:Schedule(17)
+	self:Schedule(20, TankThrow, self)
 end
 
 function mod:OnCombatStart(delay)
 	self:SetStage(1)
 	currentCharge = nil
 	down = 0
-	self:Schedule(20.6 - delay, TankThrow, self)
+	self:Schedule(20 - delay, TankThrow, self)
 	timerThrow:Start(-delay)
-	warnThrowSoon:Schedule(17.6 - delay)
+	warnThrowSoon:Schedule(17 - delay)
 end
 
 do
@@ -119,7 +119,7 @@ do
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 28134 and DBM:IsTanking("player", DBM:GetUnitIdFromCID(15929, false)) then
+	if (args.spellId == 28134 or args.spellId == 54529) and DBM:IsTanking("player", DBM:GetUnitIdFromCID(15929, false)) then
 		warnPowerSurge:Show()
 		warnChargeChanged:Play("defensive")
 	end	
