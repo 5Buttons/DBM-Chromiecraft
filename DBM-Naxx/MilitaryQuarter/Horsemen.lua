@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Horsemen", "DBM-Naxx", 4)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260222210600")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(16063, 16064, 16065, 30549)
 mod:SetEncounterID(1121)
 
@@ -9,7 +9,7 @@ mod:RegisterCombat("combat", 16063, 16064, 16065, 30549)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 28884 57467",
-	"SPELL_CAST_SUCCESS 28832 28833 28834 28835 28883 53638 57466 32455 57463",
+	"SPELL_CAST_SUCCESS 28832 28833 28834 28835 28883 53638 57466 32455 57463 28863",
 	"SPELL_AURA_APPLIED 29061",
 	"SPELL_AURA_REMOVED 29061",
 	"SPELL_AURA_APPLIED_DOSE 28832 28833 28834 28835",
@@ -88,7 +88,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 			timerThaneMark:Start()
 		end
 		warnMarkSoon:Schedule(12)
-	elseif args.spellId == 57463 then
+	elseif args.spellId == 57463 or args.spellId == 28863 then
 --		timerVoidZoneCD:Start()
 		if args:IsPlayer() then
 			specWarnVoidZone:Show()
