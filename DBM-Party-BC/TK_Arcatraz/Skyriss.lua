@@ -1,7 +1,7 @@
 local mod = DBM:NewMod(551, "DBM-Party-BC", 15, 254)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(20912)
 
 mod:SetModelID(19943)
@@ -19,7 +19,7 @@ mod:RegisterEventsInCombat(
 	"UNIT_HEALTH"
 )
 
-local timerCombatStart	= mod:NewCombatTimer(37)
+local timerCombatStart	= mod:NewCombatTimer(41)
 
 local warnSplitSoon		= mod:NewAnnounce("warnSplitSoon", 2)
 local warnSplit			= mod:NewAnnounce("warnSplit", 3)
@@ -70,7 +70,7 @@ do
 		if not self.vb.warnedSplit1 and self:GetUnitCreatureId(uId) == 20912 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.70 then
 			self.vb.warnedSplit1 = true
 			warnSplitSoon:Show()
-		elseif not self.vb.warnedSplit2 and self:IsHeroic() and self:GetUnitCreatureId(uId) == 20912 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.37 then
+		elseif not self.vb.warnedSplit2 and self:GetUnitCreatureId(uId) == 20912 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.37 then
 			self.vb.warnedSplit2 = true
 			warnSplitSoon:Show()
 		end
