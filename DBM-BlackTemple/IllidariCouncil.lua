@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Council", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528_cafe20241008v4")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(22949, 22950, 22951, 22952)
 
 mod:SetModelID(21416)
@@ -11,9 +11,9 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 41455 41472 41541 41481",
-	"SPELL_CAST_SUCCESS 41467 41541 41482 41476",
+	"SPELL_CAST_SUCCESS 41467 41541 41482 41476 41479",
 	"SPELL_AURA_APPLIED 41485 41481 41482 41541 41475 41452 41453 41450 41451",
-	"SPELL_AURA_REMOVED 41479 41485"
+	"SPELL_AURA_REMOVED 41485"
 )
 
 --added 41472 Divine Wrath, 41467 Judgement, 41541 Consecration, 41481 Flamestrike, 41482 Blizzard
@@ -47,7 +47,7 @@ local warnVanishEnd			= mod:NewEndAnnounce(41476, 3)
 local warnDevAura			= mod:NewSpellAnnounce(41452, 3, nil, "Physical", 2)
 local warnResAura			= mod:NewSpellAnnounce(41453, 3, nil, "-Physical", 2)
 local timerVanish			= mod:NewBuffActiveTimer(31-2, 41476, nil, nil, nil, 6) --adjusted to scripted time 28s plus 1s
-local warnVanish			= mod:NewPreWarnAnnounce(41476, 5, 2)
+local warnVanishSoon		= mod:NewPreWarnAnnounce(41476, 5, 2)
 
 --Others
 local specWarnImmune			= mod:NewSpecialWarning("Immune", false)
@@ -63,6 +63,11 @@ function mod:OnCombatStart(delay)
 --	timerBlizzardCD:Start(5-delay) --new Blizzard timer, too many timers, removed
 	timerNextCoH:Start(20-delay) --new CoH timer
 	timerWrathCD:Start(5-delay) --new Wrath timer
+end
+
+function mod:IsCouncilMember(guid)
+	local cid = self:GetCIDFromGUID(guid)
+	return cid == 22949 or cid == 22950 or cid == 22951 or cid == 22952
 end
 
 function mod:SPELL_AURA_APPLIED(args)
@@ -93,10 +98,10 @@ function mod:SPELL_AURA_APPLIED(args)
 		warnResAura:Show()
 		timerResAura:Start()
 ]]--too many timers, removed for now
-	elseif spellId == 41450 and self:GetCIDFromGUID(args.destGUID) == 22951 then
+	elseif spellId == 41450 and self:IsCouncilMember(args.destGUID) then
 		timerMeleeImmune:Start(args.destName)
 		specWarnImmune:Show(L.Melee)
-	elseif spellId == 41451 and self:GetCIDFromGUID(args.destGUID) == 22951 then
+	elseif spellId == 41451 and self:IsCouncilMember(args.destGUID) then
 		timerSpellImmune:Start(args.destName)
 		specWarnImmune:Show(L.Spell)
 	end
@@ -104,9 +109,7 @@ end
 
 function mod:SPELL_AURA_REMOVED(args)
 	local spellId = args.spellId
-	if spellId == 41479 then
-		warnVanishEnd:Show()
-	elseif spellId == 41485 then
+	if spellId == 41485 then
 		if self.Options.PoisonIcon then
 			self:SetIcon(args.destName, 0)
 		end
@@ -124,21 +127,23 @@ function mod:SPELL_CAST_START(args)
 	elseif args.spellId == 41472 then
 		timerWrathCD:Start() --new wrath timer
 ]]--too spammy, removed for now
-	elseif args.spellID == 41481 then
-		timerFlamestrike:Start() --newly added CD timer
-	elseif args.spellID == 41467 then
-		timerJudgeCD:Start() --newly added CD timer
+	elseif args.spellId == 41481 then
+		timerFlamestrikeCD:Start() --newly added CD timer
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 41541 then
 		timerConsecrationCD:Start() --newly added CD timer
-	elseif args.spellID == 41482 then
-		timerBlizzard:Start() --newly added CD timer
+	elseif args.spellId == 41467 then
+		timerJudgeCD:Start() --newly added CD timer
+	elseif args.spellId == 41482 then
+		timerBlizzardCD:Start() --newly added CD timer
 	elseif args.spellId == 41476 then --newly added CD timer
-		warnVanish:Show()
+		warnVanish:Show(args.sourceName)
 		timerVanish:Start()
-		warnVanish:Schedule(29-5)
+		warnVanishSoon:Schedule(29-5)
+	elseif args.spellId == 41479 then--AC: Vanish Out cast by Veras after 29s
+		warnVanishEnd:Show()
 	end
 end

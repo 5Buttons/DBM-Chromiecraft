@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic"
 
-mod:SetRevision("20260222220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(26631)
 mod:SetEncounterID(371)
 
@@ -12,8 +12,7 @@ mod:RegisterKill("yell", L.YellKill)
 mod:SetWipeTime(25)
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 59856 59854",
-	"SPELL_AURA_APPLIED 59856 59854",
+	"SPELL_CAST_SUCCESS 50089 59856 49034 59854",
 	"CHAT_MSG_MONSTER_YELL"
 )
 
@@ -42,20 +41,20 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		if self.vb.CrystalHandlers > 0 then
 			timerCrystalHandler:Start()
 		end
-	elseif msg == L.Phase2 then
-		self:SetStage(2)
-		warnPhase2:Show()
 	end
 end
 
--- need transcriptor logs to validate this. Seems unnecessary to have this event duplication
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 59856 then
+	-- AC never says the stage 2 yell; Blizzard/Wrath of Misery are only cast in stage 2
+	if self:GetStage(1) then
+		self:SetStage(2)
+		warnPhase2:Show()
+	end
+	if args:IsSpellID(50089, 59856) then
 		warnCurseTarget:Show(args.destName)
 		specwarnCurse:Show()
 		timerNextCurse:Start()
-	elseif args.spellId == 59854 and self:AntiSpam(1,2) then
+	elseif args:IsSpellID(49034, 59854) and self:AntiSpam(1,2) then
 		specwarnSnow:Show()
 	end
 end
-mod.SPELL_AURA_APPLIED = mod.SPELL_CAST_SUCCESS

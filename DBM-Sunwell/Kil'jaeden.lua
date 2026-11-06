@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kil", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261026180406")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(25315, 25588)
 mod:SetEncounterID(729)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
@@ -269,7 +269,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 			timerBombCD:Cancel()
 			timerBloomCD:Cancel()
 			timerBlueOrb:Start(48) --AC: 48s
-			timerBloomCD:Start(20) 
+			timerBloomCD:Start(51) --AC: 1s + 36s sacrifice + 7s + 9s
 			timerBombCD:Start(59) --14.05.2025 Chromie PTR 74s 
 			timerDartCD:Start(67) --14.04.25 Chromie PTR: 67.85s
 		end

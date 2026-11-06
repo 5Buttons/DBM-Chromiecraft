@@ -4,7 +4,7 @@ local L		= mod:GetLocalizedStrings()
 local UnitGUID, UnitName, GetSpellInfo = UnitGUID, UnitName, GetSpellInfo
 local UnitInRange, UnitIsUnit, UnitInVehicle, IsInRaid = UnitInRange, UnitIsUnit, UnitInVehicle, DBM.IsInRaid
 
-mod:SetRevision("20251102144322")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(36597)
 mod:SetEncounterID(856)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7)
@@ -307,9 +307,9 @@ local function NextPhase(self, delay)
 		timerVileSpirit:Start(17)
 		timerSoulreaperCD:Start(37.5, self.vb.soulReaperCount+1)
 		soundSoulReaperSoon:Schedule(37.5-2.5, "Interface\\AddOns\\DBM-Core\\sounds\\RaidAbilities\\soulreaperSoon.mp3")
-		timerDefileCD:Start(nil, self.vb.defileCount+1)
-		warnDefileSoon:Schedule(32-5, self.vb.defileCount+1)
-		warnDefileSoon:ScheduleVoice(32-5, "scatter")
+		timerDefileCD:Start(38, self.vb.defileCount+1) -- AC: 38s
+		warnDefileSoon:Schedule(38-5, self.vb.defileCount+1)
+		warnDefileSoon:ScheduleVoice(38-5, "scatter")
 		timerHarvestSoulCD:Start(13.6) -- REVIEW! variance? (25H Lordaeron 2022/10/21 || 25H Lordaeron 2022/11/16) - 13.6 || 14.0
 --		if self:IsHeroic() then
 --			self:RegisterShortTermEvents(

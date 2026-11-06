@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ArchmageArugal", "DBM-Party-Classic", 14)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261030120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(4275)
 mod:SetEncounterID(471)
 
@@ -15,12 +15,12 @@ mod:RegisterEventsInCombat(
 local warningArugalsCurse			= mod:NewTargetNoFilterAnnounce(7621, 2)
 local warningShadowPort				= mod:NewSpellAnnounce(7587, 2)
 
-local timerArugalsCurseCD			= mod:NewAITimer(180, 7621, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON)
-local timerShadowPortCD				= mod:NewAITimer(180, 7587, nil, nil, nil, 6)
+local timerArugalsCurseCD			= mod:NewCDTimer(25, 7621, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON)
+local timerShadowPortCD				= mod:NewCDTimer(13, 7587, nil, nil, nil, 6)
 
 function mod:OnCombatStart(delay)
-	timerArugalsCurseCD:Start(1-delay)
-	timerShadowPortCD:Start(1-delay)
+	timerArugalsCurseCD:Start(7-delay)
+	timerShadowPortCD:Start(3-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)

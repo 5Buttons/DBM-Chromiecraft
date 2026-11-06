@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20251123220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(26693)
 mod:SetEncounterID(581)
 mod:SetMinSyncRevision(3108)
@@ -27,7 +27,7 @@ local specWarnWhirlwind		= mod:NewSpecialWarningRun(59322, nil, nil, 2, 4, 2)
 
 local timerPoisonDebuff		= mod:NewTargetTimer(12, 50258, nil, "Healer", 2, 5, nil, DBM_COMMON_L.HEALER_ICON)
 local timerPoisonCD			= mod:NewCDTimer(10, 59331, nil, "Healer", nil, 5)
-local timerWhirlwindCD		= mod:NewCDTimer(20, 59322, nil, nil, nil, 2)
+local timerWhirlwindCD		= mod:NewVarTimer("v15-20", 59322, nil, nil, nil, 2)
 local timerAchieve			= mod:NewAchievementTimer(180, 1873)
 
 function mod:SPELL_CAST_START(args)

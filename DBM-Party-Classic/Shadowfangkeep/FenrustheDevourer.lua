@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("FenrustheDevourer", "DBM-Party-Classic", 14)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(4274)
 mod:SetEncounterID(469)
 
@@ -14,10 +14,10 @@ mod:RegisterEventsInCombat(
 
 local warningToxicSaliva				= mod:NewTargetNoFilterAnnounce(7125, 2, nil, "RemovePoison")
 
-local timerToxicSalivaCD				= mod:NewAITimer(180, 7125, nil, nil, nil, 3, nil, DBM_COMMON_L.POISON_ICON)
+local timerToxicSalivaCD				= mod:NewCDTimer("v22-45", 7125, nil, nil, nil, 3, nil, DBM_COMMON_L.POISON_ICON)
 
-function mod:OnCombatStart(delay)
-	timerToxicSalivaCD:Start(1-delay)
+function mod:OnCombatStart()
+	timerToxicSalivaCD:Start("v1-7")--AC: 1-7s, then 22-45s
 end
 
 function mod:SPELL_CAST_SUCCESS(args)

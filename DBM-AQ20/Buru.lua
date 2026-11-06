@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Buru", "DBM-AQ20", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15370)
 
 mod:SetModelID(15370)
@@ -63,7 +63,7 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:CHAT_MSG_MONSTER_EMOTE(msg, _, _, _, target)
-	if (msg:find(L.PursueEmote) or msg == L.PursueEmote) and target then
+	if (msg:find((L.PursueEmote:gsub("%%s", ".+"))) or msg == L.PursueEmote) and target then--"%s" in the locale string is a Lua pattern class, so turn the placeholders into wildcards
 		target = DBM:GetUnitFullName(target)
 		if target == UnitName("player") then
 			specWarnPursue:Show()

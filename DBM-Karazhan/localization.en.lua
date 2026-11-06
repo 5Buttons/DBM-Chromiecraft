@@ -42,6 +42,8 @@ L:SetMiscLocalization({
 	Event				= "Tonight... we explore a tale of forbidden love!",
 	RJ_Pull				= "What devil art thou, that dost torment me thus?",
 	DBM_RJ_PHASE2_YELL	= "Come, gentle night; and give me back my Romulo!",
+	DBM_RJ_JULIANNE_POISON	= "Romulo, I come! Oh... this do I drink to thee!",
+	DBM_RJ_ROMULO_DEATH	= "Thou smilest... upon the stroke that... murders me.",
 	Romulo				= "Romulo",
 	Julianne			= "Julianne"
 })
@@ -91,7 +93,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "I'm not afraid a' you! Do you wanna' fight? Huh, do ya'? C'mon! I'll fight ya' with both paws behind my back!",
 	DBM_OZ_YELL_STRAWMAN	= "Now what should I do with you? I simply can't make up my mind.",
 	DBM_OZ_YELL_TINHEAD		= "I could really use a heart. Say, can I have yours?",
-	DBM_OZ_YELL_CRONE		= "Woe to each and every one of you, my pretties!"
+	DBM_OZ_YELL_CRONE		= "Woe to each and every one of you, my pretties!",
+	DBM_OZ_YELL_CRONE2		= "It will all be over soon!",
+	DBM_OZ_YELL_TITO		= "Don't let them hurt us Tito! Oh, you won't, will you?"
 })
 
 -- Curator
@@ -198,7 +202,7 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "Simple fools! Time is the fire in which you'll burn!",
-	DBM_PRINCE_YELL_P3		= "How can you hope to stand against such overwhelming power?",
+	DBM_PRINCE_YELL_P3		= "I see the subtlety of conception is beyond primitives such as you.",
 	DBM_PRINCE_YELL_INF1	= "All realities, all dimensions are open to me!",
 	DBM_PRINCE_YELL_INF2	= "You face not Malchezaar alone, but the legions I command!"
 })

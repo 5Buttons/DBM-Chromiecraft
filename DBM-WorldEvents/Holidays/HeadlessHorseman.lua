@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("HeadlessHorseman", "DBM-WorldEvents")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251018163045")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(23682, 23775)
 
 mod:SetReCombatTime(10)
@@ -89,12 +89,6 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.HorsemanSoldiers and self:AntiSpam(5, 1) then
 		warnHorsemanSoldiers:Show()
 	end
-end
-
-function mod:CHAT_MSG_MONSTER_EMOTE(msg)
-    if msg == "%s laughs." or msg == L.HeadLaugh then
-	self:SendSync("HeadRepositions")
-    end
 end
 
 function mod:CHAT_MSG_MONSTER_SAY(msg)

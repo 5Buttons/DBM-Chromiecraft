@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Taragaman", "DBM-Party-Classic", 9)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(11520)
 mod:SetEncounterID(431)
 
@@ -14,12 +14,12 @@ mod:RegisterEventsInCombat(
 local warningUppercut			= mod:NewSpellAnnounce(18072, 3, nil, "Tank", 2)
 local warningFireNova			= mod:NewSpellAnnounce(11970, 3)
 
-local timerUppercutCD			= mod:NewAITimer(180, 18072, nil, "Tank", 2, 5, nil, DBM_COMMON_L.TANK_ICON)
-local timerFireNovaCD			= mod:NewAITimer(180, 11970, nil, nil, nil, 2, nil, DBM_COMMON_L.HEALER_ICON)
+local timerUppercutCD			= mod:NewCDTimer(10, 18072, nil, "Tank", 2, 5, nil, DBM_COMMON_L.TANK_ICON)
+local timerFireNovaCD			= mod:NewCDTimer(10, 11970, nil, nil, nil, 2, nil, DBM_COMMON_L.HEALER_ICON)
 
 function mod:OnCombatStart(delay)
-	timerUppercutCD:Start(1-delay)
-	timerFireNovaCD:Start(1-delay)
+	timerUppercutCD:Start(3-delay)
+	timerFireNovaCD:Start(7-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
