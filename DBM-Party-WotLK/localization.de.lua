@@ -743,7 +743,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Pull				= "Gut gemacht. Ihr habt Euch heute bewiesen-",
 	AchievementFailed	= ">> ERFOLG FEHLGESCHLAGEN: %s wurde von Ghulexplosion getroffen <<",
-	YellCombatEnd		= "Meine Glückwünsche, Champions. In Prüfungen sowohl geplant als auch unerwartet habt Ihr triumphiert."	-- can also be "Nein! Ich darf nicht... wieder... versagen..."
+	YellCombatEnd		= "Nein! Ich darf nicht... wieder... versagen..."
 })
 
 -----------------------

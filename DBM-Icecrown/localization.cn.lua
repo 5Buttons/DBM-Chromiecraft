@@ -177,7 +177,8 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	YellTransform1 = "嗯，什么感觉也没有。什么？！这是哪儿来的？",
-	YellTransform2 = "味道像……樱桃！哦！见笑了！"
+	YellTransform2 = "味道像……樱桃！哦！见笑了！",
+	YellHeroicTransition = "两泥，一室。会有无限惊喜哦！"
 })
 
 ----------------------------

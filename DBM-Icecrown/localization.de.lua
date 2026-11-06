@@ -180,7 +180,8 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	YellTransform1			= "Hm, ich spüre gar nichts. Nanu?! Wo kommen die denn her?",
-	YellTransform2			= "Schmeckt nach... Kirsche! OH! Verzeihung!"
+	YellTransform2			= "Schmeckt nach... Kirsche! OH! Verzeihung!",
+	YellHeroicTransition			= "Zwei Schleime, ein Raum. So viele reizende Möglichkeiten!"
 })
 
 ----------------------------

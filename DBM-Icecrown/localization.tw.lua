@@ -179,7 +179,8 @@ L:SetTimerLocalization({
 
 L:SetMiscLocalization({
 	YellTransform1			= "嗯，我看不出來有何不同。啊?!這些東西從哪來的?",
-	YellTransform2			= "嚐起來像是...櫻桃!喔!抱歉!"
+	YellTransform2			= "嚐起來像是...櫻桃!喔!抱歉!",
+	YellHeroicTransition			= "兩個軟泥、一個房間。超多令人開心的可能性!"
 })
 
 ----------------------------

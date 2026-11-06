@@ -11,6 +11,10 @@ L:SetGeneralLocalization({
 	name = "Пророк Скерам"
 })
 
+L:SetMiscLocalization({
+	YellDeath	= "Вы лишь откладываете неизбежное!"
+})
+
 ----------------
 -- Three Bugs --
 ----------------

@@ -941,6 +941,10 @@ L:SetGeneralLocalization({
 	name		= "Mograine y Melenablanca"
 })
 
+L:SetMiscLocalization({
+	YellWhitemane	= "¡Mograine ha caído! ¡Pagarás por esta traición! ¡Levántate, mi campeón! ¡Levántate!"
+})
+
 -----------------------------
 --  High Inquisitor Fairbanks  --
 -----------------------------

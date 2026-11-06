@@ -43,6 +43,8 @@ L:SetMiscLocalization({
 	Event				= "오늘 밤... 금지된 사랑의 이야기를 파헤쳐 보겠습니다!",
 	RJ_Pull				= "당신들은 대체 누구시기에 절 이리도 괴롭히나요?",
 	DBM_RJ_PHASE2_YELL	= "정다운 밤이시여. 어서 와서 나의 로밀로를 돌려주소서!",
+	DBM_RJ_JULIANNE_POISON	= "로밀로, 제가 가요! 오... 당신께 축배를!",
+	DBM_RJ_ROMULO_DEATH	= "그대들은 나를 쓰러뜨린 그 일격을 자랑스러워하며... 미소짓는구나.",
 	Romulo				= "로밀로",
 	Julianne			= "줄리엔"
 })
@@ -90,7 +92,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "하나도 안 무섭다고! 덤벼! 앞발 두 개를 몽땅 꺼내서 할퀴어주마!",
 	DBM_OZ_YELL_STRAWMAN	= "너희를 어떻게 해주면 좋을까? 아무 생각도 나지 않아!",
 	DBM_OZ_YELL_TINHEAD		= "나도 심장 갖고 싶어. 너희들 것 나한테 주면 안 될까?",
-	DBM_OZ_YELL_CRONE		= "곧 모두 다 끝장날 것이다!"
+	DBM_OZ_YELL_CRONE		= "요런 앙큼한, 너희 모두에게 재앙이 따르리라!",
+	DBM_OZ_YELL_CRONE2		= "곧 모두 다 끝장날 것이다!",
+	DBM_OZ_YELL_TITO		= "티토! 우리를 보호해줘, 응? 그래 줄 수 있지, 티토?"
 })
 
 -- Curator
@@ -197,7 +201,6 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "바보 같으니! 시간은 너의 몸을 태우는 불길이 되리라!",
-	DBM_PRINCE_YELL_P3		= "어찌 감히 이렇게 압도적인 힘에 맞서기를 꿈꾸느냐?",
 	DBM_PRINCE_YELL_INF1	= "모든 차원과 실체가 나를 향해 열려 있노라!",
 	DBM_PRINCE_YELL_INF2	= "이 말체자르님은 혼자가 아니시다. 너희는 나의 군대와 맞서야 한다!"
 })

@@ -583,10 +583,6 @@ L:SetGeneralLocalization({
 	name		= "Cho'Rush der Beobachter"
 })
 
-L:SetMiscLocalization({
-	Defeat	= "Der König ist tot- OH NEIN! Ruft Mizzle den Gewieften! Er weiß, was jetzt zu tun ist!"
-})
-
 ----------------
 -- King Gordok --
 ----------------
@@ -943,6 +939,10 @@ L = DBM:GetModLocalization("Mograine_and_Whitemane")
 
 L:SetGeneralLocalization({
 	name		= "Mograine und Whitemane"
+})
+
+L:SetMiscLocalization({
+	YellWhitemane	= "Mograine ist gefallen! Für diesen Verrat werdet Ihr bezahlen! Erhebt Euch, mein Champion! Erhebt Euch!"
 })
 
 -----------------------------

@@ -42,6 +42,8 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_RJ_PHASE2_YELL	= "Viens, gentille nuit ; rends-moi mon Romulo !",
+	DBM_RJ_JULIANNE_POISON	= "Romulo ! Voici à boire ! Je bois à toi.",
+	DBM_RJ_ROMULO_DEATH	= "Tu souris… au coup… qui me tue.",
 	Romulo				= "Romulo",
 	Julianne			= "Julianne"
 })
@@ -133,7 +135,6 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "Imb\195\169ciles heureux ! Le temps est le brasier dans lequel vous br\195\187lerez !",
-	DBM_PRINCE_YELL_P3		= "Comment pouvez-vous esp\195\169rer r\195\169sister devant un tel pouvoir ?",
 	DBM_PRINCE_YELL_INF1	= "Toutes les r\195\169alit\195\169s, toutes les dimensions me sont ouvertes !",
 	DBM_PRINCE_YELL_INF2	= "Vous n'affrontez pas seulement Malchezzar, mais les l\195\169gions que je commande !"
 })
@@ -192,7 +193,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "J'ai peur d'personne ! Tu veux t'battre ! Hein, tu veux ? Vas-y ! Je te prends avec les deux pattes attachées dans l'dos !",
 	DBM_OZ_YELL_STRAWMAN	= "Alors que vais-je faire de vous ? Je n'arrive tout simplement pas à me décider.",
 	DBM_OZ_YELL_TINHEAD		= "J'aurais bien besoin d'un cœur. Dites, vous me donnez le vôtre ?",
-	DBM_OZ_YELL_CRONE		= "Malheur à chacun d’entre vous, mes mignons !"
+	DBM_OZ_YELL_CRONE		= "Malheur à chacun d’entre vous, mes mignons !",
+	DBM_OZ_YELL_CRONE2		= "Ce sera bientôt terminé !",
+	DBM_OZ_YELL_TITO		= "Ne les laisse pas nous faire du mal, Tito ! Oh, tu ne le feras pas, hein ?"
 })
 
 -- Named Beasts

@@ -735,7 +735,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Pull				= "幹得好。今天，你已證明了你自己-",
 	AchievementFailed	= ">> 成就失敗: %s 被食屍鬼爆炸炸到了 <<",
-	YellCombatEnd		= "恭喜你，勇士們。儘管試煉隱藏著許多不安的變數，但你們仍然通過了考驗。"
+	YellCombatEnd		= "不!我不能再次...失敗..."
 })
 
 -----------------------
