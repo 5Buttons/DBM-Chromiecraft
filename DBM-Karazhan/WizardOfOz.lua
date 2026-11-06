@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Oz", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250806215207")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(18168, 17535)
 --
 mod:SetModelID(17550)
@@ -63,11 +63,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args.spellId == 31014 then
-		if self.Options.AnnounceBosses then
-			WarnTido:Schedule(1)
-		end
-	elseif args.spellId == 32337 then
+	if args.spellId == 32337 then
 		warnChain:Show()
 	end
 end
@@ -97,7 +93,11 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		if self.Options.AnnounceBosses then
 			WarnTinhead:Show()
 		end
-	elseif msg == L.DBM_OZ_YELL_CRONE then
+	elseif msg == L.DBM_OZ_YELL_TITO then--AC summons Tito directly (no cast), Dorothee yells on summon
+		if self.Options.AnnounceBosses then
+			WarnTido:Show()
+		end
+	elseif msg == L.DBM_OZ_YELL_CRONE or msg == L.DBM_OZ_YELL_CRONE2 then
 		if self.Options.AnnounceBosses then
 			WarnCrone:Show()
 			timerFearCD:Stop("Dorothee")
