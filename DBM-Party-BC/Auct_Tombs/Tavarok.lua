@@ -1,6 +1,6 @@
 local mod	= DBM:NewMod(535, "DBM-Party-BC", 8, 250)
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(18343)
 
 mod:SetModelID(19332)
@@ -19,11 +19,11 @@ local WarnPrison		= mod:NewTargetNoFilterAnnounce(32361, 3)
 
 local specWarnQuake		= mod:NewSpecialWarningSpell(33919, nil, nil, nil, 2, 2)
 
-local timerPrisonCD		= mod:NewCDTimer(17.8, 32361, nil, nil, nil, 2)
+local timerPrisonCD		= mod:NewVarTimer("v15-22", 32361, nil, nil, nil, 2)
 local timerPrison		= mod:NewTargetTimer(5, 32361, nil, nil, nil, 3)
 
 function mod:OnCombatStart()
-	timerPrisonCD:Start()
+	timerPrisonCD:Start("v12-22")
 end
 
 function mod:SPELL_CAST_START(args)
