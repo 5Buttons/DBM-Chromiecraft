@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Shahraz", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261026180406") --based on cafe20240916v1
+mod:SetRevision("20261105120000") --based on cafe20240916v1
 mod:SetCreatureID(22947)
 
 mod:SetModelID(21252)
@@ -50,7 +50,6 @@ function mod:OnCombatStart(delay)
 	self.vb.prewarn_enrage = false
 	self.vb.enrage = false
 		self.vb.FATargets = 0
-	timerShriekCD:Start(15.8-delay)
 	timerFACD:Start(24.4+25.6-delay) --modified to meet scripted values 50s
 	timerShriekCD:Start() --newly added timer
 	if not self:IsTrivial() then
@@ -100,7 +99,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(_, source)
 end
 
 function mod:UNIT_HEALTH(uId)
-	if UnitHealth(uId) / UnitHealthMax(uId) <= 0.23 and self:GetUnitCreatureId(uId) == 22947 and not self.vb.prewarn_enrage then
+	if UnitHealth(uId) / UnitHealthMax(uId) <= 0.13 and self:GetUnitCreatureId(uId) == 22947 and not self.vb.prewarn_enrage then
 		self:UnregisterShortTermEvents()
 		self.vb.prewarn_enrage = true
 		warnEnrageSoon:Show()
