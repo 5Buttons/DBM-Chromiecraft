@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("RomuloAndJulianne", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(17534, 17533, 99999)--99999 bogus creature id to keep mod from pre mature combat end.
 --
 mod:SetEncounterID(655) -- Opera Hall
@@ -73,7 +73,10 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
-	if (msg == L.DBM_RJ_PHASE2_YELL or msg:find(L.DBM_RJ_PHASE2_YELL)) and self.vb.phase < 3 then
+	if msg == L.DBM_RJ_JULIANNE_POISON and self:IsInCombat() and self.vb.phase == 1 then--AC: Julianne fakes death (Drink Poison), no UNIT_DIED
+		warnPhase2:Show()
+		self:SetStage(2)
+	elseif (msg == L.DBM_RJ_ROMULO_DEATH or msg == L.DBM_RJ_PHASE2_YELL or msg:find(L.DBM_RJ_PHASE2_YELL)) and self:IsInCombat() and self.vb.phase < 3 then--AC: Romulo fakes death, both resurrect
 		warnPhase3:Show()
 		self:SetStage(3)
 	elseif msg == L.Event or msg:find(L.Event) then
@@ -91,9 +94,6 @@ function mod:UNIT_DIED(args)
 			if (GetTime() - self.vb.RomuloDied) < 10 then
 				DBM:EndCombat(self)
 			end
-		elseif self.vb.phase == 1 then
-			warnPhase2:Show()
-			self:SetStage(2)
 		end
 	elseif cid == 17533 and self:IsInCombat() then
 		if self.vb.phase == 3 then--kill only in phase 3.
@@ -102,9 +102,6 @@ function mod:UNIT_DIED(args)
 			if (GetTime() - self.vb.JulianneDied) < 10 then
 				DBM:EndCombat(self)
 			end
-		elseif self.vb.phase == 2 then
-			warnPhase3:Show()
-			self:SetStage(3)
 		end
 	end
 end
