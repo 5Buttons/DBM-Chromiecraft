@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ignis", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260524000000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(33118)
 mod:SetEncounterID(745)
 mod:SetUsedIcons(8)
@@ -9,9 +9,8 @@ mod:SetUsedIcons(8)
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START 62680 63472 62488 62546 63473",
-	"SPELL_CAST_SUCCESS 62548 63474",
-	"SPELL_AURA_APPLIED 62717 63477 62382",
+	"SPELL_CAST_START 62680 63472 62488 62546 63474",
+	"SPELL_AURA_APPLIED 62717 63477 62382 67114",
 	"SPELL_AURA_REMOVED 62717 63477"
 )
 
@@ -24,10 +23,10 @@ local specWarnFlameBrittle		= mod:NewSpecialWarningSwitch(62382, "Dps", nil, nil
 local timerFlameJetsCast		= mod:NewCastTimer(2.7, 63472, nil, nil, nil, 5, nil, DBM_COMMON_L.IMPORTANT_ICON)
 local timerFlameJetsCooldown	= mod:NewCDTimer(40, 63472, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON, true)
 
-local timerActivateConstruct	= mod:NewCDCountTimer(38, 62488, nil, nil, nil, 1, nil, nil, true)
+local timerActivateConstruct	= mod:NewCDCountTimer(40, 62488, nil, nil, nil, 1, nil, nil, true)
 
-local timerScorchCast			= mod:NewCastTimer(3, 63473)
-local timerScorchCooldown		= mod:NewCDTimer(20, 63473, nil, nil, nil, 5)
+local timerScorchCast			= mod:NewCastTimer(3, 63474)
+local timerScorchCooldown		= mod:NewCDTimer(20, 63474, nil, nil, nil, 5)
 
 
 local timerSlagPot				= mod:NewTargetTimer(10, 63477, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON)
@@ -52,7 +51,7 @@ end
 function mod:OnCombatStart(delay)
 	self.vb.ConstructCount = 0
 	timerAchieve:Start()
-	timerActivateConstruct:Start(36-delay, 1)
+	timerActivateConstruct:Start((self:IsDifficulty("normal10") and 40 or 30)-delay, 1) -- AC: RAID_MODE(40s, 30s)
 	timerScorchCooldown:Start(10-delay)
 	timerFlameJetsCooldown:Start(32-delay)
 end
@@ -71,15 +70,10 @@ function mod:SPELL_CAST_START(args)
 		self.vb.ConstructCount = self.vb.ConstructCount + 1
 		warnConstruct:Show(self.vb.ConstructCount)
 		if self.vb.ConstructCount < 20 then
-			timerActivateConstruct:Start(38, self.vb.ConstructCount+1)
+			timerActivateConstruct:Start(self:IsDifficulty("normal10") and 40 or 30, self.vb.ConstructCount+1)
 		end
-	elseif args:IsSpellID(62546, 63473) then		-- Scorch cast begin
+	elseif args:IsSpellID(62546, 63474) then		-- Scorch cast begin
 		timerScorchCast:Start()
-	end
-end
-
-function mod:SPELL_CAST_SUCCESS(args)
-	if args:IsSpellID(62548, 63474) then			-- Scorch channel end
 		timerScorchCooldown:Start(20)
 	end
 end
@@ -88,12 +82,15 @@ function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(62717, 63477) then			-- Slag Pot
 		timerFlameJetsCooldown:AddTime(6)
 		timerScorchCooldown:AddTime(6)
+		if self.vb.ConstructCount < 20 then			-- AC: Grab delays all events by 6s
+			timerActivateConstruct:AddTime(6, self.vb.ConstructCount+1)
+		end
 		warnSlagPot:Show(args.destName)
 		timerSlagPot:Start(args.destName)
 		if self.Options.SlagPotIcon then
 			self:SetIcon(args.destName, 8, 10)
 		end
-	elseif args.spellId == 62382 and self:AntiSpam(5, 1) then	-- Flame Brittle
+	elseif args:IsSpellID(62382, 67114) and self:AntiSpam(5, 1) then	-- Flame Brittle (10m, 25m)
 		specWarnFlameBrittle:Show()
 		specWarnFlameBrittle:Play("killmob")
 	end
