@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("CThun", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261030120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15589, 15727)
 
 mod:SetUsedIcons(1)
@@ -154,28 +154,7 @@ function mod:SPELL_CAST_START(args)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 26586 then
-		 local cid = self:GetCIDFromGUID(args.sourceGUID)
-		 if self:AntiSpam(5, cid) then--Throttle multiple spawn within 5 seconds
-			if cid == 15726 then--Eye Tentacle
-				timerEyeTentacle:Stop()
-				warnEyeTentacle:Show()
-				timerEyeTentacle:Start(self.vb.phase == 2 and 30 or 45)
-			elseif cid == 15725 then -- Claw Tentacle
-				timerClawTentacle:Stop()
-				warnClawTentacle:Show()
-				timerClawTentacle:Start()
-			elseif cid == 15334 then -- Giant Eye Tentacle
-				timerGiantEyeTentacle:Stop()
-				warnGiantEyeTentacle:Show()
-				timerGiantEyeTentacle:Start()
-			elseif cid == 15728 then -- Giant Claw Tentacle
-				timerGiantClawTentacle:Stop()
-				warnGiantClawTentacle:Show()
-				timerGiantClawTentacle:Start()
-			end
-		end
-	elseif args.spellId == 26478 then
+	if args.spellId == 26478 then
 		local cid = self:GetCIDFromGUID(args.sourceGUID)
 		if self:AntiSpam(5, cid) and self.vb.phase == 2 then
 			if cid == 15728 then -- Giant Claw Tentacle
@@ -188,10 +167,13 @@ function mod:SPELL_CAST_SUCCESS(args)
 		end
 	elseif args.spellId == 26139 then
 		local cid = self:GetCIDFromGUID(args.sourceGUID)
-		if self:AntiSpam(5, cid) and self.vb.phase == 2 then
+		if self:AntiSpam(5, cid) then--AC: Eye/Claw Tentacles cast Ground Rupture on spawn (no Birth spell)
 			if cid == 15726 then -- Eye Tentacle
 				warnEyeTentacle:Show()
-				timerEyeTentacle:Restart(29.5)
+				timerEyeTentacle:Restart(self.vb.phase == 2 and 29.5 or 45)
+			elseif cid == 15725 then -- Claw Tentacle
+				warnClawTentacle:Show()
+				timerClawTentacle:Restart()
 			end
 		end
 	end
