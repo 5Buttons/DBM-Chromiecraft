@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("MordreshFireEye", "DBM-Party-Classic", 10)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(7357)
 mod:SetEncounterID(435)
 
@@ -16,12 +16,11 @@ local warningFireNova			= mod:NewSpellAnnounce(12470, 2)
 
 local specWarnFireball			= mod:NewSpecialWarningInterrupt(12466, "HasInterrupt", nil, nil, 1, 2)
 
-local timerFireballCD			= mod:NewAITimer(180, 12466, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
-local timerFireNovaCD			= mod:NewAITimer(180, 12470, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
+local timerFireballCD			= mod:NewCDTimer(3, 12466, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
+local timerFireNovaCD			= mod:NewCDTimer(10, 12470, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
 
 function mod:OnCombatStart(delay)
-	timerFireballCD:Start(1-delay)
-	timerFireNovaCD:Start(1-delay)
+	timerFireNovaCD:Start(10-delay)
 end
 
 function mod:SPELL_CAST_START(args)
