@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Souls", "DBM-BlackTemple")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250902110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(23418, 23419, 23420)
 
 mod:SetModelID(21483)
@@ -12,7 +12,7 @@ mod:RegisterCombat("yell", L.Phase1Start1, L.Phase1Start2, L.Phase1End1, L.Phase
 mod:RegisterKill("kill", 23420)
 
 mod:RegisterEventsInCombat(
-	"SPELL_AURA_APPLIED 41305 41431 41376 41303 41294 41410 41292 41350 41337",
+	"SPELL_AURA_APPLIED 41305 41431 41376 41303 41294 41410 41292",
 	"SPELL_AURA_REMOVED 41305 41350", --added aura of desire
 	"SPELL_CAST_START 41410 41426 41545 41305",
 	"SPELL_CAST_SUCCESS 41350 41337 41545",
@@ -81,10 +81,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		end ]]--
 --fixate code not used for CC
 --Phase 2
-	elseif args.spellId == 41350 then --added to trigger spell timers at start
-		timerNextDeaden:Start(28+2)
-		timerNextShock:Start(8+2)
-		timerNextShield:Start(13+2)
 	elseif args.spellId == 41410 and not args:IsDestTypePlayer() then
 		warnDeaden:Show(args.destName)
 		timerDeaden:Start(args.destName)
@@ -93,9 +89,6 @@ function mod:SPELL_AURA_APPLIED(args)
 		specWarnShield:Show(args.destName)
 		specWarnShield:Play("dispelboss")
 --Phase 3
-	elseif args.spellId == 41337 then --added to trigger spell timers at start
-		timerSpiteCD:Start(15-0.5) --newly added spite timer
-		timerNextSoul:Start() --newly added soulscream timer
 	elseif args.spellId == 41376 then
 		timerSpiteCD:Start() --newly added spite timer
 		warnSpite:CombinedShow(0.3, args.destName)
@@ -142,6 +135,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 	elseif args.spellId == 41337 then --Aura of Anger
 		warnPhase3:Show()
 		timerNextSoul:Start()
+		timerSpiteCD:Start(15)
 	end
 end
 

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lethon", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261030120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(14888)--121821 TW ID, 14888 classic ID
 --mod:SetModelID(17887)
 mod:EnableWBEngageSync()--Enable syncing engage in outdoors
@@ -24,15 +24,15 @@ local specWarnSleepingFog		= mod:NewSpecialWarningDodge(24814, nil, nil, nil, 2,
 --local specWarnShadowBoltWhirl	= mod:NewSpecialWarningDodge(243468, nil, nil, nil, 2, 2)
 
 --local timerNoxiousBreathCD		= mod:NewCDTimer(18.3, 24818, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)--Iffy
-local timerSleepingFogCD		= mod:NewCDTimer(16.8, 24814, nil, nil, nil, 3)
+local timerSleepingFogCD		= mod:NewCDTimer(120, 24814, nil, nil, nil, 3)--AC: 120-150s
 --local timerShadowBoltWhirlCD	= mod:NewCDTimer(15.8, 243468, nil, nil, nil, 3)
 
 --mod:AddReadyCheckOption(48620, false)
 
-function mod:OnCombatStart(_, yellTriggered)
+function mod:OnCombatStart(delay, yellTriggered)
 	if yellTriggered then
 		--timerNoxiousBreathCD:Start(11.9-delay)
-		--timerSleepingFogCD:Start(18.4-delay)
+		timerSleepingFogCD:Start(12.5-delay)--AC: 12.5-20s
 	end
 end
 

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Razorscale", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20260926220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(33186)
 mod:SetEncounterID(746)
 
@@ -9,7 +9,7 @@ mod:RegisterCombat("combat_yell", L.YellAir)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 63317 64021 63236",
-	"SPELL_CAST_SUCCESS 64771",
+	"SPELL_CAST_SUCCESS 64771 64821",
 	"SPELL_AURA_APPLIED 64771",
 	"SPELL_AURA_APPLIED_DOSE 64771",
 	"SPELL_DAMAGE 64733 64704",
@@ -45,7 +45,7 @@ local warnFuseArmor					= mod:NewStackAnnounce(64771, 2, nil, "Tank")
 local specWarnFuseArmor				= mod:NewSpecialWarningStack(64771, nil, 2, nil, nil, 1, 6)
 local specWarnFuseArmorOther		= mod:NewSpecialWarningTaunt(64771, nil, nil, nil, 1, 2)
 
-local timerDeepBreathCooldown		= mod:NewCDTimer(20, 64021, nil, nil, nil, 5) --20s on AC
+local timerDeepBreathCooldown		= mod:NewCDTimer(21, 64021, nil, nil, nil, 5) -- AC: 21s in stage 2
 local timerDeepBreathCast			= mod:NewCastTimer(2.5, 64021)
 local timerGrounded					= mod:NewTimer(45, "timerGrounded", nil, nil, nil, 6)
 local timerFuseArmorCD				= mod:NewCDTimer(12, 64771, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)
@@ -90,14 +90,16 @@ end
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(63317, 64021) then	-- Flame Breath
 		timerDeepBreathCast:Start()
-		timerDeepBreathCooldown:Start()
+		if self:GetStage(2) then
+			timerDeepBreathCooldown:Start()
+		end
 	elseif args.spellId == 63236 then		-- Devouring Flame
 		self:BossTargetScanner(args.sourceGUID, "FlameTarget", 0.1, 12)
 	end
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 64771 then		-- Fuse Armor
+	if args:IsSpellID(64771, 64821) then		-- Fuse Armor
 		timerFuseArmorCD:Start()
 	end
 end

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("PT", "DBM-Party-BC", 12)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 
 mod:RegisterEvents(
 	"UPDATE_WORLD_STATES",
@@ -23,9 +23,9 @@ local lastPortal = 0
 
 function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
-	if cid == 17879 or cid == 17880 then
-		timerNextPortal:Start(122+30, lastPortal + 1)
-		warnWavePortalSoon:Schedule(112+30)
+	if cid == 17879 or cid == 17880 or cid == 21697 or cid == 21698 then
+		timerNextPortal:Start(150, lastPortal + 1)--AC: 2.5min after-boss delay
+		warnWavePortalSoon:Schedule(140)
 	end
 end
 
@@ -45,8 +45,9 @@ function mod:UPDATE_WORLD_STATES()
 		else
 			warnWavePortal:Show(currentPortal)
 			if self.Options.ShowAllPortalTimers then
-				timerNextPortal:Start(122, currentPortal + 1)
-				warnWavePortalSoon:Schedule(112)
+				local nextPortal = currentPortal >= 13 and 120 or 90--AC: 90s, 120s from portal 13
+				timerNextPortal:Start(nextPortal, currentPortal + 1)
+				warnWavePortalSoon:Schedule(nextPortal - 10)
 			end
 		end
 		lastPortal = currentPortal

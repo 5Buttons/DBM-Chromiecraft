@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("BaronSilverlaine", "DBM-Party-Classic", 14)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(3887)
 mod:SetEncounterID(466)
 
@@ -14,10 +14,10 @@ mod:RegisterEventsInCombat(
 
 local warningVeilofShadow			= mod:NewTargetNoFilterAnnounce(7068, 2)
 
-local timerVeilofShadowCD			= mod:NewAITimer(180, 7068, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON)
+local timerVeilofShadowCD			= mod:NewCDTimer(11, 7068, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON)
 
 function mod:OnCombatStart(delay)
-	timerVeilofShadowCD:Start(1-delay)
+	timerVeilofShadowCD:Start(2-delay)
 end
 
 function mod:SPELL_CAST_START(args)

@@ -1,8 +1,8 @@
 local mod	= DBM:NewMod(553, "DBM-Party-BC", 12, 255)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
-mod:SetCreatureID(17880)
+mod:SetRevision("20261105120000")
+mod:SetCreatureID(17880, 21698)
 
 mod:SetModelID(19066)
 mod:SetModelOffset(0, 50, 0)
@@ -10,7 +10,8 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 31458 38592",
-	"SPELL_AURA_REMOVED 31458"
+	"SPELL_AURA_REMOVED 31458",
+	"UNIT_DIED"
 )
 
 local specWarnSpellReflect	= mod:NewSpecialWarningReflect(38592, nil, nil, 2, 1, 2)
@@ -34,5 +35,12 @@ end
 function mod:SPELL_AURA_REMOVED(args)
 	if args.spellId == 31458 then
 		timerHasten:Stop(args.destName)
+	end
+end
+
+function mod:UNIT_DIED(args)
+	local cid = self:GetCIDFromGUID(args.destGUID)
+	if cid == 17880 or cid == 21698 then--Only one of them is up per run
+		DBM:EndCombat(self)
 	end
 end

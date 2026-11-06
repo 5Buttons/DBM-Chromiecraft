@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Emeriss", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(14889)--121913 TW ID, 14889 classic ID
 --mod:SetModelID(17887)
 mod:EnableWBEngageSync()--Enable syncing engage in outdoors
@@ -22,14 +22,14 @@ local specWarnSleepingFog		= mod:NewSpecialWarningDodge(24814, nil, nil, nil, 2,
 --local specWarnMushroom			= mod:NewSpecialWarningYou(243451, nil, nil, nil, 1, 2)
 
 --local timerNoxiousBreathCD		= mod:NewCDTimer(18.3, 24818, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)--Iffy
-local timerSleepingFogCD		= mod:NewCDTimer(15.8, 24814, nil, nil, nil, 3)
+local timerSleepingFogCD		= mod:NewCDTimer(120, 24814, nil, nil, nil, 3)--AC: 120-150s
 
 --mod:AddReadyCheckOption(48620, false)
 
 function mod:OnCombatStart(delay, yellTriggered)
 	if yellTriggered then
 		--timerNoxiousBreathCD:Start(11.9-delay)--13
-		timerSleepingFogCD:Start(18.4-delay)--19.2
+		timerSleepingFogCD:Start(12.5-delay)--AC: 12.5-20s
 	end
 end
 

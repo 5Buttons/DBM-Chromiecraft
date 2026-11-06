@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Baltharus", "DBM-ChamberOfAspects", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(39751)
 mod:SetEncounterID(890)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
@@ -102,9 +102,9 @@ function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
 	if self.vb.allClonesSpawned then return end
 	if UnitExists("boss3") then
 		self.vb.allClonesSpawned = true
-		timerBladeTempest:Start(20, 3, UnitGUID("boss3")) -- REVIEW! 5s variance? Based on clone spawn? (25N Lordaeron 2022-09-19 || 25H Lordaeron 2022-09-23) - 20.7 || 20.2
+		timerBladeTempest:Start("v18-25", 3, UnitGUID("boss3")) -- AC: 18-25s after clone spawn
 	elseif UnitExists("boss2") then
-		timerBladeTempest:Start(20, 2, UnitGUID("boss2")) -- REVIEW! 5s variance? Based on clone spawn? (25N Lordaeron 2022-09-19 || 25H Lordaeron 2022-09-23) - 24.3 || 19.9
+		timerBladeTempest:Start("v18-25", 2, UnitGUID("boss2")) -- AC: 18-25s after clone spawn
 	end
 end
 

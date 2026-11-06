@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("DeathSpeakerJargba", "DBM-Party-Classic", 11)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(4428)
 mod:SetEncounterID(440)
 
@@ -16,10 +16,10 @@ mod:RegisterEventsInCombat(
 local warningMCCast			= mod:NewCastAnnounce(14515, 3)
 local warningMC				= mod:NewTargetNoFilterAnnounce(14515, 4, nil, false, 2)--Don't want to announce the MC cast AND the target, 2 second apart warnings for same thing is not agreeable in classic (by default)
 
-local timerMCCD				= mod:NewAITimer(180, 14515, nil, nil, nil, 3)--Uses success, because start can be interrupted by CC, evem though normal interrupts don't work, but boss recasts immediately on CC break
+local timerMCCD				= mod:NewCDTimer(30, 14515, nil, nil, nil, 3)--Uses success, because start can be interrupted by CC, evem though normal interrupts don't work, but boss recasts immediately on CC break
 
-function mod:OnCombatStart(--[[delay]])
-	--timerMCCD:Start(6-delay)--Cast Start
+function mod:OnCombatStart(delay)
+	timerMCCD:Start(5-delay)
 end
 
 function mod:SPELL_CAST_START(args)
@@ -30,7 +30,7 @@ end
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args.spellId == 14515 then
-		timerMCCD:Start()--From Success to start when final, but while AI, success to success :\
+		timerMCCD:Start()
 	end
 end
 
