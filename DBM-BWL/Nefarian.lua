@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Nefarian-Classic", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261030120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(11583)
 mod:SetModelID(11380)
 mod:RegisterCombat("combat_yell", L.YellP1)--ENCOUNTER_START appears to fire when he lands, so start of phase 2, ignoring all of phase 1
@@ -177,8 +177,6 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	elseif msg == L.YellWarrior or msg:find(L.YellWarrior) then
 		self:SendSync("ClassCall", "WARRIOR")
 	elseif msg == L.YellP2 or msg:find(L.YellP2) then
-		self:SendSync("Phase", 2)
-	elseif msg == L.YellP2CC1 or msg:find(L.YellP2CC1) then
 		self:SendSync("Phase", 2)
 	elseif msg == L.YellP2CC2 or msg:find(L.YellP2CC2) then
 		self:SendSync("Phase", 2)

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(471, "DBM-Party-Classic", 18, 239)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(7291)
 mod:SetEncounterID(552)
 
@@ -16,10 +16,10 @@ local warningFireNova				= mod:NewSpellAnnounce(11969, 2)
 local specWarnFlameSpike			= mod:NewSpecialWarningInterrupt(6725, "HasInterrupt", nil, nil, 1, 2)
 local specWarnFlameLash				= mod:NewSpecialWarningInterrupt(3356, "HasInterrupt", nil, nil, 1, 2)
 
-local timerFireNovaCD				= mod:NewAITimer(180, 11969, nil, nil, nil, 2)
+local timerFireNovaCD				= mod:NewCDTimer(20, 11969, nil, nil, nil, 2)
 
 function mod:OnCombatStart(delay)
-	timerFireNovaCD:Start(1-delay)
+	timerFireNovaCD:Start(10-delay)
 end
 
 function mod:SPELL_CAST_START(args)

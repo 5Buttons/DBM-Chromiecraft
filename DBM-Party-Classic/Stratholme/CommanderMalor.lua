@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(749, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(11032)
 mod:SetEncounterID(476)
 
@@ -17,11 +17,11 @@ local warningGroundSmash				= mod:NewSpellAnnounce(12734, 2)
 local specWarnShadowBoltVolley			= mod:NewSpecialWarningInterrupt(15245, "HasInterrupt", nil, nil, 1, 2)
 
 local timerShadowBoltVolleyCD			= mod:NewAITimer(180, 15245, nil, nil, nil, 4, nil, DBM_COMMON_L.INTERRUPT_ICON)
-local timerGroundSmashCD				= mod:NewAITimer(180, 12734, nil, nil, nil, 2)
+local timerGroundSmashCD				= mod:NewCDTimer("v11-17", 12734, nil, nil, nil, 2)--AC: first 3-12s, then 11-17s
 
 function mod:OnCombatStart(delay)
 	timerShadowBoltVolleyCD:Start(1-delay)
-	timerGroundSmashCD:Start(1-delay)
+	timerGroundSmashCD:Start("v3-12")
 end
 
 function mod:SPELL_CAST_START(args)

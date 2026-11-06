@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Malygos", "DBM-EyeOfEternity")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20261030120000")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(28859)
 
 mod:RegisterCombat("yell", L.YellPull)
@@ -16,7 +16,8 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 60936 57407 56263 57429 57428 55853",
 	"SPELL_CAST_START 56505",
 	"SPELL_CAST_SUCCESS 56105 57430",
-	"CHAT_MSG_RAID_BOSS_EMOTE"
+	"CHAT_MSG_RAID_BOSS_EMOTE",
+	"CHAT_MSG_RAID_BOSS_WHISPER"
 --	"UNIT_SPELLCAST_SUCCEEDED boss1"
 )
 -- General
@@ -215,6 +216,9 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 		warnSummonPowerSpark:Show()
 		timerSummonPowerSpark:Start()
 	end
+end
+
+function mod:CHAT_MSG_RAID_BOSS_WHISPER(msg)
 	if msg == L.EmoteSurge or msg:find(L.EmoteSurge) then
 		self:SendSync("MalygosSurge", UnitName("player"))
 	end

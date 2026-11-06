@@ -4,7 +4,7 @@ local L		= mod:GetLocalizedStrings()
 local CancelUnitBuff = CancelUnitBuff
 local GetSpellInfo = GetSpellInfo
 
-mod:SetRevision("20261026180406")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(34564)
 mod:SetEncounterID(645)
 mod:SetUsedIcons(1, 2, 3, 4, 5, 8)
@@ -39,7 +39,7 @@ local specWarnPCold			= mod:NewSpecialWarningYou(66013, false, nil, nil, 1, 2)
 
 local timerEmerge			= mod:NewNextTimer(62, 65982, nil, nil, nil, 6, "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", DBM_COMMON_L.IMPORTANT_ICON, nil, 1) -- AC: 60s + 2s. Time to Emerge, related to Phase 2, but it's here for better Grouping
 local timerAdds				= mod:NewNextTimer(45, 66332, nil, nil, nil, 1, 45419, DBM_COMMON_L.TANK_ICON) -- AC: 5-8s after pull/emerge, then 45s
-local timerShadowStrike		= mod:NewNextTimer(30, 66134, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON, nil, 3)
+local timerShadowStrike		= mod:NewVarTimer("v30-45", 66134, nil, nil, nil, 3, nil, DBM_COMMON_L.DEADLY_ICON, nil, 3)
 local timerFreezingSlash	= mod:NewCDTimer("v15-20", 66012, nil, "Tank|Healer", nil, 5, nil, DBM_COMMON_L.TANK_ICON) -- AC: 7-15s after pull/emerge, then 15-20s
 local timerPCold			= mod:NewBuffActiveTimer(15, 66013, nil, nil, nil, 5, nil, DBM_COMMON_L.HEALER_ICON)
 
@@ -83,15 +83,11 @@ local function Adds(self)
 	end
 end]]
 
+-- AC: each Nerubian Burrower casts Shadow Strike 30-45s after spawn, then every 30-45s
 local function ShadowStrike(self)
-	self:Unschedule(ShadowStrike)
-	if self:IsInCombat() then
-		timerShadowStrike:Cancel()
-		timerShadowStrike:Start()
-		preWarnShadowStrike:Cancel()
-		preWarnShadowStrike:Schedule(25.5)
-		self:Schedule(30, ShadowStrike, self)
-	end
+	timerShadowStrike:Restart()
+	preWarnShadowStrike:Cancel()
+	preWarnShadowStrike:Schedule(25)
 end
 
 function mod:AnnouncePcoldIcons(uId, icon)
@@ -117,11 +113,6 @@ function mod:OnCombatStart(delay)
 	timerSubmerge:Start(-delay)
 	enrageTimer:Start(-delay)
 	timerFreezingSlash:Start("v7-15")
-	if self:IsHeroic() then
-		timerShadowStrike:Start()
-		preWarnShadowStrike:Schedule(25.5-delay)
-		self:Schedule(30-delay, ShadowStrike, self)
-	end
 end
 
 function mod:SPELL_CAST_START(args)
@@ -141,7 +132,6 @@ function mod:SPELL_CAST_START(args)
 			mod:ScheduleMethod(0.1, "RemoveBuffs")
 		end
 	elseif args.spellId == 66134 and self:IsHeroic() and self:AntiSpam(2, 1) then	-- Shadow Strike
-		self:Unschedule(ShadowStrike)
 		ShadowStrike(self)
 		if self.Options.SpecWarn66134spell then
 			specWarnShadowStrike:Show()
@@ -213,7 +203,6 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 		timerEmerge:Start()
 		timerFreezingSlash:Stop()
 		if self:IsHeroic() then
-			self:Unschedule(ShadowStrike)
 			timerShadowStrike:Cancel()
 			preWarnShadowStrike:Cancel()
 		end
@@ -226,9 +215,6 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 		warnSubmergeSoon:Schedule(70)
 		timerSubmerge:Start()
 		timerFreezingSlash:Start("v7-15")
-		if self:IsHeroic() then
-			ShadowStrike(self)
-		end
 	end
 end
 
@@ -242,5 +228,8 @@ function mod:OnSync(msg)
 	if msg == "Adds" and self:IsInCombat() then
 		warnAdds:Show()
 		timerAdds:Start()
+		if self:IsHeroic() and not timerShadowStrike:IsStarted() then
+			ShadowStrike(self)
+		end
 	end
 end

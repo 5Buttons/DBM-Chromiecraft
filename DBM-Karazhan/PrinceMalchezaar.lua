@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Prince", "DBM-Karazhan")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15690)
 mod:SetEncounterID(661)
 
@@ -12,8 +12,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 30852",
 	"SPELL_CAST_SUCCESS 30843",
 	"SPELL_AURA_APPLIED 30854 30898 39095 30843 30859",
-	"CHAT_MSG_MONSTER_YELL",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"CHAT_MSG_MONSTER_YELL"
 )
 
 --TODO, improve phase change timer updates, I don't really feel like it right now
@@ -91,14 +90,6 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 		self:SetStage(2)
 		warnPhase2:Show()
 		--Doesn't seem to affect any timers.
-	end
-end
-
---"<275.31 12:32:09> [UNIT_SPELLCAST_SUCCEEDED] Prince Malchezaar(Deafstroket) -Summon Axes- [[target:Cast-3-4615-532-1222-30891-0000F6542B:30891]]", -- [3138]
---"<275.56 12:32:10> [CHAT_MSG_MONSTER_YELL] How can you hope to stand against such overwhelming power?#Prince Malchezaar#####0#0##0#1766#nil#0#false#false#false#false", -- [3146]
-function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
-	if spellName == GetSpellInfo(30891) and self:AntiSpam(3, 1) then--Summon Axes
-		self:SendSync("Phase3")
 	end
 end
 
