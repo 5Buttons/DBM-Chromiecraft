@@ -42,6 +42,7 @@ showbutton:SetScript("OnClick", function()
 		DBM.BossHealth:AddBoss(createDummyFunc(50), "TestBoss 2")
 		DBM.BossHealth:AddBoss(createDummyFunc(75), "TestBoss 3")
 		DBM.BossHealth:AddBoss(createDummyFunc(100), "TestBoss 4")
+		DBM.BossHealth:ShowDemoDetails()
 end)
 
 ------------
@@ -57,6 +58,10 @@ local Styles = {
 	{
 		text	= L.HP_StyleFlat,
 		value	= "Flat"
+	},
+	{
+		text	= L.HP_StyleRetail,
+		value	= "Retail"
 	}
 }
 
@@ -222,6 +227,31 @@ local borderbttn = styleArea:CreateCheckButton(L.HP_Border, false, nil, "HealthF
 borderbttn:SetPoint("TOPLEFT", FontSizeSlider, "BOTTOMLEFT", -10, -20)
 borderbttn:HookScript("OnClick", updateSettings)
 
+local portraitbttn = styleArea:CreateCheckButton(L.HP_ShowPortrait, false, nil, "HealthFrameShowPortrait")
+portraitbttn:SetPoint("TOPLEFT", borderbttn, "BOTTOMLEFT", 0, -2)
+portraitbttn:HookScript("OnClick", updateSettings)
+
+local castbarbttn = styleArea:CreateCheckButton(L.HP_ShowCastBar, false, nil, "HealthFrameShowCastBar")
+castbarbttn:SetPoint("TOPLEFT", portraitbttn, "BOTTOMLEFT", 0, -2)
+castbarbttn:HookScript("OnClick", updateSettings)
+
+local powerbarbttn = styleArea:CreateCheckButton(L.HP_ShowPowerBar, false, nil, "HealthFrameShowPowerBar")
+powerbarbttn:SetPoint("TOPLEFT", castbarbttn, "BOTTOMLEFT", 0, -2)
+powerbarbttn:HookScript("OnClick", updateSettings)
+
+local debuffbttn = styleArea:CreateCheckButton(L.HP_ShowDebuffs, false, nil, "HealthFrameShowDebuffs")
+debuffbttn:SetPoint("TOPLEFT", powerbarbttn, "BOTTOMLEFT", 0, -2)
+debuffbttn:HookScript("OnClick", updateSettings)
+
+local buffbttn = styleArea:CreateCheckButton(L.HP_ShowBuffs, false, nil, "HealthFrameShowBuffs")
+buffbttn:SetPoint("TOPLEFT", debuffbttn, "BOTTOMLEFT", 0, -2)
+buffbttn:HookScript("OnClick", updateSettings)
+
+local CastBarHeightSlider = createOptionSlider(L.HP_CastBarHeight, 6, 30, 1, "HealthFrameCastBarHeight")
+CastBarHeightSlider:SetPoint("TOPLEFT", buffbttn, "BOTTOMLEFT", 10, -20)
+local PowerBarHeightSlider = createOptionSlider(L.HP_PowerBarHeight, 2, 20, 1, "HealthFramePowerBarHeight")
+PowerBarHeightSlider:SetPoint("LEFT", CastBarHeightSlider, "RIGHT", 40, 0)
+
 local resetbutton = styleArea:CreateButton(L.Reset, 120, 16)
 resetbutton:SetPoint("BOTTOMRIGHT", styleArea.frame, "BOTTOMRIGHT", -5, 5)
 resetbutton:SetNormalFontObject(GameFontNormalSmall)
@@ -232,20 +262,23 @@ resetbutton:SetScript("OnClick", function()
 		"HPFramePoint", "HPFrameX", "HPFrameY", "HealthFrameGrowUp", "HealthFrameWidth", "HealthFrameScale", "HealthFrameStyle",
 		"HealthFrameBarHeight", "HealthFrameSpacing", "HealthFrameBorder", "HealthFrameTexture", "HealthFrameBgAlpha",
 		"HealthFrameFont", "HealthFrameFontSize", "HealthFrameFontStyle", "HealthFrameColorMode",
-		"HealthFrameColorR", "HealthFrameColorG", "HealthFrameColorB", "HealthFrameShowHeader", "HealthFrameDecimals"
+		"HealthFrameColorR", "HealthFrameColorG", "HealthFrameColorB", "HealthFrameShowHeader", "HealthFrameDecimals",
+		"HealthFrameShowPortrait", "HealthFrameShowCastBar", "HealthFrameCastBarHeight",
+		"HealthFrameShowPowerBar", "HealthFramePowerBarHeight", "HealthFrameShowDebuffs", "HealthFrameShowBuffs"
 	}) do
 		DBM.Options[option] = DBM.DefaultOptions[option]
 	end
 	-- refresh all widgets of the panel from the new values
 	for _, widget in ipairs({growbttn, headerbttn, decimalsbttn, borderbttn, StyleDropDown, TextureDropDown, FontDropDown, FontStyleDropDown,
-		ColorModeDropDown, colorSelect, BarWidthSlider, BarHeightSlider, ScaleSlider, SpacingSlider, FontSizeSlider, BgAlphaSlider}) do
+		ColorModeDropDown, colorSelect, BarWidthSlider, BarHeightSlider, ScaleSlider, SpacingSlider, FontSizeSlider, BgAlphaSlider,
+		portraitbttn, castbarbttn, powerbarbttn, debuffbttn, buffbttn, CastBarHeightSlider, PowerBarHeightSlider}) do
 		widget:GetScript("OnShow")(widget)
 	end
 	updateSettings()
 end)
 
 -- every widget above is placed manually, so the area height is accounted for here
-StyleDropDown.myheight = 400
-for _, widget in ipairs({TextureDropDown, FontDropDown, FontStyleDropDown, ColorModeDropDown, colorSelect, borderbttn}) do
+StyleDropDown.myheight = 580
+for _, widget in ipairs({TextureDropDown, FontDropDown, FontStyleDropDown, ColorModeDropDown, colorSelect, borderbttn, portraitbttn, castbarbttn, powerbarbttn, debuffbttn, buffbttn}) do
 	widget.myheight = 0
 end

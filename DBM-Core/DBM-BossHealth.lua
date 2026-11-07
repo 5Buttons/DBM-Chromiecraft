@@ -26,10 +26,17 @@ local pendingSync
 local AceTimer = LibStub("AceTimer-3.0")
 
 local InCombatLockdown = InCombatLockdown
-local tremove, tinsert, tmaxn, mfloor, mmax = table.remove, table.insert, table.maxn, math.floor, math.max
+local UnitGUID, UnitCastingInfo, UnitChannelInfo, GetTime = UnitGUID, UnitCastingInfo, UnitChannelInfo, GetTime
+local tremove, tinsert, tmaxn, mfloor, mmax, mmin = table.remove, table.insert, table.maxn, math.floor, math.max, math.min
 
 local CLASSIC_BORDER_TEXTURE = "Interface\\PaperDollInfoFrame\\UI-Character-Skills-BarBorder"
 local CLASSIC_BAR_HEIGHT = 20
+local PORTRAIT_FALLBACK = "Interface\\TargetingFrame\\UI-TargetingFrame-Skull"
+local PORTRAIT_RETRIES = 3 -- SetPortraitTexture renders nothing until the unit's model is loaded
+local INNER_GAP = 1 -- between portrait, health bar and cast bar; borders of neighbours overlap into one line
+local MAX_AURAS = 6 -- per row
+local AURA_GAP = 2
+local AURA_OFFSET = 4 -- distance of the auras to the slot
 local flatBackdrop = {
 	edgeFile = "Interface\\Buttons\\WHITE8X8",
 	edgeSize = 1
@@ -54,16 +61,57 @@ local function checkEntry(t, val)
 	return false
 end
 
-local function isFlat()
-	return DBM.Options.HealthFrameStyle == "Flat"
+-- "Flat" and "Retail" are the modern styles, "Classic" mimics the old health frame and has none of the extras
+local function isModern()
+	return DBM.Options.HealthFrameStyle ~= "Classic"
 end
 
+local function isRetail()
+	return DBM.Options.HealthFrameStyle == "Retail"
+end
+
+local function showPortrait()
+	return isModern() and DBM.Options.HealthFrameShowPortrait
+end
+
+local function showCastBar()
+	return isModern() and DBM.Options.HealthFrameShowCastBar
+end
+
+local function showPowerBar()
+	return isModern() and DBM.Options.HealthFrameShowPowerBar
+end
+
+local function showDebuffs()
+	return isModern() and DBM.Options.HealthFrameShowDebuffs
+end
+
+local function showBuffs()
+	return isModern() and DBM.Options.HealthFrameShowBuffs
+end
+
+-- the retail style shows the name above the health bar
+local function getNameRowHeight()
+	return isRetail() and DBM.Options.HealthFrameFontSize + 4 or 0
+end
+
+-- height of one slot: name row, health bar, power bar and cast bar
 local function getBarHeight()
-	return isFlat() and DBM.Options.HealthFrameBarHeight or CLASSIC_BAR_HEIGHT
+	if not isModern() then
+		return CLASSIC_BAR_HEIGHT
+	end
+	local height = getNameRowHeight() + DBM.Options.HealthFrameBarHeight
+	if showPowerBar() then
+		height = height + INNER_GAP + DBM.Options.HealthFramePowerBarHeight
+	end
+	if showCastBar() then
+		height = height + INNER_GAP + DBM.Options.HealthFrameCastBarHeight
+	end
+	return height
 end
 
 local function getBarSpacing()
-	return isFlat() and DBM.Options.HealthFrameSpacing or 0
+	return isModern() and DBM.Options.HealthFrameSpacing or 0
 end
 
 local function getFont()
@@ -338,29 +386,162 @@ local function updateBarColor(bar, percent)
 	end
 end
 
+-- draws a 1px border just outside of the given regions
+local function applyFlatBorder(border, topLeft, bottomRight)
+	border:ClearAllPoints()
+	border:SetPoint("TOPLEFT", topLeft, "TOPLEFT", -1, 1)
+	border:SetPoint("BOTTOMRIGHT", bottomRight or topLeft, "BOTTOMRIGHT", 1, -1)
+	if DBM.Options.HealthFrameBorder then
+		border:SetBackdrop(flatBackdrop)
+		border:SetBackdropBorderColor(0, 0, 0, 1)
+	else
+		border:SetBackdrop(nil)
+	end
+end
+
+-- the flat style crops the round portrait into a square, the retail style keeps it round
+local function applyPortraitCoords(bar)
+	if bar.portraitGUID and not isRetail() then
+		bar.portrait:SetTexCoord(0.15, 0.85, 0.15, 0.85)
+	else
+		bar.portrait:SetTexCoord(0, 1, 0, 1)
+	end
+end
+
+local function updateCastBarStyle(bar, above, font, size, flags)
+	local castbar = bar.castbar
+	if not showCastBar() then
+		castbar:Hide()
+		return
+	end
+	local height = DBM.Options.HealthFrameCastBarHeight
+	castbar:ClearAllPoints()
+	-- the spell icon sits left of the bar, inside the slot
+	castbar:SetPoint("TOPLEFT", above, "BOTTOMLEFT", height + INNER_GAP, -INNER_GAP)
+	castbar:SetPoint("TOPRIGHT", above, "BOTTOMRIGHT", 0, -INNER_GAP)
+	castbar:SetHeight(height)
+	castbar:SetStatusBarTexture(DBM.Options.HealthFrameTexture)
+	castbar.icon:SetWidth(height)
+	castbar.icon:SetHeight(height)
+	castbar.bg:SetTexture(0, 0, 0, DBM.Options.HealthFrameBgAlpha)
+	applyFlatBorder(castbar.border, castbar.icon, castbar)
+	size = mmin(size, mmax(height - 1, 6))
+	setFont(castbar.text, font, size, flags)
+	setFont(castbar.time, font, size, flags)
+end
+
+-- returns the lowest bar, the cast bar is placed below it
+local function updatePowerBarStyle(bar)
+	local powerbar = bar.powerbar
+	if not showPowerBar() then
+		powerbar:Hide()
+		return bar.statusbar
+	end
+	powerbar:ClearAllPoints()
+	powerbar:SetPoint("TOPLEFT", bar.statusbar, "BOTTOMLEFT", 0, -INNER_GAP)
+	powerbar:SetPoint("TOPRIGHT", bar.statusbar, "BOTTOMRIGHT", 0, -INNER_GAP)
+	powerbar:SetHeight(DBM.Options.HealthFramePowerBarHeight)
+	powerbar:SetStatusBarTexture(DBM.Options.HealthFrameTexture)
+	powerbar.bg:SetTexture(0, 0, 0, DBM.Options.HealthFrameBgAlpha)
+	applyFlatBorder(powerbar.border, powerbar)
+	powerbar:Show()
+	return powerbar
+end
+
+-- auras are shown left of the slot: own debuffs in the first row, buffs of the boss below
+local function updateAuraStyle(bar)
+	local rows = {}
+	bar.debuffs.enabled, bar.buffs.enabled = showDebuffs(), showBuffs()
+	for _, row in ipairs({bar.debuffs, bar.buffs}) do
+		if row.enabled then
+			rows[#rows + 1] = row
+		else
+			for _, button in ipairs(row) do
+				button:Hide()
+			end
+		end
+	end
+	if #rows == 0 then return end
+	local size = mfloor((getBarHeight() - (#rows - 1) * AURA_GAP) / #rows)
+	size = mmin(mmax(size, 10), 30)
+	for rowIndex, row in ipairs(rows) do
+		for i, button in ipairs(row) do
+			button:ClearAllPoints()
+			button:SetPoint("TOPRIGHT", bar, "TOPLEFT", -(AURA_OFFSET + (i - 1) * (size + AURA_GAP)), -(rowIndex - 1) * (size + AURA_GAP))
+			button:SetWidth(size)
+			button:SetHeight(size)
+		end
+	end
+end
+
 local function updateBarStyle(bar)
 	local width = DBM.Options.HealthFrameWidth
 	local statusbar, border, borderTexture = bar.statusbar, bar.border, bar.borderTexture
+	local font, size, flags = getFont()
 	bar:SetWidth(width)
 	statusbar:ClearAllPoints()
 	border:ClearAllPoints()
+	bar.icon:ClearAllPoints()
+	bar.nameText:ClearAllPoints()
 	statusbar:SetStatusBarTexture(DBM.Options.HealthFrameTexture)
-	if isFlat() then
-		local height = DBM.Options.HealthFrameBarHeight
-		bar:SetHeight(height)
-		statusbar:SetAllPoints(bar)
-		borderTexture:Hide()
-		border:SetPoint("TOPLEFT", statusbar, "TOPLEFT", -1, 1)
-		border:SetPoint("BOTTOMRIGHT", statusbar, "BOTTOMRIGHT", 1, -1)
-		if DBM.Options.HealthFrameBorder then
-			border:SetBackdrop(flatBackdrop)
-			border:SetBackdropBorderColor(0, 0, 0, 1)
-		else
-			border:SetBackdrop(nil)
-		end
-		bar.icon:SetWidth(height)
-		bar.icon:SetHeight(height)
+	if isRetail() then
+		bar.nameText:SetPoint("BOTTOMLEFT", statusbar, "TOPLEFT", 1, 2)
+		bar.nameText:SetPoint("BOTTOMRIGHT", statusbar, "TOPRIGHT", -1, 2)
 	else
+		bar.nameText:SetPoint("LEFT", statusbar, "LEFT", 2, 1)
+		bar.nameText:SetPoint("RIGHT", bar.percentText, "LEFT", -2, 0)
+	end
+	if isModern() then
+		local height = DBM.Options.HealthFrameBarHeight
+		local slotHeight = getBarHeight()
+		bar:SetHeight(slotHeight)
+		local left, right = 0, 0
+		local portraitFrame = bar.portraitFrame
+		if showPortrait() then
+			-- retail: round portrait on the right, flat: square portrait on the left
+			local side = isRetail() and "RIGHT" or "LEFT"
+			portraitFrame:ClearAllPoints()
+			portraitFrame:SetPoint("TOP" .. side, bar, "TOP" .. side)
+			portraitFrame:SetWidth(slotHeight)
+			portraitFrame:SetHeight(slotHeight)
+			if isRetail() then
+				bar.portraitBorder:SetBackdrop(nil)
+				right = slotHeight + INNER_GAP
+			else
+				applyFlatBorder(bar.portraitBorder, portraitFrame)
+				left = slotHeight + INNER_GAP
+			end
+			applyPortraitCoords(bar)
+			portraitFrame:Show()
+			-- raid target icon goes on the outer top corner of the portrait, like on unit frames
+			local iconSize = mmax(mfloor(slotHeight * 0.4), 8)
+			bar.icon:SetWidth(iconSize)
+			bar.icon:SetHeight(iconSize)
+			bar.icon:SetPoint("TOP" .. side, portraitFrame, "TOP" .. side, 0, 0)
+		else
+			portraitFrame:Hide()
+			bar.icon:SetWidth(height)
+			bar.icon:SetHeight(height)
+			bar.icon:SetPoint("RIGHT", statusbar, "LEFT", -4, 0)
+		end
+		statusbar:SetPoint("TOPLEFT", bar, "TOPLEFT", left, -getNameRowHeight())
+		statusbar:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -right, -getNameRowHeight())
+		statusbar:SetHeight(height)
+		borderTexture:Hide()
+		applyFlatBorder(border, statusbar)
+		updateCastBarStyle(bar, updatePowerBarStyle(bar), font, size, flags)
+		updateAuraStyle(bar)
+	else
+		bar.portraitFrame:Hide()
+		bar.castbar:Hide()
+		bar.powerbar:Hide()
+		bar.debuffs.enabled, bar.buffs.enabled = false, false
+		for _, row in ipairs({bar.debuffs, bar.buffs}) do
+			for _, button in ipairs(row) do
+				button:Hide()
+			end
+		end
+		bar.icon:SetPoint("RIGHT", statusbar, "LEFT", -4, 0)
 		-- these health frames really suck :(
 		local borderWidth
 		bar:SetHeight(CLASSIC_BAR_HEIGHT)
@@ -387,7 +568,6 @@ local function updateBarStyle(bar)
 		bar.icon:SetHeight(12)
 	end
 	bar.bg:SetTexture(0, 0, 0, DBM.Options.HealthFrameBgAlpha)
-	local font, size, flags = getFont()
 	setFont(bar.nameText, font, size, flags)
 	setFont(bar.percentText, font, size, flags)
 	if bar.value then
@@ -439,6 +619,230 @@ local function createFrame(self)
 	menu[1].checked = DBM.Options.HealthFrameLocked
 end
 
+----------------
+--  Portrait  --
+----------------
+local function resetPortrait(bar)
+	bar.portraitGUID, bar.portraitTries = nil, nil
+	bar.portrait:SetTexture(PORTRAIT_FALLBACK)
+	bar.portrait:SetTexCoord(0, 1, 0, 1)
+end
+
+local function updatePortrait(bar, unit, guid)
+	if guid ~= bar.portraitGUID then
+		bar.portraitGUID, bar.portraitTries = guid, 0
+	end
+	if bar.portraitTries >= PORTRAIT_RETRIES then return end
+	bar.portraitTries = bar.portraitTries + 1
+	SetPortraitTexture(bar.portrait, unit)
+	applyPortraitCoords(bar)
+end
+
+local function setPortraitGreyed(bar, greyed)
+	bar.portrait:SetDesaturated(greyed)
+	local c = greyed and 0.5 or 1
+	bar.portrait:SetVertexColor(c, c, c)
+end
+
+-- remembers the unit a bar was last seen on, used by the portrait and the cast bar
+local function setUnit(bar, unit)
+	local guid = unit and UnitGUID(unit)
+	bar.unit, bar.unitGUID = guid and unit, guid
+	if guid and showPortrait() then
+		updatePortrait(bar, unit, guid)
+	end
+end
+
+
+----------------
+--  Cast Bar  --
+----------------
+local function onCastUpdate(self)
+	local now = GetTime()
+	if now >= self.endTime then
+		self:Hide()
+		return
+	end
+	local duration = self.endTime - self.startTime
+	local progress = duration > 0 and (now - self.startTime) / duration or 1
+	self:SetValue(self.channel and 1 - progress or progress)
+	self.time:SetFormattedText("%.1f", self.endTime - now)
+end
+
+local function startCast(castbar, spell, texture, startTime, endTime, channel, notInterruptible)
+	castbar.startTime, castbar.endTime, castbar.channel = startTime, endTime, channel
+	castbar.text:SetText(spell)
+	castbar.icon:SetTexture(texture)
+	if notInterruptible then
+		castbar:SetStatusBarColor(0.63, 0.63, 0.63)
+	elseif channel then
+		castbar:SetStatusBarColor(0, 0.8, 0.2)
+	else
+		castbar:SetStatusBarColor(1, 0.7, 0)
+	end
+	castbar:Show()
+	onCastUpdate(castbar)
+end
+
+local function updateCast(bar, unit)
+	if not unit then return end -- a running cast keeps going until its end
+	local channel
+	local spell, _, _, texture, startTime, endTime, _, _, notInterruptible = UnitCastingInfo(unit)
+	if not spell then
+		spell, _, _, texture, startTime, endTime, _, notInterruptible = UnitChannelInfo(unit)
+		channel = spell and true
+	end
+	if spell then
+		startCast(bar.castbar, spell, texture, startTime / 1000, endTime / 1000, channel, notInterruptible)
+	else
+		bar.castbar:Hide()
+	end
+end
+
+
+-----------------
+--  Power Bar  --
+-----------------
+local function setPower(bar, value, max, color)
+	local powerbar = bar.powerbar
+	powerbar:SetMinMaxValues(0, max > 0 and max or 1)
+	powerbar:SetValue(max > 0 and value or 0)
+	if color then
+		powerbar:SetStatusBarColor(color.r, color.g, color.b)
+	end
+end
+
+local function updatePower(bar, unit)
+	if not unit then return end -- keep the last known value
+	local powerType, powerToken = UnitPowerType(unit)
+	setPower(bar, UnitPower(unit), UnitPowerMax(unit), PowerBarColor[powerToken] or PowerBarColor[powerType] or PowerBarColor.MANA)
+end
+
+
+-------------
+--  Auras  --
+-------------
+local function onAuraEnter(self)
+	local bar = self.bar
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+	if bar.unit and UnitGUID(bar.unit) == bar.unitGUID and self.index then
+		GameTooltip:SetUnitAura(bar.unit, self.index, self.filter)
+	elseif self.spellId then
+		GameTooltip:SetHyperlink("spell:" .. self.spellId)
+	end
+	GameTooltip:Show()
+end
+
+local function onAuraLeave()
+	GameTooltip:Hide()
+end
+
+local function createAuraRow(bar, filter, isDebuff)
+	local row = {filter = filter}
+	for i = 1, MAX_AURAS do
+		local button = CreateFrame("Frame", nil, bar)
+		button.bar, button.filter, button.isDebuff = bar, filter, isDebuff
+		button.icon = button:CreateTexture(nil, "ARTWORK")
+		button.icon:SetAllPoints(button)
+		button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+		button.border = CreateFrame("Frame", nil, button)
+		button.border:SetPoint("TOPLEFT", button, "TOPLEFT", -1, 1)
+		button.border:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, -1)
+		button.border:SetBackdrop(flatBackdrop)
+		button.cooldown = CreateFrame("Cooldown", nil, button)
+		button.cooldown:SetAllPoints(button)
+		button.cooldown:SetReverse(true)
+		local countFrame = CreateFrame("Frame", nil, button)
+		countFrame:SetAllPoints(button)
+		countFrame:SetFrameLevel(button.cooldown:GetFrameLevel() + 1)
+		button.count = countFrame:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
+		button.count:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, 0)
+		button:EnableMouse(true)
+		button:SetScript("OnEnter", onAuraEnter)
+		button:SetScript("OnLeave", onAuraLeave)
+		button:Hide()
+		row[i] = button
+	end
+	return row
+end
+
+local function setAura(button, index, icon, count, debuffType, duration, expiration, spellId)
+	button.index, button.spellId = index, spellId
+	button.icon:SetTexture(icon)
+	button.count:SetText(count and count > 1 and count or "")
+	if duration and duration > 0 then
+		-- restarting the cooldown every poll would make it flicker
+		if button.expiration ~= expiration or button.duration ~= duration then
+			button.cooldown:SetCooldown(expiration - duration, duration)
+		end
+		button.cooldown:Show()
+	else
+		button.cooldown:Hide()
+	end
+	button.expiration, button.duration = expiration, duration
+	local color = button.isDebuff and DebuffTypeColor[debuffType or "none"]
+	if color then
+		button.border:SetBackdropBorderColor(color.r, color.g, color.b, 1)
+	else
+		button.border:SetBackdropBorderColor(0, 0, 0, 1)
+	end
+	button:Show()
+end
+
+local function hideAuras(row, from)
+	for i = from or 1, MAX_AURAS do
+		local button = row[i]
+		button:Hide()
+		button.expiration, button.duration = nil, nil
+	end
+end
+
+local function updateAuraRow(row, unit)
+	if not row.enabled then return end
+	local shown = 0
+	if unit then
+		local i = 1
+		while shown < MAX_AURAS do
+			local name, _, icon, count, debuffType, duration, expiration, _, _, _, spellId = UnitAura(unit, i, row.filter)
+			if not name then break end
+			shown = shown + 1
+			setAura(row[shown], i, icon, count, debuffType, duration, expiration, spellId)
+			i = i + 1
+		end
+	end
+	hideAuras(row, shown + 1)
+end
+
+
+------------------
+--  Unit State  --
+------------------
+-- forgets the unit of a bar and everything shown about it (except the portrait)
+local function clearUnit(bar)
+	bar.unit, bar.unitGUID = nil, nil
+	bar.castbar:Hide()
+	setPower(bar, 0, 0)
+	hideAuras(bar.debuffs)
+	hideAuras(bar.buffs)
+end
+
+-- cast bar, power bar and auras, polled more often than the health
+local function updateUnitDetails(bar)
+	if not bar.active or type(bar.id) == "function" then return end -- generic bars have no unit
+	local unit = bar.unit
+	-- unit tokens like raid5target can point to another mob by now, the next health update finds the boss again
+	if unit and UnitGUID(unit) ~= bar.unitGUID then return end
+	if showCastBar() then
+		updateCast(bar, unit)
+	end
+	if showPowerBar() then
+		updatePower(bar, unit)
+	end
+	updateAuraRow(bar.debuffs, unit)
+	updateAuraRow(bar.buffs, unit)
+end
+
+
 local function createBarFrame()
 	local bar = CreateFrame("Frame", "DBM_BossHealth_Bar_" .. getBarId(), anchor)
 	bar:EnableMouse(true)
@@ -466,7 +870,45 @@ local function createBarFrame()
 	bar.nameText:SetJustifyH("LEFT")
 	bar.icon = textFrame:CreateTexture(nil, "OVERLAY")
 	bar.icon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
-	bar.icon:SetPoint("RIGHT", statusbar, "LEFT", -4, 0)
+	-- portrait
+	bar.portraitFrame = CreateFrame("Frame", nil, bar)
+	bar.portrait = bar.portraitFrame:CreateTexture(nil, "ARTWORK")
+	bar.portrait:SetAllPoints(bar.portraitFrame)
+	bar.portraitBorder = CreateFrame("Frame", nil, bar.portraitFrame)
+	resetPortrait(bar)
+	-- cast bar
+	local castbar = CreateFrame("StatusBar", nil, bar)
+	castbar:SetMinMaxValues(0, 1)
+	castbar.icon = castbar:CreateTexture(nil, "ARTWORK")
+	castbar.icon:SetPoint("TOPRIGHT", castbar, "TOPLEFT", -INNER_GAP, 0)
+	castbar.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+	castbar.bg = castbar:CreateTexture(nil, "BACKGROUND")
+	castbar.bg:SetPoint("TOPLEFT", castbar.icon, "TOPLEFT")
+	castbar.bg:SetPoint("BOTTOMRIGHT", castbar, "BOTTOMRIGHT")
+	castbar.border = CreateFrame("Frame", nil, castbar)
+	local castText = CreateFrame("Frame", nil, castbar)
+	castText:SetAllPoints(castbar)
+	castText:SetFrameLevel(castbar.border:GetFrameLevel() + 1)
+	castbar.time = castText:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	castbar.time:SetPoint("RIGHT", castbar, "RIGHT", -2, 0)
+	castbar.text = castText:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	castbar.text:SetPoint("LEFT", castbar, "LEFT", 2, 0)
+	castbar.text:SetPoint("RIGHT", castbar.time, "LEFT", -2, 0)
+	castbar.text:SetJustifyH("LEFT")
+	castbar:SetScript("OnUpdate", onCastUpdate)
+	castbar:Hide()
+	bar.castbar = castbar
+	-- power bar
+	local powerbar = CreateFrame("StatusBar", nil, bar)
+	powerbar.bg = powerbar:CreateTexture(nil, "BACKGROUND")
+	powerbar.bg:SetAllPoints(powerbar)
+	powerbar.border = CreateFrame("Frame", nil, powerbar)
+	powerbar:Hide()
+	bar.powerbar = powerbar
+	-- auras
+	bar.debuffs = createAuraRow(bar, "HARMFUL|PLAYER", true)
+	bar.buffs = createAuraRow(bar, "HELPFUL")
+	setPower(bar, 0, 0, PowerBarColor.MANA)
 	return bar
 end
 
@@ -483,6 +925,9 @@ local function releaseBar(bar)
 		layout[bar.slot] = false
 	end
 	bar.slot, bar.reservedIndex, bar.active, bar.id, bar.value = nil, nil, nil, nil, nil
+	clearUnit(bar)
+	resetPortrait(bar)
+	setPortraitGreyed(bar, false)
 	barCache[#barCache + 1] = bar
 end
 
@@ -496,6 +941,9 @@ local function showPlaceholder(bar, slot)
 	bar.statusbar:SetValue(100)
 	bar.statusbar:SetStatusBarColor(0.3, 0.3, 0.3)
 	bar.icon:Hide()
+	clearUnit(bar)
+	-- reserved bars keep the portrait of their boss, greyed out
+	setPortraitGreyed(bar, true)
 end
 
 local function activateBar(bar, name, id)
@@ -506,6 +954,7 @@ local function activateBar(bar, name, id)
 	bar.percentText:SetTextColor(1, 1, 1)
 	bar.nameText:SetText(name or "")
 	bar.nameused = name and true or nil
+	setPortraitGreyed(bar, false)
 	bar:Show()
 	if type(bar.id) == "function" then
 		local health, icon = bar.id()
@@ -714,10 +1163,37 @@ function updateBar(bar, percent, icon, dontShowDead, name)
 end
 
 do
+	-- units DBM:GetBossHP doesn't scan: mouseover and, with awesome_wotlk (https://github.com/FrostAtom/awesome_wotlk), nameplates
+	local extraUnits = {"mouseover"}
+	if C_NamePlate then
+		for i = 1, 40 do
+			extraUnits[#extraUnits + 1] = "nameplate" .. i
+		end
+	end
+
+	-- id is a creature ID or a GUID
+	local function getExtraUnitHP(id)
+		for _, unit in ipairs(extraUnits) do
+			local guid = UnitGUID(unit)
+			if guid and (guid == id or DBM:GetCIDFromGUID(guid) == id) and UnitHealthMax(unit) ~= 0 then
+				return UnitHealth(unit) / UnitHealthMax(unit) * 100, unit, UnitName(unit)
+			end
+		end
+	end
+
+	local function getHP(id)
+		local health, unit, name = DBM:GetBossHP(id)
+		if not health then
+			health, unit, name = getExtraUnitHP(id)
+		end
+		return health, unit, name
+	end
+
 	function updateFrame(self)
 		for _, v in ipairs(bars) do
 			if type(v.id) == "number" then -- creature ID
-				local health, id, name = DBM:GetBossHP(v.id)
+				local health, id, name = getHP(v.id)
+				setUnit(v, health and id)
 				if health then
 					updateBar(v, health, GetRaidTargetIndex(id), nil, name)
 				else
@@ -729,7 +1205,11 @@ do
 					health, id, name = DBM:GetBossHPByUnitID(v.id)
 				else
 					health, id, name = DBM:GetBossHPByGUID(v.id)
+					if not health then
+						health, id, name = getExtraUnitHP(v.id)
+					end
 				end
+				setUnit(v, health and id)
 				if health then
 					updateBar(v, health, GetRaidTargetIndex(id), nil, name)
 				else
@@ -738,13 +1218,16 @@ do
 			elseif type(v.id) == "table" then -- multi boss
 				-- TODO: it would be more efficient to scan all party/raid members for all IDs instead of going over all raid members n times
 				-- this is especially important for the cache
+				local found
 				for _, id in ipairs(v.id) do
-					local health = DBM:GetBossHP(id)
+					local health, unit = getHP(id)
 					if health then
+						found = unit
 						updateBar(v, health)
 						break
 					end
 				end
+				setUnit(v, found)
 			elseif type(v.id) == "function" then -- generic bars
 				local health, icon = v.id()
 				updateBar(v, health, icon, true)
@@ -852,6 +1335,47 @@ function bossHealth:Show(name)
 	if not bossHealth.ticker then
 		bossHealth.ticker = AceTimer:ScheduleRepeatingTimer(function() updateFrame(bossHealth) end, 0.5)
 	end
+	-- casts, power and auras are polled more often than health so they show up without a noticeable delay
+	if not bossHealth.castTicker then
+		bossHealth.castTicker = AceTimer:ScheduleRepeatingTimer(function()
+			for _, bar in ipairs(bars) do
+				updateUnitDetails(bar)
+			end
+		end, 0.1)
+	end
+end
+
+-- fake casts, power and auras on the demo bars of the options panel
+function bossHealth:ShowDemoDetails()
+	if not anchor or not anchor:IsShown() or not isModern() then return end
+	local now = GetTime()
+	local casts = {
+		{133, 3}, -- Fireball
+		{5143, 5, true}, -- Arcane Missiles (channel)
+		{686, 4, false, true} -- Shadow Bolt (not interruptible)
+	}
+	local powers = {"MANA", "RAGE", "ENERGY", "MANA"}
+	local debuffs = {{172, 18, "Magic"}, {980, 24, "Curse"}, {348, 15, "Magic"}} -- Corruption, Curse of Agony, Immolate
+	local buffs = {{12880, 12}, {1459, 0}} -- Enrage, Arcane Intellect
+	local function demoAuras(row, list, count)
+		if not row.enabled then return end
+		for i = 1, count do
+			local aura = list[i]
+			local _, _, icon = GetSpellInfo(aura[1])
+			setAura(row[i], nil, icon, i == 1 and 3 or 0, aura[3], aura[2], now + aura[2], aura[1])
+		end
+		hideAuras(row, count + 1)
+	end
+	for i, bar in ipairs(bars) do
+		local cast = casts[i]
+		if cast and showCastBar() then
+			local spell, _, texture = GetSpellInfo(cast[1])
+			startCast(bar.castbar, spell, texture, now, now + cast[2], cast[3], cast[4])
+		end
+		setPower(bar, 100 - i * 20, 100, PowerBarColor[powers[i] or "MANA"])
+		demoAuras(bar.debuffs, debuffs, mmin(i, #debuffs))
+		demoAuras(bar.buffs, buffs, i % 2 == 0 and #buffs or 1)
+	end
 end
 
 function bossHealth:SetHeaderText(name)
@@ -873,6 +1397,10 @@ function bossHealth:Hide()
 		if bossHealth.ticker then
 			AceTimer:CancelTimer(bossHealth.ticker)
 			bossHealth.ticker = nil
+		end
+		if bossHealth.castTicker then
+			AceTimer:CancelTimer(bossHealth.castTicker)
+			bossHealth.castTicker = nil
 		end
 		anchor:Hide()
 		syncOverlays()
