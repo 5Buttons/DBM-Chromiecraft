@@ -354,6 +354,7 @@ DBM.DefaultOptions = {
 	HealthFramePowerBarHeight = 6,
 	HealthFrameShowDebuffs = true,
 	HealthFrameShowBuffs = true,
+	HealthFrameElvUISkin = true,
 	ArrowPosX = 0,
 	ArrowPosY = -150,
 	ArrowPoint = "TOP",
@@ -2207,6 +2208,9 @@ do
 				return unitId
 			end
 		end
+		if not scanOnlyBoss then
+			return private:GetModule("Nameplates"):GetUnitByGUID(guid)
+		end
 	end
 
 	function DBM:GetPlayerGUIDByName(name)
@@ -2382,6 +2386,9 @@ function DBM:GetUnitIdFromCID(creatureID, bossOnly)
 			if cid == creatureID then
 				returnUnitID = unitId
 			end
+		end
+		if not returnUnitID then
+			returnUnitID = private:GetModule("Nameplates"):GetUnitByCID(creatureID)
 		end
 	end
 	return returnUnitID
@@ -7875,6 +7882,18 @@ function DBM:GetBossHP(cIdOrGUID, onlyHighest)
 				return hp, unitId, UnitName(unitId)
 			end
 		end
+		--Nameplates (awesome_wotlk)
+		local Nameplates = private:GetModule("Nameplates")
+		local unitId = type(cIdOrGUID) == "number" and Nameplates:GetUnitByCID(cIdOrGUID) or type(cIdOrGUID) == "string" and Nameplates:GetUnitByGUID(cIdOrGUID)
+		if unitId and UnitHealthMax(unitId) ~= 0 then
+			if bossHealth[cIdOrGUID] and (UnitHealth(unitId) == 0 and not UnitIsDead(unitId)) then return bossHealth[cIdOrGUID], unitId, UnitName(unitId) end
+			local hp = UnitHealth(unitId) / UnitHealthMax(unitId) * 100
+			if not onlyHighest or onlyHighest and hp > (bossHealth[cIdOrGUID] or 0) then
+				bossHealth[cIdOrGUID] = hp
+			end
+			bossHealthuIdCache[cIdOrGUID] = unitId
+			return hp, unitId, UnitName(unitId)
+		end
 	end
 end
 
@@ -7912,6 +7931,15 @@ function DBM:GetBossHPByGUID(guid)
 				bossHealthuIdCache[guid] = unitId
 				return hp, unitId, UnitName(unitId)
 			end
+		end
+		--Nameplates (awesome_wotlk)
+		local unitId = private:GetModule("Nameplates"):GetUnitByGUID(guid)
+		if unitId and UnitHealthMax(unitId) ~= 0 then
+			if bossHealth[guid] and (UnitHealth(unitId) == 0 and not UnitIsDead(unitId)) then return bossHealth[guid], unitId, UnitName(unitId) end
+			local hp = UnitHealth(unitId) / UnitHealthMax(unitId) * 100
+			bossHealth[guid] = hp
+			bossHealthuIdCache[guid] = unitId
+			return hp, unitId, UnitName(unitId)
 		end
 	end
 	return nil

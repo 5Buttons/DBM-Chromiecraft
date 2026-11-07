@@ -37,6 +37,11 @@ local INNER_GAP = 1 -- between portrait, health bar and cast bar; borders of nei
 local MAX_AURAS = 6 -- per row
 local AURA_GAP = 2
 local AURA_OFFSET = 4 -- distance of the auras to the slot
+-- Boss1TargetFrame of the 3.3.5 FrameXML
+local BLIZZ_SCALE = 0.75
+local BLIZZ_WIDTH, BLIZZ_HEIGHT = 232, 100
+local BLIZZ_OVERLAP = 10 -- Boss2TargetFrame is anchored 10px into Boss1TargetFrame
+local BLIZZ_CAST_SPACE = 20
 local flatBackdrop = {
 	edgeFile = "Interface\\Buttons\\WHITE8X8",
 	edgeSize = 1
@@ -61,42 +66,104 @@ local function checkEntry(t, val)
 	return false
 end
 
--- "Flat" and "Retail" are the modern styles, "Classic" mimics the old health frame and has none of the extras
+-- "Retail" is the modern style, "Classic" mimics the old health frame and has none of the extras,
+-- "Blizzard" looks like the default boss frames
 local function isModern()
-	return DBM.Options.HealthFrameStyle ~= "Classic"
+	local style = DBM.Options.HealthFrameStyle
+	if style == "Flat" or style == "ElvUI" then -- removed styles
+		style = "Retail"
+		DBM.Options.HealthFrameStyle = style
+	end
+	return style == "Retail"
 end
 
-local function isRetail()
-	return DBM.Options.HealthFrameStyle == "Retail"
+local function isBlizzard()
+	return DBM.Options.HealthFrameStyle == "Blizzard"
+end
+
+-- with ElvUI loaded, the DBM style is skinned like the rest of the UI
+local function getElvUI()
+	return DBM.Options.HealthFrameStyle == "Classic" and ElvUI and ElvUI[1]
+end
+
+-- ElvUI replaces the boss frames: the Blizzard style then copies its boss unitframes and their settings
+local function getElvBoss()
+	if not isBlizzard() or not DBM.Options.HealthFrameElvUISkin or not ElvUI then return end
+	local E = ElvUI[1]
+	local uf = E.db and E.db.unitframe
+	local db = uf and uf.units and uf.units.boss
+	if db and db.enable and E.private.unitframe and E.private.unitframe.enable then
+		return E, db, uf
+	end
+end
+
+local function getTexture()
+	local E = getElvUI()
+	return E and E.media.normTex or DBM.Options.HealthFrameTexture
 end
 
 local function showPortrait()
+	local E, db = getElvBoss()
+	if E then
+		return db.portrait.enable
+	end
 	return isModern() and DBM.Options.HealthFrameShowPortrait
 end
 
 local function showCastBar()
-	return isModern() and DBM.Options.HealthFrameShowCastBar
+	local E, db = getElvBoss()
+	if E then
+		return db.castbar.enable
+	end
+	return isBlizzard() or isModern() and DBM.Options.HealthFrameShowCastBar
 end
 
 local function showPowerBar()
-	return isModern() and DBM.Options.HealthFrameShowPowerBar
+	local E, db = getElvBoss()
+	if E then
+		return db.power.enable
+	end
+	return isBlizzard() or isModern() and DBM.Options.HealthFrameShowPowerBar
 end
 
 local function showDebuffs()
+	local E, db = getElvBoss()
+	if E then
+		return db.debuffs.enable
+	end
 	return isModern() and DBM.Options.HealthFrameShowDebuffs
 end
 
 local function showBuffs()
+	local E, db = getElvBoss()
+	if E then
+		return db.buffs.enable
+	end
 	return isModern() and DBM.Options.HealthFrameShowBuffs
+end
+
+local function growUp()
+	local E, db = getElvBoss()
+	if E then
+		return db.growthDirection == "UP"
+	end
+	return DBM.Options.HealthFrameGrowUp
 end
 
 -- the retail style shows the name above the health bar
 local function getNameRowHeight()
-	return isRetail() and DBM.Options.HealthFrameFontSize + 4 or 0
+	return isModern() and DBM.Options.HealthFrameFontSize + 4 or 0
 end
 
 -- height of one slot: name row, health bar, power bar and cast bar
 local function getBarHeight()
+	local E, db = getElvBoss()
+	if E then
+		return db.height
+	end
+	if isBlizzard() then
+		return (BLIZZ_HEIGHT - BLIZZ_OVERLAP + (showCastBar() and BLIZZ_CAST_SPACE or 0)) * BLIZZ_SCALE
+	end
 	if not isModern() then
 		return CLASSIC_BAR_HEIGHT
 	end
@@ -111,11 +178,28 @@ local function getBarHeight()
 end
 
 local function getBarSpacing()
-	return isModern() and DBM.Options.HealthFrameSpacing or 0
+	local E, db = getElvBoss()
+	if E then
+		return db.spacing
+	end
+	if isModern() then
+		return DBM.Options.HealthFrameSpacing
+	end
+	-- the skinned DBM bars get a small gap, like AddOnSkins used to do
+	return not isBlizzard() and getElvUI() and 4 or 0
+end
+
+local function getBarWidth()
+	local E, db = getElvBoss()
+	if E then
+		return db.width
+	end
+	return isBlizzard() and BLIZZ_WIDTH * BLIZZ_SCALE or DBM.Options.HealthFrameWidth
 end
 
 local function getFont()
-	local font = DBM.Options.HealthFrameFont
+	local E = getElvUI()
+	local font = E and E.media.normFont or DBM.Options.HealthFrameFont
 	if not font or font == "standardFont" then
 		font = GameFontHighlightSmall:GetFont()
 	end
@@ -211,10 +295,10 @@ local function getSlotRect(index)
 	local scale = anchor:GetEffectiveScale() / UIParent:GetEffectiveScale()
 	local left, right, top, bottom = anchor:GetLeft(), anchor:GetRight(), anchor:GetTop(), anchor:GetBottom()
 	if not left then return end
-	local width, height = DBM.Options.HealthFrameWidth, getBarHeight()
+	local width, height = getBarWidth(), getBarHeight()
 	local offset = (index - 1) * (height + getBarSpacing())
 	local slotTop
-	if DBM.Options.HealthFrameGrowUp then
+	if growUp() then
 		slotTop = top + offset + height
 	else
 		slotTop = bottom - offset
@@ -377,8 +461,32 @@ end
 -- Apply Style --
 -----------------
 local function updateBarColor(bar, percent)
-	if percent <= 0 then
+	local E, _, uf = getElvBoss()
+	if E then
+		-- oUF health colors of ElvUI: smooth gradient red > yellow > health color, background a darker version
+		local colors = uf.colors
+		local r, g, b = colors.health.r, colors.health.g, colors.health.b
+		local p = mmax(percent, 0) / 100
+		if colors.colorhealthbyvalue then
+			if p < 0.5 then
+				r, g, b = 1, p * 2, 0
+			else
+				local t = (p - 0.5) * 2
+				r, g, b = 1 + (r - 1) * t, 1 + (g - 1) * t, b * t
+			end
+		end
+		bar.statusbar:SetStatusBarColor(r, g, b)
+		if colors.customhealthbackdrop then
+			local c = colors.health_backdrop
+			bar.bg:SetVertexColor(c.r, c.g, c.b)
+		else
+			local m = colors.healthMultiplier > 0 and colors.healthMultiplier or 0.35
+			bar.bg:SetVertexColor(r * m, g * m, b * m)
+		end
+	elseif percent <= 0 then
 		bar.statusbar:SetStatusBarColor(0, 0, 0)
+	elseif isBlizzard() then
+		bar.statusbar:SetStatusBarColor(0, 1, 0)
 	elseif DBM.Options.HealthFrameColorMode == "Custom" then
 		bar.statusbar:SetStatusBarColor(DBM.Options.HealthFrameColorR, DBM.Options.HealthFrameColorG, DBM.Options.HealthFrameColorB)
 	else
@@ -399,12 +507,39 @@ local function applyFlatBorder(border, topLeft, bottomRight)
 	end
 end
 
--- the flat style crops the round portrait into a square, the retail style keeps it round
-local function applyPortraitCoords(bar)
-	if bar.portraitGUID and not isRetail() then
-		bar.portrait:SetTexCoord(0.15, 0.85, 0.15, 0.85)
+local function setNameColors(bar, greyed)
+	bar.greyed = greyed
+	if greyed then
+		bar.nameText:SetTextColor(0.5, 0.5, 0.5)
+		bar.percentText:SetTextColor(0.5, 0.5, 0.5)
 	else
-		bar.portrait:SetTexCoord(0, 1, 0, 1)
+		local E, _, uf = getElvBoss()
+		if E then
+			-- [namecolor] of a hostile npc
+			local c = uf.colors.reaction.BAD
+			bar.nameText:SetTextColor(c.r, c.g, c.b)
+		elseif isBlizzard() then
+			bar.nameText:SetTextColor(1, 0.82, 0)
+		else
+			bar.nameText:SetTextColor(1, 1, 1)
+		end
+		bar.percentText:SetTextColor(1, 1, 1)
+	end
+	if bar.blizzNameBg then
+		if greyed then
+			bar.blizzNameBg:SetVertexColor(0.5, 0.5, 0.5)
+		else
+			bar.blizzNameBg:SetVertexColor(1, 0, 0)
+		end
+	end
+end
+
+local function hideAuraButtons(bar)
+	bar.debuffs.enabled, bar.buffs.enabled = false, false
+	for _, row in ipairs({bar.debuffs, bar.buffs}) do
+		for _, button in ipairs(row) do
+			button:Hide()
+		end
 	end
 end
 
@@ -415,12 +550,27 @@ local function updateCastBarStyle(bar, above, font, size, flags)
 		return
 	end
 	local height = DBM.Options.HealthFrameCastBarHeight
+	if castbar.blizzBorder then
+		castbar.blizzBorder:Hide()
+		castbar.blizzShield:Hide()
+		castbar.spark:Hide()
+	end
+	castbar.icon:ClearAllPoints()
+	castbar.icon:SetPoint("TOPRIGHT", castbar, "TOPLEFT", -INNER_GAP, 0)
+	castbar.bg:ClearAllPoints()
+	castbar.bg:SetPoint("TOPLEFT", castbar.icon, "TOPLEFT")
+	castbar.bg:SetPoint("BOTTOMRIGHT", castbar, "BOTTOMRIGHT")
+	castbar.text:ClearAllPoints()
+	castbar.text:SetPoint("LEFT", castbar, "LEFT", 2, 0)
+	castbar.text:SetPoint("RIGHT", castbar.time, "LEFT", -2, 0)
+	castbar.text:SetJustifyH("LEFT")
+	castbar.time:Show()
 	castbar:ClearAllPoints()
 	-- the spell icon sits left of the bar, inside the slot
 	castbar:SetPoint("TOPLEFT", above, "BOTTOMLEFT", height + INNER_GAP, -INNER_GAP)
 	castbar:SetPoint("TOPRIGHT", above, "BOTTOMRIGHT", 0, -INNER_GAP)
 	castbar:SetHeight(height)
-	castbar:SetStatusBarTexture(DBM.Options.HealthFrameTexture)
+	castbar:SetStatusBarTexture(getTexture())
 	castbar.icon:SetWidth(height)
 	castbar.icon:SetHeight(height)
 	castbar.bg:SetTexture(0, 0, 0, DBM.Options.HealthFrameBgAlpha)
@@ -441,7 +591,7 @@ local function updatePowerBarStyle(bar)
 	powerbar:SetPoint("TOPLEFT", bar.statusbar, "BOTTOMLEFT", 0, -INNER_GAP)
 	powerbar:SetPoint("TOPRIGHT", bar.statusbar, "BOTTOMRIGHT", 0, -INNER_GAP)
 	powerbar:SetHeight(DBM.Options.HealthFramePowerBarHeight)
-	powerbar:SetStatusBarTexture(DBM.Options.HealthFrameTexture)
+	powerbar:SetStatusBarTexture(getTexture())
 	powerbar.bg:SetTexture(0, 0, 0, DBM.Options.HealthFrameBgAlpha)
 	applyFlatBorder(powerbar.border, powerbar)
 	powerbar:Show()
@@ -474,7 +624,440 @@ local function updateAuraStyle(bar)
 	end
 end
 
+-- layout of Boss1TargetFrame (TargetFrameTemplate + BossTargetFrame_OnLoad), in unscaled frame coordinates
+local function createBlizzardArt(bar)
+	if bar.blizzArt then return end
+	local background = bar:CreateTexture(nil, "BACKGROUND")
+	background:SetTexture(0, 0, 0, 0.5)
+	background:SetPoint("TOPLEFT", bar, "TOPLEFT", 7, -22)
+	background:SetWidth(119)
+	background:SetHeight(41)
+	bar.blizzBackground = background
+	local nameBg = bar:CreateTexture(nil, "BORDER")
+	nameBg:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-LevelBackground")
+	nameBg:SetPoint("TOPLEFT", bar, "TOPLEFT", 7, -22)
+	nameBg:SetWidth(119)
+	nameBg:SetHeight(19)
+	bar.blizzNameBg = nameBg
+	local art = CreateFrame("Frame", nil, bar)
+	art:SetPoint("TOPLEFT", bar, "TOPLEFT")
+	art:SetWidth(BLIZZ_WIDTH)
+	art:SetHeight(BLIZZ_HEIGHT)
+	art:SetFrameLevel(bar:GetFrameLevel() + 4)
+	local border = art:CreateTexture(nil, "BACKGROUND")
+	border:SetTexture("Interface\\TargetingFrame\\UI-UnitFrame-Boss")
+	border:SetTexCoord(0.09375, 1, 0, 0.78125)
+	border:SetAllPoints(art)
+	local skull = art:CreateTexture(nil, "ARTWORK")
+	skull:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Skull")
+	skull:SetWidth(16)
+	skull:SetHeight(16)
+	skull:SetPoint("CENTER", art, "CENTER", 12, -16)
+	bar.blizzArt = art
+	local castbar = bar.castbar
+	castbar.blizzBorder = castbar:CreateTexture(nil, "ARTWORK")
+	castbar.blizzBorder:SetTexture("Interface\\CastingBar\\UI-CastingBar-Border-Small")
+	castbar.blizzBorder:SetPoint("TOP", castbar, "TOP", 0, 20)
+	castbar.blizzShield = castbar:CreateTexture(nil, "ARTWORK")
+	castbar.blizzShield:SetTexture("Interface\\CastingBar\\UI-CastingBar-Small-Shield")
+	castbar.blizzShield:SetPoint("TOP", castbar, "TOP", -5, 20)
+	for _, texture in ipairs({castbar.blizzBorder, castbar.blizzShield}) do
+		texture:SetWidth(197)
+		texture:SetHeight(49)
+	end
+	castbar.spark = castbar:CreateTexture(nil, "OVERLAY")
+	castbar.spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+	castbar.spark:SetBlendMode("ADD")
+	castbar.spark:SetWidth(32)
+	castbar.spark:SetHeight(32)
+end
+
+-- ElvUI backdrop (border and background) around the given regions, drawn below the bars
+local function showSkin(bar, key, parent, topLeft, bottomRight, E, transparent, thin)
+	local skin = bar[key]
+	if not skin then
+		skin = CreateFrame("Frame", nil, parent)
+		bar[key] = skin
+	end
+	if skin.SetTemplate then
+		skin:SetTemplate(transparent and "Transparent" or "Default", nil, nil, thin)
+	else
+		skin:SetBackdrop(flatBackdrop)
+		skin:SetBackdropBorderColor(0, 0, 0, 1)
+	end
+	skin:SetFrameLevel(bar:GetFrameLevel())
+	local b = thin and E.mult or E.Border or 1
+	skin:ClearAllPoints()
+	skin:SetPoint("TOPLEFT", topLeft, "TOPLEFT", -b, b)
+	skin:SetPoint("BOTTOMRIGHT", bottomRight, "BOTTOMRIGHT", b, -b)
+	skin:Show()
+end
+
+-- undoes everything the ElvUI skins changed on a bar
+local function resetElvUI(bar)
+	for _, key in ipairs({"elvHealth", "elvPower", "elvPortrait", "elvCast", "elvCastIcon"}) do
+		if bar[key] then
+			bar[key]:Hide()
+		end
+	end
+	if bar.elvModel then
+		bar.elvModel:Hide()
+	end
+	bar.bg:SetVertexColor(1, 1, 1)
+	bar.powerbar.bg:SetVertexColor(1, 1, 1)
+	bar.castbar.bg:SetVertexColor(1, 1, 1)
+	bar.powerbar.elvBg = nil
+	bar.powerbar:SetFrameLevel(bar:GetFrameLevel() + 1)
+	bar.noRaidIcon = nil
+	bar.debuffs.limit, bar.buffs.limit = nil, nil
+	bar.portrait:SetTexCoord(0, 1, 0, 1)
+	bar.portrait:Show()
+	bar.portraitFrame:SetAlpha(1)
+	bar.nameText:Show()
+	bar.percentText:Show()
+	if bar.castbar.spark then
+		bar.castbar.spark:SetWidth(32)
+		bar.castbar.spark:SetHeight(32)
+	end
+end
+
+local function updateBlizzardCastBar(bar)
+	local castbar = bar.castbar
+	if not showCastBar() then
+		castbar:Hide()
+		return
+	end
+	castbar:ClearAllPoints()
+	castbar:SetPoint("TOPLEFT", bar, "TOPLEFT", 25, 7 - BLIZZ_HEIGHT)
+	castbar:SetWidth(150)
+	castbar:SetHeight(10)
+	castbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	castbar.border:SetBackdrop(nil)
+	castbar.icon:ClearAllPoints()
+	castbar.icon:SetPoint("RIGHT", castbar, "LEFT", -5, 0)
+	castbar.icon:SetWidth(16)
+	castbar.icon:SetHeight(16)
+	castbar.icon:Show()
+	castbar.bg:ClearAllPoints()
+	castbar.bg:SetAllPoints(castbar)
+	castbar.bg:SetTexture(0, 0, 0, 0.5)
+	castbar.text:ClearAllPoints()
+	castbar.text:SetPoint("TOP", castbar, "TOP", 0, 4)
+	castbar.text:SetWidth(150)
+	castbar.text:SetJustifyH("CENTER")
+	setFont(castbar.text, (SystemFont_Shadow_Small or GameFontHighlightSmall):GetFont())
+	castbar.time:Hide()
+	castbar.blizzBorder:Show()
+	castbar.blizzShield:Hide()
+end
+
+local function updateBlizzardStyle(bar)
+	local statusbar, powerbar = bar.statusbar, bar.powerbar
+	createBlizzardArt(bar)
+	bar:SetScale(BLIZZ_SCALE)
+	bar:SetWidth(BLIZZ_WIDTH)
+	bar:SetHeight(getBarHeight() / BLIZZ_SCALE)
+	bar.blizzArt:Show()
+	bar.blizzBackground:Show()
+	bar.blizzNameBg:Show()
+	bar.textFrame:SetFrameLevel(bar.blizzArt:GetFrameLevel() + 1)
+	bar.portraitFrame:Hide()
+	bar.borderTexture:Hide()
+	bar.border:SetBackdrop(nil)
+	bar.bg:SetTexture(0, 0, 0, 0)
+	hideAuraButtons(bar)
+	for _, statusBar in ipairs({statusbar, powerbar}) do
+		statusBar:ClearAllPoints()
+		statusBar:SetWidth(119)
+		statusBar:SetHeight(12)
+		statusBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	end
+	statusbar:SetPoint("TOPLEFT", bar, "TOPLEFT", 7, -41)
+	powerbar:SetPoint("TOPLEFT", bar, "TOPLEFT", 7, -52)
+	powerbar.bg:SetTexture(0, 0, 0, 0)
+	powerbar.border:SetBackdrop(nil)
+	powerbar:Show()
+	bar.nameText:ClearAllPoints()
+	bar.nameText:SetPoint("CENTER", bar, "TOPLEFT", 66, -31)
+	bar.nameText:SetWidth(100)
+	bar.nameText:SetJustifyH("CENTER")
+	setFont(bar.nameText, GameFontNormalSmall:GetFont())
+	bar.percentText:ClearAllPoints()
+	bar.percentText:SetPoint("CENTER", bar, "TOPLEFT", 66, -47)
+	setFont(bar.percentText, (TextStatusBarText or GameFontHighlightSmall):GetFont())
+	bar.icon:ClearAllPoints()
+	bar.icon:SetPoint("RIGHT", bar, "TOPRIGHT", -90, -BLIZZ_HEIGHT / 2)
+	bar.icon:SetWidth(26)
+	bar.icon:SetHeight(26)
+	updateBlizzardCastBar(bar)
+	setNameColors(bar, bar.greyed)
+	if bar.value then
+		updateBarColor(bar, bar.value)
+	end
+end
+
+local INVERT_POINT = {LEFT = "RIGHT", RIGHT = "LEFT", TOP = "BOTTOM", BOTTOM = "TOP", CENTER = "CENTER",
+	TOPLEFT = "BOTTOMRIGHT", TOPRIGHT = "BOTTOMLEFT", BOTTOMLEFT = "TOPRIGHT", BOTTOMRIGHT = "TOPLEFT"}
+
+-- buffs or debuffs of an ElvUI boss frame (UF:Configure_Auras), at most MAX_AURAS
+local function updateElvAuras(bar, row, adb, db, LSM)
+	row.enabled = adb.enable
+	if not row.enabled then
+		for _, button in ipairs(row) do
+			button:Hide()
+		end
+		return
+	end
+	local perrow = mmax(adb.perrow, 1)
+	row.limit = mmin(perrow * adb.numrows, MAX_AURAS)
+	local gap = 1
+	local size = adb.sizeOverride and adb.sizeOverride > 0 and adb.sizeOverride or mfloor((db.width - gap * (perrow - 1)) / perrow)
+	local anchorPoint = adb.anchorPoint
+	for i, button in ipairs(row) do
+		local col, line = (i - 1) % perrow, mfloor((i - 1) / perrow)
+		local step, lineStep = col * (size + gap), line * (size + gap)
+		button:ClearAllPoints()
+		if anchorPoint == "RIGHT" then
+			button:SetPoint("LEFT", bar, "RIGHT", adb.xOffset + gap + step, adb.yOffset - lineStep)
+		elseif anchorPoint == "TOP" then
+			button:SetPoint("BOTTOMLEFT", bar, "TOPLEFT", adb.xOffset + step, adb.yOffset + gap + lineStep)
+		elseif anchorPoint == "BOTTOM" then
+			button:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", adb.xOffset + step, adb.yOffset - gap - lineStep)
+		else
+			button:SetPoint("RIGHT", bar, "LEFT", adb.xOffset - gap - step, adb.yOffset - lineStep)
+		end
+		button:SetWidth(size)
+		button:SetHeight(size)
+		setFont(button.count, LSM:Fetch("font", adb.countFont), adb.countFontSize, adb.countFontOutline)
+		if i > row.limit then
+			button:Hide()
+		end
+	end
+end
+
+-- castbar of an ElvUI boss frame (UF:Configure_Castbar), below the frame
+local function updateElvCastBar(bar, E, db, uf, B, S, thin, texture, font)
+	local castbar, cdb = bar.castbar, db.castbar
+	if not cdb.enable then
+		castbar:Hide()
+		return
+	end
+	local inner = B + S
+	local height = cdb.height - inner * 2
+	local left = inner
+	castbar.border:SetBackdrop(nil)
+	castbar.blizzBorder:Hide()
+	castbar.blizzShield:Hide()
+	castbar.icon:ClearAllPoints()
+	if cdb.icon then
+		castbar.icon:Show()
+		if cdb.iconAttached then
+			castbar.icon:SetWidth(height)
+			castbar.icon:SetHeight(height)
+			castbar.icon:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", inner, -(B - S) - inner)
+			left = inner + height + B * 2 + S * 3
+		else
+			local size = cdb.iconSize - B * 2
+			castbar.icon:SetWidth(size)
+			castbar.icon:SetHeight(size)
+			local target = cdb.iconAttachedTo == "Frame" and bar or castbar
+			castbar.icon:SetPoint(INVERT_POINT[cdb.iconPosition] or "RIGHT", target, cdb.iconPosition, cdb.iconXOffset, cdb.iconYOffset)
+		end
+		showSkin(bar, "elvCastIcon", castbar, castbar.icon, castbar.icon, E, uf.colors.transparentCastbar, thin)
+	else
+		castbar.icon:Hide()
+		if bar.elvCastIcon then
+			bar.elvCastIcon:Hide()
+		end
+	end
+	castbar:ClearAllPoints()
+	castbar:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", left, -(B - S) - inner)
+	castbar:SetWidth(cdb.width - left - inner)
+	castbar:SetHeight(height)
+	castbar:SetStatusBarTexture(texture)
+	castbar.bg:ClearAllPoints()
+	castbar.bg:SetAllPoints(castbar)
+	castbar.bg:SetTexture(texture)
+	local c = uf.colors.customcastbarbackdrop and uf.colors.castbar_backdrop or uf.colors.castColor
+	local m = uf.colors.customcastbarbackdrop and 1 or 0.35
+	castbar.bg:SetVertexColor(c.r * m, c.g * m, c.b * m)
+	showSkin(bar, "elvCast", castbar, castbar, castbar, E, uf.colors.transparentCastbar, thin)
+	castbar.spark:SetWidth(12)
+	castbar.spark:SetHeight(cdb.height * 2)
+	castbar.text:ClearAllPoints()
+	castbar.text:SetPoint("LEFT", castbar, "LEFT", 4, 0)
+	castbar.text:SetPoint("RIGHT", castbar.time, "LEFT", -4, 0)
+	castbar.text:SetWidth(0)
+	castbar.text:SetJustifyH("LEFT")
+	castbar.time:ClearAllPoints()
+	castbar.time:SetPoint("RIGHT", castbar, "RIGHT", -4, 0)
+	castbar.time:Show()
+	setFont(castbar.text, font, uf.fontSize, uf.fontOutline)
+	setFont(castbar.time, font, uf.fontSize, uf.fontOutline)
+end
+
+-- copy of ElvUI's boss unitframes (UF:Update_BossFrames) with their current settings
+local function updateElvBossStyle(bar, E, db, uf)
+	local LSM = E.LSM or LibStub("LibSharedMedia-3.0")
+	local thin = uf.thinBorders or E.PixelMode
+	local B = thin and E.mult or E.Border
+	local S = thin and 0 or E.Spacing
+	local colors = uf.colors
+	local texture = LSM:Fetch("statusbar", uf.statusbar)
+	local font = LSM:Fetch("font", uf.font)
+	local statusbar, powerbar = bar.statusbar, bar.powerbar
+	createBlizzardArt(bar)
+	bar.blizzArt:Hide()
+	bar.blizzBackground:Hide()
+	bar.blizzNameBg:Hide()
+	bar:SetScale(1)
+	bar:SetWidth(db.width)
+	bar:SetHeight(db.height)
+	bar.borderTexture:Hide()
+	bar.border:SetBackdrop(nil)
+	powerbar.border:SetBackdrop(nil)
+	-- portrait (UF:Configure_Portrait)
+	local usePortrait = db.portrait.enable
+	local overlay = usePortrait and db.portrait.overlay
+	local portraitWidth = usePortrait and not overlay and db.portrait.width or 0
+	local side = db.orientation == "LEFT" and "LEFT" or "RIGHT"
+	-- health (UF:Configure_HealthBar)
+	local usePower = db.power.enable
+	local inset = usePower and db.power.width == "inset"
+	local bottom = B + S
+	if usePower and not inset then
+		bottom = S + db.power.height
+	end
+	statusbar:ClearAllPoints()
+	statusbar:SetPoint("TOPLEFT", bar, "TOPLEFT", B + S + (side == "LEFT" and portraitWidth or 0), -(B + S))
+	statusbar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -(B + S + (side == "RIGHT" and portraitWidth or 0)), bottom)
+	statusbar:SetStatusBarTexture(texture)
+	bar.bg:SetTexture(texture)
+	showSkin(bar, "elvHealth", bar, statusbar, statusbar, E, colors.transparentHealth, thin)
+	-- power (UF:Configure_Power)
+	if usePower then
+		powerbar:ClearAllPoints()
+		if inset then
+			local offset = B * 3
+			powerbar:SetPoint("BOTTOMLEFT", statusbar, "BOTTOMLEFT", offset, offset)
+			powerbar:SetPoint("BOTTOMRIGHT", statusbar, "BOTTOMRIGHT", -offset, offset)
+			powerbar:SetFrameLevel(statusbar:GetFrameLevel() + 2)
+		else
+			powerbar:SetPoint("TOPLEFT", statusbar, "BOTTOMLEFT", 0, -(B + S * 3))
+			powerbar:SetPoint("TOPRIGHT", statusbar, "BOTTOMRIGHT", 0, -(B + S * 3))
+			powerbar:SetFrameLevel(statusbar:GetFrameLevel())
+		end
+		powerbar:SetHeight(mmax(db.power.height - (B + S) * 2, 1))
+		powerbar:SetStatusBarTexture(texture)
+		powerbar.bg:SetTexture(texture)
+		powerbar.elvBg = true
+		showSkin(bar, "elvPower", powerbar, powerbar, powerbar, E, colors.transparentPower, thin)
+		if inset then
+			bar.elvPower:SetFrameLevel(powerbar:GetFrameLevel() - 1)
+		end
+		powerbar:Show()
+	else
+		powerbar:Hide()
+	end
+	-- portrait
+	local portraitFrame = bar.portraitFrame
+	if usePortrait then
+		portraitFrame:ClearAllPoints()
+		if overlay then
+			portraitFrame:SetAllPoints(statusbar)
+			portraitFrame:SetAlpha(db.portrait.overlayAlpha)
+		else
+			portraitFrame:SetAlpha(1)
+			if side == "LEFT" then
+				portraitFrame:SetPoint("TOPLEFT", bar, "TOPLEFT", S + B, -(S + B))
+				portraitFrame:SetPoint("BOTTOMRIGHT", bar, "BOTTOMLEFT", S + portraitWidth - B, S + B)
+			else
+				portraitFrame:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -(S + B), -(S + B))
+				portraitFrame:SetPoint("BOTTOMLEFT", bar, "BOTTOMRIGHT", -(S + portraitWidth - B), S + B)
+			end
+			showSkin(bar, "elvPortrait", portraitFrame, portraitFrame, portraitFrame, E, false, thin)
+		end
+		if db.portrait.style == "3D" then
+			if not bar.elvModel then
+				bar.elvModel = CreateFrame("PlayerModel", nil, portraitFrame)
+				bar.elvModel:SetAllPoints(portraitFrame)
+			end
+			bar.elvModel:Show()
+			bar.portrait:Hide()
+		else
+			bar.portrait:Show()
+			bar.portrait:SetTexCoord(0.15, 0.85, 0.15, 0.85)
+		end
+		portraitFrame:Show()
+	else
+		portraitFrame:Hide()
+	end
+	-- texts (UF:UpdateNameSettings, health text)
+	bar.textFrame:SetFrameLevel(statusbar:GetFrameLevel() + 4)
+	local name, health = db.name, db.health
+	bar.nameText:ClearAllPoints()
+	bar.nameText:SetPoint(name.position, statusbar, name.position, name.xOffset, name.yOffset)
+	bar.nameText:SetWidth(0)
+	bar.nameText:SetJustifyH(name.position == "LEFT" and "LEFT" or name.position == "RIGHT" and "RIGHT" or "CENTER")
+	setFont(bar.nameText, font, uf.fontSize, uf.fontOutline)
+	if name.text_format == "" then
+		bar.nameText:Hide()
+	else
+		bar.nameText:Show()
+	end
+	bar.percentText:ClearAllPoints()
+	bar.percentText:SetPoint(health.position, statusbar, health.position, health.xOffset, health.yOffset)
+	setFont(bar.percentText, font, uf.fontSize, uf.fontOutline)
+	if health.text_format == "" then
+		bar.percentText:Hide()
+	else
+		bar.percentText:Show()
+	end
+	-- raid icon (UF:Configure_RaidIcon)
+	local raidicon = db.raidicon
+	bar.noRaidIcon = not raidicon.enable or nil
+	bar.icon:ClearAllPoints()
+	bar.icon:SetPoint("CENTER", bar, raidicon.attachTo, raidicon.xOffset, raidicon.yOffset)
+	bar.icon:SetWidth(raidicon.size)
+	bar.icon:SetHeight(raidicon.size)
+	if bar.noRaidIcon then
+		bar.icon:Hide()
+	end
+	updateElvAuras(bar, bar.debuffs, db.debuffs, db, LSM)
+	updateElvAuras(bar, bar.buffs, db.buffs, db, LSM)
+	updateElvCastBar(bar, E, db, uf, B, S, thin, texture, font)
+	setNameColors(bar, bar.greyed)
+	if bar.value then
+		updateBarColor(bar, bar.value)
+	end
+end
+
+local function resetBlizzardStyle(bar)
+	bar:SetScale(1)
+	if bar.blizzArt then
+		bar.blizzArt:Hide()
+		bar.blizzBackground:Hide()
+		bar.blizzNameBg:Hide()
+	end
+	bar.textFrame:SetFrameLevel(bar.border:GetFrameLevel() + 1)
+	bar.nameText:SetWidth(0)
+	bar.nameText:SetJustifyH("LEFT")
+	bar.percentText:ClearAllPoints()
+	bar.percentText:SetPoint("RIGHT", bar.statusbar, "RIGHT", -2, 1)
+	setNameColors(bar, bar.greyed)
+end
+
 local function updateBarStyle(bar)
+	resetElvUI(bar)
+	local E, db, uf = getElvBoss()
+	if E then
+		updateElvBossStyle(bar, E, db, uf)
+		return
+	elseif isBlizzard() then
+		updateBlizzardStyle(bar)
+		return
+	end
+	resetBlizzardStyle(bar)
 	local width = DBM.Options.HealthFrameWidth
 	local statusbar, border, borderTexture = bar.statusbar, bar.border, bar.borderTexture
 	local font, size, flags = getFont()
@@ -483,8 +1066,8 @@ local function updateBarStyle(bar)
 	border:ClearAllPoints()
 	bar.icon:ClearAllPoints()
 	bar.nameText:ClearAllPoints()
-	statusbar:SetStatusBarTexture(DBM.Options.HealthFrameTexture)
-	if isRetail() then
+	statusbar:SetStatusBarTexture(getTexture())
+	if isModern() then
 		bar.nameText:SetPoint("BOTTOMLEFT", statusbar, "TOPLEFT", 1, 2)
 		bar.nameText:SetPoint("BOTTOMRIGHT", statusbar, "TOPRIGHT", -1, 2)
 	else
@@ -498,26 +1081,18 @@ local function updateBarStyle(bar)
 		local left, right = 0, 0
 		local portraitFrame = bar.portraitFrame
 		if showPortrait() then
-			-- retail: round portrait on the right, flat: square portrait on the left
-			local side = isRetail() and "RIGHT" or "LEFT"
+			-- round portrait on the right
 			portraitFrame:ClearAllPoints()
-			portraitFrame:SetPoint("TOP" .. side, bar, "TOP" .. side)
+			portraitFrame:SetPoint("TOPRIGHT", bar, "TOPRIGHT")
 			portraitFrame:SetWidth(slotHeight)
 			portraitFrame:SetHeight(slotHeight)
-			if isRetail() then
-				bar.portraitBorder:SetBackdrop(nil)
-				right = slotHeight + INNER_GAP
-			else
-				applyFlatBorder(bar.portraitBorder, portraitFrame)
-				left = slotHeight + INNER_GAP
-			end
-			applyPortraitCoords(bar)
+			right = slotHeight + INNER_GAP
 			portraitFrame:Show()
 			-- raid target icon goes on the outer top corner of the portrait, like on unit frames
 			local iconSize = mmax(mfloor(slotHeight * 0.4), 8)
 			bar.icon:SetWidth(iconSize)
 			bar.icon:SetHeight(iconSize)
-			bar.icon:SetPoint("TOP" .. side, portraitFrame, "TOP" .. side, 0, 0)
+			bar.icon:SetPoint("TOPRIGHT", portraitFrame, "TOPRIGHT", 0, 0)
 		else
 			portraitFrame:Hide()
 			bar.icon:SetWidth(height)
@@ -535,12 +1110,7 @@ local function updateBarStyle(bar)
 		bar.portraitFrame:Hide()
 		bar.castbar:Hide()
 		bar.powerbar:Hide()
-		bar.debuffs.enabled, bar.buffs.enabled = false, false
-		for _, row in ipairs({bar.debuffs, bar.buffs}) do
-			for _, button in ipairs(row) do
-				button:Hide()
-			end
-		end
+		hideAuraButtons(bar)
 		bar.icon:SetPoint("RIGHT", statusbar, "LEFT", -4, 0)
 		-- these health frames really suck :(
 		local borderWidth
@@ -566,8 +1136,18 @@ local function updateBarStyle(bar)
 		borderTexture:Show()
 		bar.icon:SetWidth(12)
 		bar.icon:SetHeight(12)
+		local E = getElvUI()
+		if E then
+			-- flat bar filling the slot, like the AddOnSkins skin of the old health frame
+			local b = E.Border or 1
+			borderTexture:Hide()
+			statusbar:ClearAllPoints()
+			statusbar:SetPoint("TOPLEFT", bar, "TOPLEFT", b, -b)
+			statusbar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -b, b)
+			showSkin(bar, "elvHealth", bar, statusbar, statusbar, E, true)
+		end
 	end
-	bar.bg:SetTexture(0, 0, 0, DBM.Options.HealthFrameBgAlpha)
+	bar.bg:SetTexture(0, 0, 0, getElvUI() and 0 or DBM.Options.HealthFrameBgAlpha)
 	setFont(bar.nameText, font, size, flags)
 	setFont(bar.percentText, font, size, flags)
 	if bar.value then
@@ -576,9 +1156,10 @@ local function updateBarStyle(bar)
 end
 
 local function positionBar(bar)
-	local offset = (bar.slot - 1) * (getBarHeight() + getBarSpacing())
+	-- offsets are in the coordinates of the (scaled) bar
+	local offset = (bar.slot - 1) * (getBarHeight() + getBarSpacing()) / bar:GetScale()
 	bar:ClearAllPoints()
-	if DBM.Options.HealthFrameGrowUp then
+	if growUp() then
 		bar:SetPoint("BOTTOM", anchor, "TOP", 0, offset)
 	else
 		bar:SetPoint("TOP", anchor, "BOTTOM", 0, -offset)
@@ -635,7 +1216,6 @@ local function updatePortrait(bar, unit, guid)
 	if bar.portraitTries >= PORTRAIT_RETRIES then return end
 	bar.portraitTries = bar.portraitTries + 1
 	SetPortraitTexture(bar.portrait, unit)
-	applyPortraitCoords(bar)
 end
 
 local function setPortraitGreyed(bar, greyed)
@@ -648,8 +1228,23 @@ end
 local function setUnit(bar, unit)
 	local guid = unit and UnitGUID(unit)
 	bar.unit, bar.unitGUID = guid and unit, guid
+	-- click the reserved slot by the real name of its unit from now on
+	local slot = guid and bar.reservedIndex and slots and slots[bar.reservedIndex]
+	if slot and type(slot.cid) == "number" and DBM:GetCIDFromGUID(guid) == slot.cid then
+		local name = UnitName(unit)
+		if name and slot.target ~= name then
+			slot.target = name
+			syncOverlays()
+		end
+	end
 	if guid and showPortrait() then
 		updatePortrait(bar, unit, guid)
+		local model = bar.elvModel
+		if model and model:IsShown() and bar.modelGUID ~= guid then
+			bar.modelGUID = guid
+			model:SetUnit(unit)
+			model:SetCamera(0)
+		end
 	end
 end
 
@@ -667,13 +1262,41 @@ local function onCastUpdate(self)
 	local progress = duration > 0 and (now - self.startTime) / duration or 1
 	self:SetValue(self.channel and 1 - progress or progress)
 	self.time:SetFormattedText("%.1f", self.endTime - now)
+	if self.spark and self.spark:IsShown() then
+		self.spark:SetPoint("CENTER", self, "LEFT", progress * self:GetWidth(), 2)
+	end
 end
 
 local function startCast(castbar, spell, texture, startTime, endTime, channel, notInterruptible)
 	castbar.startTime, castbar.endTime, castbar.channel = startTime, endTime, channel
 	castbar.text:SetText(spell)
 	castbar.icon:SetTexture(texture)
-	if notInterruptible then
+	local E, db, uf = getElvBoss()
+	if E then
+		local c = notInterruptible and uf.colors.castNoInterrupt or uf.colors.castColor
+		castbar:SetStatusBarColor(c.r, c.g, c.b)
+		if db.castbar.spark then
+			castbar.spark:Show()
+		else
+			castbar.spark:Hide()
+		end
+	elseif isBlizzard() and castbar.blizzBorder then
+		-- CastingBarFrame_OnEvent: shield instead of the border for casts that can't be interrupted, no spark on channels
+		if channel then
+			castbar:SetStatusBarColor(0, 1, 0)
+			castbar.spark:Hide()
+		else
+			castbar:SetStatusBarColor(1, 0.7, 0)
+			castbar.spark:Show()
+		end
+		if notInterruptible then
+			castbar.blizzShield:Show()
+			castbar.blizzBorder:Hide()
+		else
+			castbar.blizzShield:Hide()
+			castbar.blizzBorder:Show()
+		end
+	elseif notInterruptible then
 		castbar:SetStatusBarColor(0.63, 0.63, 0.63)
 	elseif channel then
 		castbar:SetStatusBarColor(0, 0.8, 0.2)
@@ -709,13 +1332,18 @@ local function setPower(bar, value, max, color)
 	powerbar:SetValue(max > 0 and value or 0)
 	if color then
 		powerbar:SetStatusBarColor(color.r, color.g, color.b)
+		if powerbar.elvBg then
+			powerbar.bg:SetVertexColor(color.r * 0.35, color.g * 0.35, color.b * 0.35)
+		end
 	end
 end
 
 local function updatePower(bar, unit)
 	if not unit then return end -- keep the last known value
 	local powerType, powerToken = UnitPowerType(unit)
-	setPower(bar, UnitPower(unit), UnitPowerMax(unit), PowerBarColor[powerToken] or PowerBarColor[powerType] or PowerBarColor.MANA)
+	local E, _, uf = getElvBoss()
+	local color = E and uf.colors.power[powerToken] or PowerBarColor[powerToken] or PowerBarColor[powerType] or PowerBarColor.MANA
+	setPower(bar, UnitPower(unit), UnitPowerMax(unit), color)
 end
 
 
@@ -799,10 +1427,21 @@ end
 
 local function updateAuraRow(row, unit)
 	if not row.enabled then return end
+	if not unit then
+		-- the boss is on no unit token right now: keep the last known auras until they run out
+		local now = GetTime()
+		for i = 1, MAX_AURAS do
+			local button = row[i]
+			if button:IsShown() and button.duration and button.duration > 0 and button.expiration <= now then
+				button:Hide()
+			end
+		end
+		return
+	end
 	local shown = 0
-	if unit then
+	do
 		local i = 1
-		while shown < MAX_AURAS do
+		while shown < (row.limit or MAX_AURAS) do
 			local name, _, icon, count, debuffType, duration, expiration, _, _, _, spellId = UnitAura(unit, i, row.filter)
 			if not name then break end
 			shown = shown + 1
@@ -844,7 +1483,7 @@ end
 
 
 local function createBarFrame()
-	local bar = CreateFrame("Frame", "DBM_BossHealth_Bar_" .. getBarId(), anchor)
+	local bar = CreateFrame("Frame", "DBMBossHealthBar" .. getBarId(), anchor)
 	bar:EnableMouse(true)
 	bar:SetScript("OnMouseDown", onMouseDown)
 	bar:SetScript("OnMouseUp", onMouseUp)
@@ -862,6 +1501,7 @@ local function createBarFrame()
 	local textFrame = CreateFrame("Frame", nil, statusbar)
 	textFrame:SetAllPoints(statusbar)
 	textFrame:SetFrameLevel(bar.border:GetFrameLevel() + 1)
+	bar.textFrame = textFrame
 	bar.percentText = textFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	bar.percentText:SetPoint("RIGHT", statusbar, "RIGHT", -2, 1)
 	bar.nameText = textFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -874,7 +1514,6 @@ local function createBarFrame()
 	bar.portraitFrame = CreateFrame("Frame", nil, bar)
 	bar.portrait = bar.portraitFrame:CreateTexture(nil, "ARTWORK")
 	bar.portrait:SetAllPoints(bar.portraitFrame)
-	bar.portraitBorder = CreateFrame("Frame", nil, bar.portraitFrame)
 	resetPortrait(bar)
 	-- cast bar
 	local castbar = CreateFrame("StatusBar", nil, bar)
@@ -935,9 +1574,8 @@ end
 local function showPlaceholder(bar, slot)
 	bar.active, bar.id, bar.value, bar.nameused = nil, nil, nil, nil
 	bar.nameText:SetText(slot.name or "")
-	bar.nameText:SetTextColor(0.5, 0.5, 0.5)
 	bar.percentText:SetText("-")
-	bar.percentText:SetTextColor(0.5, 0.5, 0.5)
+	setNameColors(bar, true)
 	bar.statusbar:SetValue(100)
 	bar.statusbar:SetStatusBarColor(0.3, 0.3, 0.3)
 	bar.icon:Hide()
@@ -950,8 +1588,7 @@ local function activateBar(bar, name, id)
 	bar.id = id
 	bar.value = nil
 	bar.active = true
-	bar.nameText:SetTextColor(1, 1, 1)
-	bar.percentText:SetTextColor(1, 1, 1)
+	setNameColors(bar, false)
 	bar.nameText:SetText(name or "")
 	bar.nameused = name and true or nil
 	setPortraitGreyed(bar, false)
@@ -1024,10 +1661,13 @@ local function getModSlots(mod)
 	if not mod.generatedHealthFrameSlots then
 		local list = {}
 		if mod.bossHealthInfo then
+			-- the labels can differ from the unit names ("Kologarn Body"), the main boss is clicked by its real name
+			-- only for single boss mods, the name of an encounter like "The Iron Council" is no unit name
+			local mainCid = not mod.multiMobPullDetection and (mod.combatInfo and type(mod.combatInfo.mob) == "number" and mod.combatInfo.mob or mod.creatureId)
 			for i = 1, #mod.bossHealthInfo, 2 do
 				local cid, name = mod.bossHealthInfo[i], mod.bossHealthInfo[i + 1]
 				if type(cid) == "number" then
-					list[#list + 1] = {cid = cid, name = name}
+					list[#list + 1] = {cid = cid, name = name, target = cid == mainCid and mod.localization.general.name or nil}
 				end
 			end
 		elseif mod.combatInfo and type(mod.combatInfo.mob) == "number" then
@@ -1151,7 +1791,7 @@ function updateBar(bar, percent, icon, dontShowDead, name)
 			percentText:SetText(dontShowDead and "0%" or DEAD)
 		end
 	end
-	if not icon or type(icon) ~= "number" or icon < 1 or icon > 8 then
+	if bar.noRaidIcon or not icon or type(icon) ~= "number" or icon < 1 or icon > 8 then
 		bar.icon:Hide()
 	else
 		bar.icon:Show()
@@ -1163,21 +1803,12 @@ function updateBar(bar, percent, icon, dontShowDead, name)
 end
 
 do
-	-- units DBM:GetBossHP doesn't scan: mouseover and, with awesome_wotlk (https://github.com/FrostAtom/awesome_wotlk), nameplates
-	local extraUnits = {"mouseover"}
-	if C_NamePlate then
-		for i = 1, 40 do
-			extraUnits[#extraUnits + 1] = "nameplate" .. i
-		end
-	end
-
+	-- DBM:GetBossHP scans nameplates (awesome_wotlk) itself, but not the mouseover
 	-- id is a creature ID or a GUID
 	local function getExtraUnitHP(id)
-		for _, unit in ipairs(extraUnits) do
-			local guid = UnitGUID(unit)
-			if guid and (guid == id or DBM:GetCIDFromGUID(guid) == id) and UnitHealthMax(unit) ~= 0 then
-				return UnitHealth(unit) / UnitHealthMax(unit) * 100, unit, UnitName(unit)
-			end
+		local guid = UnitGUID("mouseover")
+		if guid and (guid == id or DBM:GetCIDFromGUID(guid) == id) and UnitHealthMax("mouseover") ~= 0 then
+			return UnitHealth("mouseover") / UnitHealthMax("mouseover") * 100, "mouseover", UnitName("mouseover")
 		end
 	end
 
@@ -1347,7 +1978,7 @@ end
 
 -- fake casts, power and auras on the demo bars of the options panel
 function bossHealth:ShowDemoDetails()
-	if not anchor or not anchor:IsShown() or not isModern() then return end
+	if not anchor or not anchor:IsShown() or not (isModern() or isBlizzard()) then return end
 	local now = GetTime()
 	local casts = {
 		{133, 3}, -- Fireball

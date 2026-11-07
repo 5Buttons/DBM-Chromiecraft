@@ -56,18 +56,20 @@ local Styles = {
 		value	= "Classic"
 	},
 	{
-		text	= L.HP_StyleFlat,
-		value	= "Flat"
-	},
-	{
 		text	= L.HP_StyleRetail,
 		value	= "Retail"
+	},
+	{
+		text	= L.HP_StyleBlizzard,
+		value	= "Blizzard"
 	}
 }
-
 local StyleDropDown = styleArea:CreateDropdown(L.HP_Style, Styles, "DBM", "HealthFrameStyle", function(value)
 	DBM.Options.HealthFrameStyle = value
 	updateSettings()
+	if styleArea.updateVisibility then
+		styleArea.updateVisibility()
+	end
 end, 160)
 StyleDropDown:SetPoint("TOPLEFT", styleArea.frame, "TOPLEFT", 0, -20)
 
@@ -264,7 +266,8 @@ resetbutton:SetScript("OnClick", function()
 		"HealthFrameFont", "HealthFrameFontSize", "HealthFrameFontStyle", "HealthFrameColorMode",
 		"HealthFrameColorR", "HealthFrameColorG", "HealthFrameColorB", "HealthFrameShowHeader", "HealthFrameDecimals",
 		"HealthFrameShowPortrait", "HealthFrameShowCastBar", "HealthFrameCastBarHeight",
-		"HealthFrameShowPowerBar", "HealthFramePowerBarHeight", "HealthFrameShowDebuffs", "HealthFrameShowBuffs"
+		"HealthFrameShowPowerBar", "HealthFramePowerBarHeight", "HealthFrameShowDebuffs", "HealthFrameShowBuffs",
+		"HealthFrameElvUISkin"
 	}) do
 		DBM.Options[option] = DBM.DefaultOptions[option]
 	end
@@ -275,6 +278,44 @@ resetbutton:SetScript("OnClick", function()
 		widget:GetScript("OnShow")(widget)
 	end
 	updateSettings()
+	styleArea.updateVisibility()
+end)
+
+-- the Blizzard style copies the Blizzard (or ElvUI) boss frames, none of the style options apply to it
+local elvUIbttn = styleArea:CreateCheckButton(L.HP_ElvUISkin, false, nil, "HealthFrameElvUISkin")
+elvUIbttn:SetPoint("TOPLEFT", StyleDropDown, "BOTTOMLEFT", 10, -10)
+elvUIbttn:HookScript("OnClick", updateSettings)
+elvUIbttn.myheight = 0
+
+local customWidgets = {TextureDropDown, FontDropDown, FontStyleDropDown, ColorModeDropDown, colorSelect, colorText, colorReset,
+	BarWidthSlider, BarHeightSlider, SpacingSlider, FontSizeSlider, BgAlphaSlider, borderbttn, portraitbttn, castbarbttn,
+	powerbarbttn, debuffbttn, buffbttn, CastBarHeightSlider, PowerBarHeightSlider}
+function styleArea.updateVisibility()
+	local blizzard = DBM.Options.HealthFrameStyle == "Blizzard"
+	for _, widget in ipairs(customWidgets) do
+		if blizzard then
+			widget:Hide()
+		else
+			widget:Show()
+		end
+	end
+	if blizzard and ElvUI then
+		elvUIbttn:Show()
+	else
+		elvUIbttn:Hide()
+	end
+	-- the SimpleHTML labels of check buttons stay empty when they were hidden while being laid out
+	for _, widget in ipairs({elvUIbttn, borderbttn, portraitbttn, castbarbttn, powerbarbttn, debuffbttn, buffbttn}) do
+		if widget:IsShown() and widget.textObj then
+			widget.textObj:SetWidth(styleArea.frame:GetWidth() - (widget.widthPad or 0) - 30)
+			widget.textObj:SetText(widget.text)
+		end
+	end
+end
+styleArea.frame:HookScript("OnShow", function()
+	styleArea.updateVisibility()
+	-- again after the panel has been laid out
+	DBM:Schedule(0.05, styleArea.updateVisibility)
 end)
 
 -- every widget above is placed manually, so the area height is accounted for here
