@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ApothecaryTrio", "DBM-WorldEvents")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220925182747")
+mod:SetRevision("20260221182747")
 mod:SetCreatureID(36272, 36296, 36565)
 
 mod:SetReCombatTime(10)
@@ -21,12 +21,18 @@ local warnChainReaction			= mod:NewCastAnnounce(68821, 3, nil, nil, "Melee", 2)
 
 local specWarnGTFO				= mod:NewSpecialWarningGTFO(68927, nil, nil, nil, 1, 8)
 
-local timerHummel				= mod:NewTimer(10.5, "HummelActive", 2457, nil, false, "TrioActiveTimer")
-local timerBaxter				= mod:NewTimer(18.5, "BaxterActive", 2457, nil, false, "TrioActiveTimer")
-local timerFrye					= mod:NewTimer(26.5, "FryeActive", 2457, nil, false, "TrioActiveTimer")
+local timerHummel				= mod:NewTimer(12, "HummelActive", 2457, nil, false, "TrioActiveTimer")
+local timerBaxter				= mod:NewTimer(18, "BaxterActive", 2457, nil, false, "TrioActiveTimer")
+local timerFrye					= mod:NewTimer(26, "FryeActive", 2457, nil, false, "TrioActiveTimer")
 local timerChainReaction		= mod:NewCastTimer(3, 68821)
 
 mod:AddBoolOption("TrioActiveTimer", true, "timer", nil, 1)
+
+local hummelDead, baxterDead, fryeDead = false, false, false
+
+function mod:OnCombatStart(delay)
+    hummelDead, baxterDead, fryeDead = false, false, false
+end
 
 function mod:SPELL_CAST_START(args)
 	if args.spellId == 68821 and self:AntiSpam(3, 1) then
@@ -44,9 +50,18 @@ end
 mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 
 function mod:CHAT_MSG_MONSTER_SAY(msg)
-	if msg == L.SayCombatStart or msg:find(L.SayCombatStart) then
-		self:SendSync("TrioPulled")
-	end
+    if msg == L.SayCombatStart or msg:find(L.SayCombatStart) then
+        self:SendSync("TrioPulled")
+    elseif msg:find(L.SayHummelDeath) then
+        hummelDead = true
+    elseif msg:find(L.SayBaxterDeath) then
+        baxterDead = true
+    elseif msg:find(L.SayFryeDeath) then
+        fryeDead = true
+    end
+    if hummelDead and baxterDead and fryeDead then
+        DBM:EndCombat(self, false, nil, "All Mobs Down")
+    end
 end
 
 function mod:OnSync(msg)

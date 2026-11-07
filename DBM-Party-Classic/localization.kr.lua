@@ -584,10 +584,6 @@ L:SetGeneralLocalization({
 	name		= "정찰병 초루쉬"
 })
 
-L:SetMiscLocalization({
-	Defeat	= "왕이 죽었다. 오, 이제 어쩌지! 약삭빠른 미즐을 불러와! 그가 다음에 어떻게 해야 하는지 알고 있다!"
-})
-
 -----------------------------
 --  King Gordok  --
 -----------------------------
@@ -944,6 +940,10 @@ L = DBM:GetModLocalization("Mograine_and_Whitemane")
 
 L:SetGeneralLocalization({
 	name		= "모그레인과 화이트메인"
+})
+
+L:SetMiscLocalization({
+	YellWhitemane	= "모그레인이 쓰러지다니! 이 원수는 꼭 갚을 것이다! 일어나라, 나의 용사여! 일어나라!"
 })
 
 -----------------------------

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Chromaggus", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251010003914")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(14020)
 mod:SetEncounterID(616)
 mod:SetModelID(14367)
@@ -150,7 +150,7 @@ local function check_target_vulns(self)
 		return
 	end
 
-	local spellId = select(11, DBM:UnitBuff("target", 22277, 22280, 22278, 22279, 22281)) or 0
+	local spellId = select(11, DBM:UnitBuff("target", 22277, 22280, 22278, 22279)) or select(11, DBM:UnitBuff("target", 22281)) or 0
 	local vulnSchool = vulnSpells[spellId]
 	if vulnSchool then
 		return check_spell_damage(self, target, 10000, vulnSchool)
@@ -272,7 +272,7 @@ end
 
 function mod:SPELL_AURA_REMOVED(args)
 	local spellId = args.spellId
-	if spellId == 23128 and args:IsPlayer() then
+	if spellId == 23155 and args:IsPlayer() then
 		mydebuffs = mydebuffs - 1
 	elseif spellId == 23169 and self:AntiSpam(3, 2) and args:IsPlayer() then
 		mydebuffs = mydebuffs - 1

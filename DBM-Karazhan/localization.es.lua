@@ -43,6 +43,8 @@ L:SetMiscLocalization({
 	Event				= "¡Esta noche... vamos a explorar un relato de amor prohibido!",
 	RJ_Pull				= "¿Qué demonio sois que me atormentáis de questa manera?",
 	DBM_RJ_PHASE2_YELL	= "Adelante, gentil noche, ¡devuélveme a mi Romulo!",
+	DBM_RJ_JULIANNE_POISON	= "¡Romulo, ya voy! ¡Oh... bebo esto en tu honor!",
+	DBM_RJ_ROMULO_DEATH	= "Sonreís... al ver el golpe que... me abate.",
 	Romulo				= "Romulo",
 	Julianne			= "Julianne"
 })
@@ -92,7 +94,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "¡No os tengo miedo! ¿Queréis pelea? ¿Eh? ¡Vamos, con las garras a la espalda os reto!",
 	DBM_OZ_YELL_STRAWMAN	= "¿Ahora que tengo que hacer contigo? No me puedo decidir.",--sic
 	DBM_OZ_YELL_TINHEAD		= "¿Me vendría bien un corazón Digamos, ¿el tuyo?",--sic
-	DBM_OZ_YELL_CRONE		= "¡Pronto acabará todo!"--There seems to be two lines, but I only ever see this one in Spanish; the one in the English localization file is the other possible pull line.
+	DBM_OZ_YELL_CRONE		= "¡Ay de todos y cada uno de vosotros, queridos míos!",
+	DBM_OZ_YELL_CRONE2		= "¡Pronto acabará todo!",
+	DBM_OZ_YELL_TITO		= "¡No permitas que nos hagan daño, Tito! Oh, no lo harás, ¿verdad?"
 })
 
 -- Curator
@@ -199,7 +203,6 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "¡Estúpidos! El tiempo es el fuego en el que arderéis!",--sic
-	DBM_PRINCE_YELL_P3		= "¿Cómo podéis esperar rebelaros ante un poder tan aplastante?",
 	DBM_PRINCE_YELL_INF1	= "¡Todas las realidades, todas las dimensiones están abiertas a mí!",
 	DBM_PRINCE_YELL_INF2	= "¡No solo os enfrentáis a Malechezaar, sino a todas las legiones bajo mi mando!"
 })

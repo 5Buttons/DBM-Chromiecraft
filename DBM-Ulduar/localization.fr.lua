@@ -292,23 +292,6 @@ L:SetMiscLocalization({
 	YellPullHard		= "Anciens, donnez-moi votre force !"
 })
 
-----------------------
---  Freya's Elders  --
-----------------------
-L = DBM:GetModLocalization("Freya_Elders")
-
-L:SetGeneralLocalization({
-	name = "Freya's Elders"
-})
-
-L:SetOptionLocalization({
-	TrashRespawnTimer	= "Montre le timer du repop des trashs"
-})
-
-L:SetMiscLocalization({
-	TrashRespawnTimer	= "Respawn des Trashs de Freya"
-})
-
 ---------------
 --  Mimiron  --
 ---------------
@@ -431,4 +414,13 @@ L:SetMiscLocalization({
 	S3TrueFaceofDeath	= "Phase 3 : le vrai visage de la mort",
 	YoggSaron			= "Yogg-Saron",
 	ImmortalGuardian	= "Gardien immortel"
+})
+
+-------------
+--  Trash  --
+-------------
+L = DBM:GetModLocalization("UlduarTrash")
+
+L:SetGeneralLocalization({
+	name = "Trash d'Ulduar"
 })

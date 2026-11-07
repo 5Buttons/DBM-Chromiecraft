@@ -103,8 +103,8 @@ L:SetMiscLocalization({
 	Shocuul				= "|TInterface\\WorldStateFrame\\Icons-Classes.blp:36:36:0:0:128:128:0:32:0:32|t 修庫爾",				-- 34475
 
 	AllianceVictory		= "榮耀歸於聯盟!",
-	HordeVictory		= "那只是讓你們知道將來必須面對的命運。為了部落!"
-	--YellKill			= "膚淺而悲痛的勝利。今天痛失的生命反而令我們更加的頹弱。除了巫妖王之外，誰還能從中獲利?偉大的戰士失去了寶貴生命。為了什麼?真正的威脅就在前方 - 巫妖王在死亡的領域中等著我們。"
+	HordeVictory		= "那只是讓你們知道將來必須面對的命運。為了部落!",
+	YellKill			= "膚淺而悲痛的勝利。今天痛失的生命反而令我們更加的頹弱。除了巫妖王之外，誰還能從中獲利?偉大的戰士失去了寶貴生命。為了什麼?真正的威脅就在前方 - 巫妖王在死亡的領域中等著我們。"
 })
 
 ---------------------
@@ -179,7 +179,6 @@ L:SetMiscLocalization({
 --	YellPull			= "這裡將會是你們的墳墓!",
 	Emerge				= "從地底鑽出!",
 	Burrow				= "鑽進地裡!",
-	YellBurrow			= "(蟲族語)靠上來，兄弟們。起來，爪牙們，吞噬...",
 	PcoldIconSet		= "透骨之寒{rt%d}於%s",
 	PcoldIconRemoved	= "移除標記:%s"
 })

@@ -9,7 +9,6 @@ local CL = DBM_CORE_L
 L.DBMWarmane						= CL.DBM .. "-Warmane par Zidras"
 L.TranslationByPrefix				= "Retail rétroportage par "
 L.TranslationBy						= "Barsoom, Bunny67, Zidras"
-L.Website							= "Rendez-nous visite sur discord à |cFF73C2FBhttps://discord.gg/CyVWDWS|r"
 L.WebsiteButton						= "Site web"
 
 L.OTabBosses						= "Bosses"--Deprecated and will be deleted once tabs no longer use this

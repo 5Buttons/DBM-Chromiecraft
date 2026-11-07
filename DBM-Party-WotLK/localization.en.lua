@@ -394,7 +394,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Pull	= "Now keep an eye out! I'll have this licked in two shakes of a--",
 	Phase1	= "Security breach in progress. Analysis of historical archives transferred to lower-priority queue. Countermeasures engaged.",
-	Phase2	= "Threat index threshold exceeded. Celestial archive aborted. Security level heightened.",
+	Phase2	= "Threat index threshold exceeded.  Celestial archive aborted. Security level heightened.",
 	Phase3	= "Critical threat index. Void analysis diverted. Initiating sanitization protocol.",
 	Kill	= "Alert: security fail-safes deactivated. Beginning memory purge and... "
 })
@@ -441,7 +441,7 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	SplitTrigger1		= "There's plenty of me to go around.",
-	SplitTrigger2		= "I'll give you more than you can handle.",
+	SplitTrigger2		= "I'll give you more than you can handle!",
 	MergeTrigger		= "Now to finish the job!"
 })
 
@@ -732,7 +732,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Pull				= "Well done. You have proven yourself today-",
 	AchievementFailed	= ">> ACHIEVEMENT FAILED: %s was hit by Ghoul Explode <<",
-	YellCombatEnd		= "My congratulations, champions. Through trials both planned and unexpected, you have triumphed."	-- can also be "No! I must not fail... again ..."
+	YellCombatEnd		= "No! I must not fail... again..."	-- AC: Black Knight SAY_DEATH (Tirion's congratulations yell is never said)
 })
 
 -----------------------

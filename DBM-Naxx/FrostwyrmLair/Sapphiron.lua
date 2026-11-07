@@ -1,10 +1,10 @@
 local mod	= DBM:NewMod("Sapphiron", "DBM-Naxx", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20251222224400")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15989)
 mod:SetEncounterID(1119)
-mod:SetHotfixNoticeRev(20251222224400)
+mod:SetHotfixNoticeRev(20260413224400)
 mod:SetMinSyncRevision(20220904000000)
 
 mod:RegisterCombat("combat")
@@ -12,7 +12,7 @@ mod:SetModelScale(0.1)
 
 mod:RegisterEventsInCombat(
 --	"SPELL_CAST_START 28524",
-	"SPELL_CAST_SUCCESS 28542 55665 28560 55697",
+	"SPELL_CAST_SUCCESS 28542 55665 28560 55696 55697",
 	"SPELL_AURA_APPLIED 28522 28547 55699",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_HEALTH"
@@ -36,7 +36,7 @@ local warnBlizzard		= mod:NewSpellAnnounce(28560, 4)
 local specWarnBlizzard	= mod:NewSpecialWarningGTFO(28547, nil, nil, nil, 1, 8)
 
 local timerDrainLife	= mod:NewCDTimer(24, 28542, nil, nil, nil, 3, nil, DBM_COMMON_L.CURSE_ICON) -- (25man Lordaeron 2022/09/02) - 24.0
-local timerAirPhase		= mod:NewTimer(60, "TimerAir", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", nil, nil, 6)
+local timerAirPhase		= mod:NewTimer(55, "TimerAir", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendUnBurrow.blp", nil, nil, 6)
 local timerBlizzard		= mod:NewNextTimer(6.5, 28560, nil, nil, nil, 3)
 local timerTailSweep	= mod:NewNextTimer(10, 55696, nil, nil, nil, 2)
 
@@ -49,7 +49,7 @@ local specWarnDeepBreath= mod:NewSpecialWarningSpell(28524, nil, nil, nil, 1, 2)
 local yellIceBlock		= mod:NewYell(28522)
 
 local timerLanding		= mod:NewTimer(20.5, "TimerLanding", "Interface\\AddOns\\DBM-Core\\textures\\CryptFiendBurrow.blp", nil, nil, 6)
-local timerIceBlast		= mod:NewCastTimer(8, 28524, nil, nil, nil, 2, DBM_COMMON_L.DEADLY_ICON)
+local timerIceBlast 	= mod:NewCastTimer(8.5, 28524, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
 
 mod:AddRangeFrameOption("12")
 
@@ -163,7 +163,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		else
 			timerBlizzard:Start(8) -- 10-man
 		end
-	elseif spellId == 55697 then
+	elseif spellId == 55696 or spellId == 55697 then
 		timerTailSweep:Start()
 	end
 end
@@ -203,6 +203,7 @@ function mod:UNIT_HEALTH(uId)
 		warned_lowhp = true
 		specWarnLowHP:Show()
 		timerAirPhase:Cancel()
+		self:Unschedule(warnAirPhaseSoon.Show, warnAirPhaseSoon)
 	end
 end
 

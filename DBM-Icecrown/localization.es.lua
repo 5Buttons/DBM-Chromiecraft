@@ -180,7 +180,8 @@ L:SetTimerLocalization({
 
 L:SetMiscLocalization({
 	YellTransform1			= "Mmm, no siento nada. ¿¡Qué!? ¿De dónde salió eso?",
-	YellTransform2			= "¡Sabe a... fresa! ¡Ups! Perdón."
+	YellTransform2			= "¡Sabe a... fresa! ¡Ups! Perdón.",
+	YellHeroicTransition			= "Dos mocos, una sala. ¡Tantas posibilidades estupendas!"
 })
 
 ------------------------------------

@@ -9,6 +9,7 @@ mod:RegisterCombat("combat_yell", L.Pull)
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 28798 54100 28732 54097 28794 54099",
+	"SPELL_AURA_REFRESH 28798 54100",
 	"SPELL_CAST_SUCCESS 28796 54098",
 	"UNIT_DIED"
 )
@@ -24,7 +25,7 @@ local specWarnGTFO			= mod:NewSpecialWarningGTFO(28794, nil, nil, nil, 1, 8)
 
 local timerEmbrace			= mod:NewBuffActiveTimer(30, 28732, nil, nil, nil, 6)
 local timerEnrage			= mod:NewCDTimer(60, 28131, nil, nil, nil, 6)
-local timerPoisonVolleyCD	= mod:NewCDTimer("v7-15", 54098, nil, nil, nil, 5) -- REVIEW! ~1s variance? (25man Lordaeron 2022/10/16) - 9.1, 9.3, 9.1, 8.5, 8.4, 8.5, 8.2, 8.8
+local timerPoisonVolleyCD	= mod:NewCDTimer("v7-15", 54098, nil, nil, nil, 5)
 
 mod.vb.enraged = false
 
@@ -38,7 +39,10 @@ end
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(28798, 54100) then			-- Frenzy
 		self.vb.enraged = true
-		if self:IsTanking("player", "boss1", nil, true) then
+		warnEnrageSoon:Cancel()
+		timerEnrage:Start()
+		warnEnrageSoon:Schedule(55)
+		if self:IsTanking("player", nil, nil, true, args.destGUID) then
 			specWarnEnrage:Show()
 			specWarnEnrage:Play("defensive")
 		else
@@ -48,11 +52,9 @@ function mod:SPELL_AURA_APPLIED(args)
 		warnEmbraceExpire:Cancel()
 		warnEmbraceExpired:Cancel()
 		warnEnrageSoon:Cancel()
-		timerEnrage:Stop()
-		if self.vb.enraged then
-			timerEnrage:Start()
-			warnEnrageSoon:Schedule(45)
-		end
+		timerEnrage:Start()
+		warnEnrageSoon:Schedule(55)
+		timerPoisonVolleyCD:Stop()
 		timerEmbrace:Start()
 		warnEmbraceActive:Show()
 		warnEmbraceExpire:Schedule(25)
@@ -63,6 +65,8 @@ function mod:SPELL_AURA_APPLIED(args)
 		specWarnGTFO:Play("watchfeet")
 	end
 end
+
+mod.SPELL_AURA_REFRESH = mod.SPELL_AURA_APPLIED
 
 function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(28796, 54098) then -- Poison Bolt Volley

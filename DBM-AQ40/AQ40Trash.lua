@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("AQ40Trash", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 mod:SetModelID(15264) -- Anubisath Sentinel
 
 mod.isTrashMod = true
@@ -18,6 +18,7 @@ mod:RegisterEvents(
 --local specWarnPrimalRampage			= mod:NewSpecialWarningDodge(198379, "Melee", nil, nil, 1, 2)
 
 mod:AddRangeFrameOption(10, 22997)
+--[[ speed clear disabled, no ENCOUNTER_END on 3.3.5
 mod:AddSpeedClearOption("AQ40", true)
 
 --Speed Clear variables
@@ -35,6 +36,7 @@ mod:RegisterShortTermEvents(
 
 --Request speed clear variables, in case it was already started before mod loaded
 mod:SendSync("IsAQ40Started")
+--]]
 
 do-- Anubisath Plague/Explode - keep in sync - AQ40/AQ40Trash.lua AQ20/AQ20Trash.lua
 	local warnPlague					= mod:NewTargetNoFilterAnnounce(22997, 2)
@@ -103,7 +105,7 @@ do
 
 	-- todo: thorns
 	local playerGUID = UnitGUID("player")
-	function mod:SPELL_DAMAGE(_, sourceName, _, _, destGUID, _, _, _, _, spellName)
+	function mod:SPELL_DAMAGE(_, sourceName, _, destGUID, _, _, spellId)
 		if spellId == 26555 and destGUID == playerGUID and self:AntiSpam(3, 3) then
 			specWarnShadowStorm:Show(sourceName)
 			specWarnShadowStorm:Play("findshelter")
@@ -144,7 +146,7 @@ do
 				if self.vb.requiredBosses == 5 then
 					DBT:CancelBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT)
 					if self.vb.firstEngageTime then
-						local thisTime = GetServerTime() - self.vb.firstEngageTime
+						local thisTime = time() - self.vb.firstEngageTime
 						if thisTime and thisTime > 0 then
 							if not self.Options.FastestClear3 then
 								--First clear, just show current clear time

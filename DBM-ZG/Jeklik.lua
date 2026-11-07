@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Jeklik", "DBM-ZG", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(14517)
 
 mod:RegisterCombat("combat")
@@ -57,10 +57,10 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args.spellID == 23952 and args:IsDestTypePlayer() then
+	if args.spellId == 23952 and args:IsDestTypePlayer() then
 		timerPain:Stop(args.destName)
 -- transition into p2 at 50% still missing. should reset timers and start a 25 sec timer for first heal
-	elseif args.spellID == 23966 then
+	elseif args.spellId == 23966 then
 		warnPhase:Show(2)
 		timerScreechCD:Stop()
 		timerHealCD:Stop()

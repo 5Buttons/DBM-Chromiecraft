@@ -215,6 +215,7 @@ L:SetMiscLocalization({
 	Phase4			= "Is this it, mortals? Is this all the fury you can muster?",
 	Demon			= "Behold the power... of the demon within!",
 	Phase5enrage		= "You've wasted too much time mortals, now you shall fall!", --newly added line
+	Defeated		= "You have won... Maiev.",
 	S1YouAreNotPrepared	= "Stage One: You Are Not Prepared",
 	S2FlamesOfAzzinoth	= "Stage Two: Flames of Azzinoth",
 	S3TheDemonWithin	= "Stage Three: The Demon Within",

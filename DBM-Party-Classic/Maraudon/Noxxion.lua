@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(423, "DBM-Party-Classic", 8, 232)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(13282)
 mod:SetEncounterID(422)
 
@@ -15,12 +15,10 @@ mod:RegisterEventsInCombat(
 local warningSpawns					= mod:NewSpellAnnounce(21707, 2)
 local warningUppercut				= mod:NewSpellAnnounce(10966, 2)
 
-local timerSpawnsCD					= mod:NewAITimer(180, 21707, nil, nil, nil, 1, nil, DBM_COMMON_L.DAMAGE_ICON)
-local timerUppercutCD				= mod:NewAITimer(180, 10966, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
+local timerUppercutCD				= mod:NewCDTimer(13, 10966, nil, nil, nil, 5, nil, DBM_COMMON_L.TANK_ICON)
 
 function mod:OnCombatStart(delay)
-	timerSpawnsCD:Start(1-delay)--6
-	timerUppercutCD:Start(1-delay)--18
+	timerUppercutCD:Start(9-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
@@ -29,6 +27,5 @@ function mod:SPELL_CAST_SUCCESS(args)
 		timerUppercutCD:Start()
 	elseif args.spellId == 21707 then
 		warningSpawns:Show()
-		timerSpawnsCD:Start()
 	end
 end

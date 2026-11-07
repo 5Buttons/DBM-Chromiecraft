@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(427, "DBM-Party-Classic", 8, 232)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(12236)
 mod:SetEncounterID(242)
 
@@ -14,10 +14,10 @@ mod:RegisterEventsInCombat(
 --TODO, smokebomb health based or this timer accurate?
 local warningSmokeBomb				= mod:NewSpellAnnounce(7964, 2)
 
-local timerSmokeBombCD				= mod:NewCDTimer(14.6, 7964, nil, nil, nil, 3)
+local timerSmokeBombCD				= mod:NewCDTimer(15, 7964, nil, nil, nil, 3)
 
-function mod:OnCombatStart(--[[delay]])
---	timerSmokeBombCD:Start(1-delay)--Used near instant on pull
+function mod:OnCombatStart(delay)
+	timerSmokeBombCD:Start(13-delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)

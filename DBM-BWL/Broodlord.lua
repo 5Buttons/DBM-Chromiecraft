@@ -1,13 +1,13 @@
 local mod	= DBM:NewMod("Broodlord", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20240206183735")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(12017)
 mod:SetModelID(14308)
 mod:RegisterCombat("combat_yell", L.Pull)--L.Pull is backup for classic, since classic probably won't have ENCOUNTER_START to rely on and player regen never works for this boss
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 23331 18670",
+	"SPELL_CAST_SUCCESS 23331 18670 25778",
 	"SPELL_AURA_APPLIED 24573",
 	"SPELL_AURA_REMOVED 24573"
 )
@@ -32,7 +32,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 	if spellId == 23331 and args:IsSrcTypeHostile() then
 		warnBlastWave:Show()
 		timerBlastWaveCD:Start()
-	elseif spellId == 18670 then
+	elseif spellId == 18670 or spellId == 25778 then
 		warnKnockAway:Show()
 		timerKnockAwayCD:Start()
 	end

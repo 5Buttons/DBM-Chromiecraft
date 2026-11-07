@@ -82,9 +82,9 @@ local function currentFullDate()
 end
 
 DBM = {
-	Revision = parseCurseDate("20251102143218"),
+	Revision = parseCurseDate("20261106002222"),
 	DisplayVersion = "10.1.13 alpha", -- the string that is shown as version
-	ReleaseRevision = releaseDate(2025, 09, 02) -- the date of the latest stable version that is available, optionally pass hours, minutes, and seconds for multiple releases in one day
+	ReleaseRevision = releaseDate(2026, 11, 06) -- the date of the latest stable version that is available, optionally pass hours, minutes, and seconds for multiple releases in one day
 }
 
 local fakeBWVersion = 7558
@@ -3644,6 +3644,7 @@ do
 				dummyMod.geartext = dummyMod:NewSpecialWarning("  %s  ", nil, nil, nil, 3)
 				dummyMod.timer = dummyMod:NewTimer(20, "%s", "Interface\\Icons\\Ability_Warrior_OffensiveStance", nil, nil, 0, nil, nil, DBM.Options.DontPlayPTCountdown and 0 or 4, threshold, nil, nil, nil, nil, nil, nil, "pull")
 			end
+			local wasRunning = dummyMod.timer:IsStarted(L.TIMER_PULL)
 			--Cancel any existing pull timers before creating new ones, we don't want double countdowns or mismatching blizz countdown text (cause you can't call another one if one is in progress)
 			if not DBM.Options.DontShowPT2 then--and DBT:GetBar(L.TIMER_PULL)
 				dummyMod.timer:Stop()
@@ -3661,7 +3662,12 @@ do
 				end
 			end
 			dummyMod.text:Cancel()
-			if timer == 0 then return end--"/dbm pull 0" will strictly be used to cancel the pull timer (which is why we let above part of code run but not below)
+			if timer == 0 then--"/dbm pull 0" will strictly be used to cancel the pull timer (which is why we let above part of code run but not below)
+				if wasRunning then
+					DBM:AddMsg(L.ANNOUNCE_PULL_CANCEL:format(sender))
+				end
+				return
+			end
 			DBM:FlashClientIcon()
 			if not DBM.Options.DontShowPT2 then
 				dummyMod.timer:Start(timer, L.TIMER_PULL)
@@ -3727,13 +3733,19 @@ do
 				--timer, name, icon, optionDefault, optionName, colorType, inlineIcon, keep, countdown, countdownMax, r, g, b, spellId, requiresCombat, waCustomName, customType
 				dummyMod2.timer = dummyMod2:NewTimer(20, L.TIMER_BREAK, "Interface\\Icons\\SPELL_HOLY_BORROWEDTIME", nil, nil, 0, nil, nil, DBM.Options.DontPlayPTCountdown and 0 or 1, threshold, nil, nil, nil, nil, nil, nil, "break")
 			end
+			local wasRunning = dummyMod2.timer:IsStarted()
 			--Cancel any existing break timers before creating new ones, we don't want double countdowns or mismatching blizz countdown text (cause you can't call another one if one is in progress)
 			if not DBM.Options.DontShowPT2 then--and DBT:GetBar(L.TIMER_BREAK)
 				dummyMod2.timer:Stop()
 			end
 			dummyMod2.text:Cancel()
 			DBM.Options.RestoreSettingBreakTimer = nil
-			if timer == 0 then return end--"/dbm break 0" will strictly be used to cancel the break timer (which is why we let above part of code run but not below)
+			if timer == 0 then--"/dbm break 0" will strictly be used to cancel the break timer (which is why we let above part of code run but not below)
+				if wasRunning and sender then
+					DBM:AddMsg(L.ANNOUNCE_BREAK_CANCEL:format(sender))
+				end
+				return
+			end
 			self.Options.RestoreSettingBreakTimer = timer.."/"..time()
 			if not self.Options.DontShowPT2 then
 				dummyMod2.timer:Start(timer)
@@ -4086,6 +4098,12 @@ do
 			end
 		end
 
+		-- senders pass difficultyIndex (175/176 normal, 193/194 heroic); 2-4 kept for old senders
+		local guildDifficultyNames = {
+			[2] = PLAYER_DIFFICULTY2, [3] = RAID_DIFFICULTY3, [4] = RAID_DIFFICULTY4,
+			[175] = RAID_DIFFICULTY1, [176] = RAID_DIFFICULTY2, [193] = RAID_DIFFICULTY3, [194] = RAID_DIFFICULTY4,
+		}
+
 		guildSyncHandlers["DBMv4-GCB"] = function(_, modId, ver, difficulty, name, groupLeader)
 			if not DBM.Options.ShowGuildMessages or not difficulty or DBM:GetRaidRank(groupLeader or "") == 2 then return end
 			if not ver or ver ~= "4" then return end--Ignore old versions
@@ -4095,16 +4113,7 @@ do
 				if not DBM.Options.ShowGuildMessagesPlus then return end
 				modId = tonumber(modId)
 				local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
-				local difficultyName
-				if difficulty == 4 then
-					difficultyName = RAID_DIFFICULTY4
-				elseif difficulty == 3 then
-					difficultyName = RAID_DIFFICULTY3
-				elseif difficulty == 2 then
-					difficultyName = PLAYER_DIFFICULTY2
-				else
-					difficultyName = PLAYER_DIFFICULTY1
-				end
+				local difficultyName = guildDifficultyNames[difficulty] or PLAYER_DIFFICULTY1
 				DBM:AddMsg(L.GUILD_COMBAT_STARTED:format(difficultyName.."-"..bossName, groupLeader))-- "%s has been engaged by %s's guild group"
 			end
 		end
@@ -4118,16 +4127,7 @@ do
 				if not DBM.Options.ShowGuildMessagesPlus then return end
 				modId = tonumber(modId)
 				local bossName = modId and DBM:GetModLocalization(modId).general.name or name or CL.UNKNOWN
-				local difficultyName
-				if difficulty == 4 then
-					difficultyName = RAID_DIFFICULTY4
-				elseif difficulty == 3 then
-					difficultyName = RAID_DIFFICULTY3
-				elseif difficulty == 2 then
-					difficultyName = PLAYER_DIFFICULTY2
-				else
-					difficultyName = PLAYER_DIFFICULTY1
-				end
+				local difficultyName = guildDifficultyNames[difficulty] or PLAYER_DIFFICULTY1
 				if wipe == "1" then
 					DBM:AddMsg(L.GUILD_COMBAT_ENDED_AT:format(groupLeader or CL.UNKNOWN, difficultyName.."-"..bossName, wipeHP, time))--"%s's Guild group has wiped on %s (%s) after %s.
 				else
@@ -4879,12 +4879,15 @@ end
 
 function DBM:InGuildParty()
 	local guildName = GetGuildInfo("player")
-	local numRaid = GetNumPartyMembers()
+	local numRaid, unit = GetNumRaidMembers(), "raid"
+	if numRaid == 0 then
+		numRaid, unit = GetNumPartyMembers(), "party"
+	end
 
 	if guildName and numRaid > 0 then
 		local guldMatch = 0
 		for i = 1, numRaid do
-			local guild = GetGuildInfo("raid"..i) or ""
+			local guild = GetGuildInfo(unit..i) or ""
 			if guild == guildName then
 				guldMatch = guldMatch + 1
 			end
@@ -4908,7 +4911,7 @@ do
 					sendGuildSync(DBMPrefix.."-GCE", modId.."\t8\t0\t"..thisTime.."\t"..difficultyIndex.."\t"..name.."\t"..lastGroupLeader)
 				end
 			else
-				sendGuildSync(DBMPrefix.."-GCB", modId.."\t3\t"..difficultyIndex.."\t"..name)
+				sendGuildSync(DBMPrefix.."-GCB", modId.."\t4\t"..difficultyIndex.."\t"..name.."\t"..(lastGroupLeader or ""))
 			end
 		end
 	end

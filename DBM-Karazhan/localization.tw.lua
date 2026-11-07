@@ -43,6 +43,8 @@ L:SetMiscLocalization({
 	Event				= "今晚...我們要探索一個禁忌之愛的故事。",
 	RJ_Pull				= "你是什麼樣的惡魔，讓我這樣的痛苦?",
 	DBM_RJ_PHASE2_YELL	= "來吧，溫和的夜晚;把我的羅慕歐還給我!",
+	DBM_RJ_JULIANNE_POISON	= "羅慕歐，我來了!喔...讓我敬你!",
+	DBM_RJ_ROMULO_DEATH	= "你大笑...在殺掉我...的最後一擊後。",
 	Romulo				= "羅慕歐",
 	Julianne			= "茱麗葉"
 })
@@ -90,7 +92,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "我不是害怕你!你想要戰鬥嗎?啊，你是嗎?來! 我將把兩支爪子放在背後跟你戰鬥!",
 	DBM_OZ_YELL_STRAWMAN	= "現在我該與你做什麼?我完全不能決定。",
 	DBM_OZ_YELL_TINHEAD		= "我真的能使用心。嘿，我能有你的心嗎?",
-	DBM_OZ_YELL_CRONE		= "為你們每一個人感到不幸，我的小美人們!"
+	DBM_OZ_YELL_CRONE		= "為你們每一個人感到不幸，我的小美人們!",
+	DBM_OZ_YELL_CRONE2		= "一切很快就會結束了!",
+	DBM_OZ_YELL_TITO		= "不要讓他們傷害我們多多!喔，你不會吧，是嗎?"
 })
 
 -- Curator
@@ -197,7 +201,6 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "頭腦簡單的笨蛋!你在燃燒的是時間的火焰!",
-	DBM_PRINCE_YELL_P3		= "你怎能期望抵抗這樣勢不可擋的力量?",
 	DBM_PRINCE_YELL_INF1	= "所有的實體，所有的空間對我來說都是開放的!",
 	DBM_PRINCE_YELL_INF2	= "你挑戰的不只是莫克札，而是我所率領的整個軍隊!"
 })

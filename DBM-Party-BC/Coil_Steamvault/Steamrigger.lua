@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(17796)
 
 mod:SetModelID(18638)
@@ -12,8 +12,8 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 35107",
-	"SPELL_AURA_REMOVED 35107",
-	"CHAT_MSG_MONSTER_YELL"
+	"SPELL_CAST_SUCCESS 31528 31529 31530",
+	"SPELL_AURA_REMOVED 35107"
 )
 
 local WarnNet			= mod:NewTargetAnnounce(35107, 2)
@@ -25,9 +25,7 @@ local timerNet			= mod:NewTargetTimer(6, 35107, nil, nil, nil, 3)
 local enrageTimer		= mod:NewBerserkTimer(300)
 
 function mod:OnCombatStart(delay)
-	if self:IsHeroic() then
-		enrageTimer:Start(-delay)
-	end
+	enrageTimer:Start(-delay)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
@@ -43,8 +41,8 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-function mod:CHAT_MSG_MONSTER_YELL(msg)
-	if msg == L.Mechs then		-- Adds
+function mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpellID(31528, 31529, 31530) and self:AntiSpam(3, 1) then		-- Summon Mechanics
 		specWarnSummon:Show()
 		specWarnSummon:Play("killmob")
 	end

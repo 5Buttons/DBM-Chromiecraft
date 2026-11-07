@@ -941,6 +941,10 @@ L:SetGeneralLocalization({
 	name		= "莫格萊尼 & 懷特邁恩"
 })
 
+L:SetMiscLocalization({
+	YellWhitemane	= "莫格萊尼已經倒下!你將為你的背叛付出代價!起來吧，我的勇士!起來吧!"
+})
+
 -----------------------------
 --  High Inquisitor Fairbanks  --
 -----------------------------

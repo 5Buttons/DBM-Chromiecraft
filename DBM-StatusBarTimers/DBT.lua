@@ -864,8 +864,7 @@ function barPrototype:SetVariance()
 	if DBT.Options.VarianceEnabled and self.hasVariance then
 		local isEnlarged = self.enlarged and not self.paused
 		local varianceScaleTime = self.totalTime
-		if isEnlarged and DBT.Options.BarStyle == "NoAnim" and not (self.dummyEnlarge or self.colorType == 7 and DBT.Options.Bar7ForceLarge) then
-			-- Keep the overlay aligned with the rebased fill of NoAnim huge bars (see enlargeRebaseTime in Update)
+		if isEnlarged and not self.huge and DBT.Options.BarStyle == "NoAnim" and not (self.dummyEnlarge or self.colorType == 7 and DBT.Options.Bar7ForceLarge) then
 			local enlargeRebaseTime = (DBT.Options.EnlargeBarTime or 11) + self.varianceDuration
 			if enlargeRebaseTime < varianceScaleTime then
 				varianceScaleTime = enlargeRebaseTime
@@ -961,8 +960,8 @@ function barPrototype:Update(elapsed)
 	--	local varianceBehaviorZeroMax = varianceEnabled self.hasVariance and barOptions.VarianceBehavior == "ZeroAtMaxTimer"
 	local varianceBehaviorNeg = varianceEnabled and self.hasVariance and barOptions.VarianceBehavior == "ZeroAtMinTimerAndNeg"
 	local timerCorrectedNegative = varianceBehaviorNeg and timerLowestValueFromVariance or timerValue
-	-- NoAnim rebase window: variance bars extend it by their variance duration so the huge bar starts empty on enlarge and the fill reaches the variance overlay exactly at the earliest possible timer
 	local enlargeRebaseTime = varianceEnabled and self.hasVariance and enlargeTime + self.varianceDuration or enlargeTime
+	local rebaseFill = currentStyle == "NoAnim" and isEnlarged and not self.huge and not enlargeHack
 	if barOptions.DynamicColor and not self.color then
 		local r, g, b
 		if colorCount and colorCount >= 1 then
@@ -999,14 +998,14 @@ function barPrototype:Update(elapsed)
 		return self:Cancel()
 	else
 		if fillUpBars then
-			if currentStyle == "NoAnim" and timerValue <= enlargeRebaseTime and not enlargeHack then
+			if rebaseFill and timerValue <= enlargeRebaseTime then
 				-- Simple/NoAnim Bar mimics BW in creating a new bar on large bar anchor instead of just moving the small bar
 				bar:SetValue(1 - timerValue/(totaltimeValue < enlargeRebaseTime and totaltimeValue or enlargeRebaseTime))
 			else
 				bar:SetValue(1 - timerValue/totaltimeValue)
 			end
 		else
-			if currentStyle == "NoAnim" and timerValue <= enlargeRebaseTime and not enlargeHack then
+			if rebaseFill and timerValue <= enlargeRebaseTime then
 				-- Simple/NoAnim Bar mimics BW in creating a new bar on large bar anchor instead of just moving the small bar
 				bar:SetValue(timerValue/(totaltimeValue < enlargeRebaseTime and totaltimeValue or enlargeRebaseTime))
 			else

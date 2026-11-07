@@ -1,26 +1,26 @@
 local mod	= DBM:NewMod(449, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(10812, 10813)--10812 Grand Crusader Dathrohan (stage 1 classic, on live the boss starts out as Balnazzar)
 mod:SetEncounterID(478)
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_SUCCESS 17405 13704",
-	"SPELL_AURA_APPLIED 17405",
+	"SPELL_CAST_SUCCESS 15690 13704",
+	"SPELL_AURA_APPLIED 15690",
 	"UNIT_DIED"
 )
 
 --TODO, P2 trigger, and cleanup boss count code
-local warningDomination					= mod:NewTargetNoFilterAnnounce(17405, 4)
+local warningDomination					= mod:NewTargetNoFilterAnnounce(15690, 4)
 --local warningSleep						= mod:NewTargetNoFilterAnnounce(66290, 3)
 local warningPsychicScream				= mod:NewSpellAnnounce(13704, 3)
 
 --local specWarnMaddeningCall			= mod:NewSpecialWarningInterrupt(86620, "HasInterrupt", nil, nil, 1, 2)
 
-local timerDominationCD					= mod:NewAITimer(180, 17405, nil, nil, nil, 3)
+local timerDominationCD					= mod:NewAITimer(180, 15690, nil, nil, nil, 3)
 --local timerSleepCD						= mod:NewAITimer(180, 66290, nil, nil, nil, 3, nil, DBM_COMMON_L.MAGIC_ICON)
 local timerPsychicScreamCD				= mod:NewAITimer(180, 13704, nil, nil, nil, 2, nil, DBM_COMMON_L.MAGIC_ICON)
 
@@ -31,7 +31,7 @@ function mod:OnCombatStart(--[[delay]])
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 17405 and args:IsSrcTypeHostile() then
+	if args.spellId == 15690 and args:IsSrcTypeHostile() then
 		timerDominationCD:Start()
 	elseif args.spellId == 13704 and args:IsSrcTypeHostile() then
 		warningPsychicScream:Show()
@@ -42,7 +42,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args.spellId == 17405 and args:IsDestTypePlayer() then
+	if args.spellId == 15690 and args:IsDestTypePlayer() then
 		warningDomination:Show(args.destName)
 	--elseif args.spellId == 66290 then
 		--warningSleep:Show(args.destName)

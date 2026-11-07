@@ -35,7 +35,7 @@ local timerBlizzad			= mod:NewBuffActiveTimer(30, 29951, nil, nil, nil, 3)
 local timerElementals		= mod:NewBuffActiveTimer(90, 37053, nil, nil, nil, 6)
 local timerChains			= mod:NewTargetTimer(10, 29991, nil, nil, nil, 3, nil, DBM_COMMON_L.MAGIC_ICON)
 
-local berserkTimer			= mod:NewBerserkTimer(900)
+local berserkTimer			= mod:NewBerserkTimer(720)
 
 mod:AddSetIconOption("WreathIcons", 29946, true, false, {5, 6, 7, 8})
 mod:AddSetIconOption("ElementalIcons", 37053, true, true, {1, 2, 3, 4})
@@ -53,7 +53,6 @@ end
 
 function mod:OnCombatStart(delay)
 	berserkTimer:Start(-delay)
-	timerSpecial:Start(-delay)
 	self.vb.flameWreathIcon = 8
 	table.wipe(WreathTargets)
 	self.vb.mobIcon = 1
@@ -111,7 +110,7 @@ end
 function mod:SPELL_AURA_REMOVED(args)
 	if args.spellId == 29991 then
 		timerChains:Cancel(args.destName)
-	elseif args.spellId == 29946 and self.Options.WreathIcon then
+	elseif args.spellId == 29946 and self.Options.WreathIcons then
 		self:SetIcon(args.destName, 0)
 	end
 end

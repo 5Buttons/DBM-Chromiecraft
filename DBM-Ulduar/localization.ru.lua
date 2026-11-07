@@ -292,23 +292,6 @@ L:SetMiscLocalization({
 	YellPullHard		= "Древни, дайте мне силы!"
 })
 
-----------------------
---  Freya's Elders  --
-----------------------
-L = DBM:GetModLocalization("Freya_Elders")
-
-L:SetGeneralLocalization({
-	name = "Древни Фрейи"
-})
-
-L:SetOptionLocalization({
-	TrashRespawnTimer	= "Отсчет времени до возрождения монстров"
-})
-
-L:SetMiscLocalization({
-	TrashRespawnTimer	= "Возрождение монстров",
-})
-
 ---------------
 --  Mimiron  --
 ---------------
@@ -430,4 +413,13 @@ L:SetMiscLocalization({
 	S3TrueFaceofDeath	= "Фаза 3: истинный лик смерти",
 	YoggSaron			= "Йогг-Сарон",
 	ImmortalGuardian	= "Бессмертный страж"
+})
+
+-------------
+--  Trash  --
+-------------
+L = DBM:GetModLocalization("UlduarTrash")
+
+L:SetGeneralLocalization({
+	name = "Трэш Ульдуара"
 })

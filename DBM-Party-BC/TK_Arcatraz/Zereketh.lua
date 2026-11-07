@@ -1,7 +1,7 @@
 local mod = DBM:NewMod(548, "DBM-Party-BC", 15, 254)
 local L = mod:GetLocalizedStrings()
 
-mod:SetRevision("20220925180445")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(20870)
 
 mod:SetModelID(19882)
@@ -10,8 +10,8 @@ mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 36127 39005",
 	"SPELL_CAST_SUCCESS 36119 30533",
-	"SPELL_AURA_APPLIED 39367 32863",
-	"SPELL_AURA_REMOVED 39367 32863"
+	"SPELL_AURA_APPLIED 39367 36123",
+	"SPELL_AURA_REMOVED 39367 36123"
 )
 
 local warnVoid		= mod:NewSpellAnnounce(36119, 3)
@@ -48,7 +48,7 @@ do
 end
 
 function mod:SPELL_AURA_APPLIED(args)
-	if args:IsSpellID(39367, 32863) then
+	if args:IsSpellID(39367, 36123) then
 		if self:CheckDispelFilter("magic") then
 			specwarnSoC:Show(args.destName)
 			specwarnSoC:Play("dispelnow")
@@ -58,7 +58,7 @@ function mod:SPELL_AURA_APPLIED(args)
 end
 
 function mod:SPELL_AURA_REMOVED(args)
-	if args:IsSpellID(39367, 32863) then
+	if args:IsSpellID(39367, 36123) then
 		timerSoC:Stop(args.destName)
 	end
 end

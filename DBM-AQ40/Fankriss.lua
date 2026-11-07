@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Fankriss", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261030120000")
 mod:SetCreatureID(15510)
 
 mod:SetModelID(15510)
@@ -25,7 +25,7 @@ local yellEntangle		= mod:NewYell(1121)
 function mod:OnCombatStart()
 	if not self:IsTrivial(85) then
 		self:RegisterShortTermEvents(
-			"SPELL_AURA_APPLIED 25646 1121",
+			"SPELL_AURA_APPLIED 25646 720 731 1121",
 			"SPELL_AURA_APPLIED_DOSE 25646",
 			"SPELL_AURA_REMOVED 25646"
 		)
@@ -53,7 +53,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		else
 			warnWound:Show(args.destName, amount)
 		end
-	elseif args.spellId == 1121 then
+	elseif args:IsSpellID(720, 731, 1121) then
 		if args:IsPlayer() then
 			yellEntangle:Yell()
 		end

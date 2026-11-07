@@ -43,6 +43,8 @@ L:SetMiscLocalization({
 	Event				= "Heute Abend werden wir Zeuge einer verbotenen Liebe!",
 	RJ_Pull				= "Welch' Teufel bist du, dass du so mich folterst?",
 	DBM_RJ_PHASE2_YELL	= "Komm, milde, liebevolle Nacht! Komm, gibt mir meinen Romulo zurück!",
+	DBM_RJ_JULIANNE_POISON	= "Ich komme, Romulo! Oh… dies trink' ich dir!",
+	DBM_RJ_ROMULO_DEATH	= "Und du lächelst zu dem Streich, der mich ermordet.",
 	Romulo				= "Romulo",
 	Julianne			= "Julianne"
 })
@@ -90,7 +92,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "Ich habe keine Angst vor Euch! Wollt Ihr kämpfen? Hä, wollt Ihr? Kommt schon! Ich schaffe Euch mit beiden Pfoten hinter dem Rücken!",
 	DBM_OZ_YELL_STRAWMAN	= " Was soll ich nur mit Euch machen? Mit fällt einfach nichts ein.",
 	DBM_OZ_YELL_TINHEAD		= "Ich könnte wirklich ein Herz brauchen. Kann ich Eures haben?",
-	DBM_OZ_YELL_CRONE		= "Wehe Euch allen, meine Hübschen!"
+	DBM_OZ_YELL_CRONE		= "Wehe Euch allen, meine Hübschen!",
+	DBM_OZ_YELL_CRONE2		= "Bald ist alles vorbei!",
+	DBM_OZ_YELL_TITO		= "Lass' nicht zu, dass sie uns wehtun, Tito. Nein, das wirst du nicht, oder?"
 })
 
 -- Curator
@@ -197,7 +201,6 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "Dummköpfe! Zeit ist das Feuer, in dem Ihr brennen werdet!",
-	DBM_PRINCE_YELL_P3		= "Wie könnt Ihr hoffen, einer so überwältigenden Macht gewachsen zu sein?",
 	DBM_PRINCE_YELL_INF1	= "Alle Realitäten, alle Dimensionen stehen mir offen!",
 	DBM_PRINCE_YELL_INF2	= "Ihr steht nicht nur vor Malchezaar allein, sondern vor den Legionen, die ich befehlige!"
 })

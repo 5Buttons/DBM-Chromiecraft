@@ -1,12 +1,12 @@
 local mod	= DBM:NewMod("ZulJin", "DBM-ZulAman")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250105182900")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(23863)
 mod:SetEncounterID(1194)
 mod:SetZone()
 
-mod:RegisterCombat("combat_yell", L.YellPull) -- //on Trinity Core I think the yell is swapped with intro yell
+mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED 43093 43150 43213",

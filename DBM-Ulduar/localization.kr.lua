@@ -279,23 +279,6 @@ L:SetMiscLocalization({
 	YellPullHard		= "장로여, 내게 힘을 나눠다오!"
 })
 
-----------------------
---  Freya's Elders  --
-----------------------
-L = DBM:GetModLocalization("Freya_Elders")
-
-L:SetGeneralLocalization({
-	name = "프레이야의 장로"
-})
-
-L:SetOptionLocalization({
-	TrashRespawnTimer	= "프레이야 지역 리젠 타이머 보기"
-})
-
-L:SetMiscLocalization({
-	TrashRespawnTimer	= "프레이야 지역 리젠타임"
-})
-
 ---------------
 --  Mimiron  --
 ---------------
@@ -417,4 +400,13 @@ L:SetMiscLocalization({
 	S3TrueFaceofDeath	= "3단계: 죽음의 진정한 얼굴",
 	YoggSaron			= "요그사론",
 	ImmortalGuardian	= "불멸의 수호병"
+})
+
+-------------
+--  Trash  --
+-------------
+L = DBM:GetModLocalization("UlduarTrash")
+
+L:SetGeneralLocalization({
+	name = "울두아르 일반몹"
 })

@@ -585,6 +585,10 @@ L:SetGeneralLocalization({
 	name		= "观察者克鲁什"
 })
 
+L:SetMiscLocalization({
+	Defeat	= "国王死了——哦，召唤狡猾的米兹勒，他知道接下来该怎么做。"
+})
+
 -----------------------------
 --  King Gordok  --
 -----------------------------
@@ -941,6 +945,10 @@ L = DBM:GetModLocalization("Mograine_and_Whitemane")
 
 L:SetGeneralLocalization({
 	name		= "莫格莱尼 & 怀特迈恩"
+})
+
+L:SetMiscLocalization({
+	YellWhitemane	= "莫格莱尼倒下了？你们要为此付出代价！复活吧，我的勇士！复活吧！"
 })
 
 -----------------------------

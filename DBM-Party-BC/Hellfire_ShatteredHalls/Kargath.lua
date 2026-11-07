@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic"
 
-mod:SetRevision("20251017110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(16808)
 
 mod:SetModelID(19799)
@@ -68,7 +68,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 end
 
 function mod:OnSync(msg)
-	if msg == "BladeDance" and self:AntiSpam(3, 1) then
+	if msg == "BladeDance" and self:AntiSpam(10, 1) then
 		specWarnBladeDance:Show()
 		timerBladeDanceCD:Start()
 		specWarnBladeDance:Play("aesoon")

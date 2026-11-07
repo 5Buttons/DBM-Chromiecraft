@@ -3,7 +3,7 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(26794)
 mod:SetEncounterID(524)
 
@@ -24,7 +24,7 @@ local specWarnSpikes		= mod:NewSpecialWarningDodge(47958, nil, nil, nil, 2, 2)
 
 local timerReflection		= mod:NewBuffActiveTimer(15, 47981, nil, "SpellCaster", 2, 5, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerReflectionCD		= mod:NewCDTimer(30, 47981, nil, "SpellCaster", 2, 5, nil, DBM_COMMON_L.DEADLY_ICON)
-local timerSpikesCD			= mod:NewCDTimer(12.1, 47958, nil, nil, nil, 3)--Health based or CD?
+local timerSpikesCD			= mod:NewCDTimer(20, 47958, nil, nil, nil, 3)-- AC: 12s on pull, then 20s
 
 function mod:OnCombatStart(delay)
 	timerSpikesCD:Start(12-delay)

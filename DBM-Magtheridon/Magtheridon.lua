@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Magtheridon", "DBM-Magtheridon")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250120150020")
+mod:SetRevision("20261026180406")
 mod:SetCreatureID(17257)
 mod:SetEncounterID(651)
 mod:SetModelID(18527)
@@ -32,7 +32,7 @@ local timerPhase2			= mod:NewTimer(120+3, "timerP2", "135566", nil, nil, 6)
 local timerBlastNovaCD		= mod:NewCDCountTimer(54+0.35, 30616, nil, nil, nil, 2, nil, DBM_COMMON_L.DEADLY_ICON)
 local timerDebris			= mod:NewNextTimer(15, 36449, nil, nil, nil, 2, nil, DBM_COMMON_L.HEALER_ICON..DBM_COMMON_L.TANK_ICON)--Only happens once per fight, after the phase 3 yell.
 
-local timerQuakeCD			= mod:NewCDTimer(53+2.65, 30657, nil, nil, nil, 2)
+local timerQuakeCD			= mod:NewCDTimer(56.3, 30657, nil, nil, nil, 2)
 local specWarnGTFO			= mod:NewSpecialWarningGTFO(30757, nil, nil, nil, 1, 8)
 
 mod.vb.blastNovaCounter = 1
@@ -70,6 +70,12 @@ end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(_, spellName)
 	if spellName == quakeName then
+		self:SendSync("Quake")
+	end
+end
+
+function mod:OnSync(msg)
+	if msg == "Quake" and self:IsInCombat() then
 		timerBlastNovaCD:AddTime(7, self.vb.blastNovaCounter)
 		timerQuakeCD:Start()
 	end

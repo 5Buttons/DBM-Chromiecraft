@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Muru", "DBM-Sunwell")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250511094200") --based on 20220518110528_cafe20250418v24_public
+mod:SetRevision("20261105120000") --based on 20220518110528_cafe20250418v24_public
 mod:SetCreatureID(25741, 25840)--25741 Muru, 25840 Entropius
 mod:SetHealthFrameSlots({25741, mod.localization.general.name}, {25840, L.Entropius})
 mod:SetEncounterID(728)
@@ -44,10 +44,10 @@ local yellP2Darkness		= mod:NewYell(46264)
 
 --local specWarnBH			= mod:NewSpecialWarning("specWarnBH")
 
-local timerBlackHoleCD		= mod:NewNextTimer(14, 46282) --AC Muru script: 14s - 29s
+local timerBlackHoleCD		= mod:NewVarTimer("v14-29", 46282) --AC Muru script: 14s - 29s
 local timerPhase			= mod:NewTimer(10, "TimerPhase", 46087, nil, nil, 6)
 --local timerSingularity		= mod:NewNextTimer(3.2, 46238) --feel this is obsolete 20250403
-local timerP2Darkness		= mod:NewNextTimer(8, 46268, nil, nil, nil, 2) --new P2 darkness timer 20250402, AC: 8 - 29s
+local timerP2Darkness		= mod:NewVarTimer("v8-29", 46268, nil, nil, nil, 2) --new P2 darkness timer 20250402, AC: 8 - 29s
 
 mod.vb.humanCount = 1
 mod.vb.voidCount = 1

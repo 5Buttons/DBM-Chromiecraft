@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Taerar", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(14890)--121911 TW ID, 14890 classic ID
 --mod:SetModelID(17887)
 mod:EnableWBEngageSync()--Enable syncing engage in outdoors
@@ -24,7 +24,7 @@ local warnNoxiousBreath			= mod:NewStackAnnounce(24818, 2, nil, "Tank", 2)
 local specWarnSleepingFog		= mod:NewSpecialWarningDodge(24814, nil, nil, nil, 2, 2)
 
 --local timerNoxiousBreathCD		= mod:NewCDTimer(19.4, 24818, nil, "Tank", nil, 5, nil, DBM_COMMON_L.TANK_ICON)--Iffy
-local timerSleepingFogCD		= mod:NewCDTimer(21.9, 24814, nil, nil, nil, 3)
+local timerSleepingFogCD		= mod:NewCDTimer(120, 24814, nil, nil, nil, 3)--AC: 120-150s
 --local timerBellowingRoarCD		= mod:NewCDTimer(7.2, 243661, nil, nil, nil, 2)
 
 --mod:AddReadyCheckOption(48620, false)
@@ -33,7 +33,7 @@ function mod:OnCombatStart(delay, yellTriggered)
 	if yellTriggered then
 		--timerBellowingRoarCD:Start(10.5-delay)
 		--timerNoxiousBreathCD:Start(14.3-delay)
-		timerSleepingFogCD:Start(21.5-delay)
+		timerSleepingFogCD:Start(12.5-delay)--AC: 12.5-20s
 	end
 end
 

@@ -584,7 +584,7 @@ L:SetGeneralLocalization({
 })
 
 L:SetMiscLocalization({
-	Defeat	= "The king is dead - OH NOES!  Summon Mizzle da Crafty!  He knows what to do next!"
+	Defeat	= "The king is dead - OH NOES! Summon Mizzle da Crafty! He knows what to do next!"
 })
 
 -----------------------------
@@ -943,6 +943,10 @@ L = DBM:GetModLocalization("Mograine_and_Whitemane")
 
 L:SetGeneralLocalization({
 	name		= "Mograine & Whitemane"
+})
+
+L:SetMiscLocalization({
+	YellWhitemane	= "Mograine has fallen! You shall pay for this treachery! Arise, my champion! Arise!"
 })
 
 -----------------------------

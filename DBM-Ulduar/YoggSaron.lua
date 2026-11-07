@@ -1,12 +1,14 @@
 local mod	= DBM:NewMod("YoggSaron", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(33288)
 mod:SetHealthFrameSlots({33134, L.Sara}, {33288, mod.localization.general.name})
 mod:SetEncounterID(756)
 mod:RegisterCombat("combat_yell", L.YellPull)
+mod:SetWipeTime(18.5) -- the raid can drop combat during Sara's 18.5s transform before P2
 mod:SetUsedIcons(1, 2, 3, 4, 5, 6, 7, 8)
+mod:SetBossHealthInfo(33134, L.Sara) -- Health frame: Sara (P1) -> Brain (P2) -> Yogg-Saron (P3)
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 64059 64189 63138 63830 63802",
@@ -35,7 +37,6 @@ local specWarnFervor				= mod:NewSpecialWarningYou(63138, nil, nil, nil, 1, 2)
 local timerFervor					= mod:NewTargetTimer(15, 63138, nil, false, 2)
 
 mod:AddSetIconOption("SetIconOnFervorTarget", 63138, false, false, {7})
-mod:AddBoolOption("ShowSaraHealth", false)
 
 -- Guardian of Yogg-Saron
 -- mod:AddTimerLine(L.GuardianofYoggSaron)
@@ -61,8 +62,8 @@ local specWarnMalady				= mod:NewSpecialWarningYou(63830, nil, nil, nil, 1, 2)
 local specWarnMaladyNear			= mod:NewSpecialWarningClose(63830, nil, nil, nil, 1, 2)
 local yellMalady					= mod:NewYell(63830)
 
-local timerBrainLinkCD				= mod:NewCDTimer(23, 63802, nil, nil, nil, 3) -- 3s variance [23-26] + portalled players incurring in a possible ~50-80s variance (25 man NM log 2022/07/10 || S3 HM log 2022/07/21) - 25.4, 26.0 || 25.5, 24.1 ; 24.7, 23.9 ; 24.7, 23.7, 24.1
-local timerMaladyCD					= mod:NewCDTimer(18.7, 63830, nil, nil, nil, 3) -- 7s variance [18-25] + portalled players incurring in a possible ~50-80s variance (25 man NM log 2022/07/10 || S3 HM log 2022/07/21 || 25m Lordaeron 2022/10/09 || 25m Lordaeron 2022/10/30) - 22.3, 22.0 || 21.3, 20.6, 20.2, 52.1, 20.4, 60.8, 20.8, 60.4, 24.8 ; 19.6, 24.5, 60.8, 22.7, 56.8, 21.5, 22.4, 46.5 || 26.0, 19.4, 63.6, 24.1, 51.3, 24.2 || 18.8, 23.0, 24.9, 52.0, 23.4
+local timerBrainLinkCD				= mod:NewCDTimer(30, 63802, nil, nil, nil, 3) --30s on AC
+local timerMaladyCD					= mod:NewCDTimer(20, 63830, nil, nil, nil, 3) --20s on AC
 
 mod:AddSetIconOption("SetIconOnBrainLinkTarget", 63802, true, false, {1, 2})
 mod:AddSetIconOption("SetIconOnFearTarget", 63830, true, false, {6})
@@ -112,7 +113,7 @@ local warnP3						= mod:NewPhaseAnnounce(3, 2, nil, nil, nil, nil, nil, 2)
 local specWarnLunaticGaze			= mod:NewSpecialWarningLookAway(64163, nil, nil, nil, 1, 2)
 
 local timerLunaticGaze				= mod:NewCastTimer(4, 64163, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON) -- Yogg-Saron's Gaze
-local timerNextLunaticGaze			= mod:NewCDTimer(8, 64163, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON) -- Yogg-Saron's Gaze, Log reviewed (25 man NM  2022/07/10) - [cast_success: apply 4s cast time correction factor] 12.0, 12.0, 12.1, 12.1, 12.0, 12.0
+local timerNextLunaticGaze			= mod:NewCDTimer("v9-18", 64163, nil, nil, nil, 2, nil, DBM_COMMON_L.IMPORTANT_ICON) -- 13-22 on AC = from aura-removed 9–18s
 
 mod:AddSetIconOption("SetIconOnBeacon", 64465, true, true, {1, 2, 3, 4, 5, 6, 7, 8})
 
@@ -120,7 +121,7 @@ mod:AddSetIconOption("SetIconOnBeacon", 64465, true, true, {1, 2, 3, 4, 5, 6, 7,
 -- mod:AddTimerLine(L.ImmortalGuardian)
 local warnEmpowerSoon				= mod:NewSoonAnnounce(64486, 4)
 
-local timerEmpower					= mod:NewCDTimer(46.0, 64486, nil, nil, nil, 3) -- REVIEW! variance 45-50? (S3 HM log 2022/07/21) - 46.0, 46.0, 47.4, 48.2
+local timerEmpower					= mod:NewCDTimer(45.0, 64486, nil, nil, nil, 3) -- 45s on AC
 local timerEmpowerDuration			= mod:NewBuffActiveTimer(10, 64486, nil, nil, nil, 3)
 
 mod:GroupSpells(64486, 64465) -- Empowering Shadows, Shadow Beacon
@@ -134,7 +135,7 @@ local warnDeafeningRoarSoon			= mod:NewPreWarnAnnounce(64189, 5, 3)
 local specWarnDeafeningRoar			= mod:NewSpecialWarningSpell(64189, nil, nil, nil, 1, 2)
 
 local timerCastDeafeningRoar		= mod:NewCastTimer(2.3, 64189, nil, nil, nil, 2)
-local timerNextDeafeningRoar		= mod:NewNextTimer(58, 64189, nil, nil, nil, 2) -- (S2 VOD || S3 VOD 2022/07/15 || S3 HM log 2022/07/21) - 58 || 58, 58, 58, 58, 60, 60, 60 || 60.1, 60.1, 60.1
+local timerNextDeafeningRoar		= mod:NewNextTimer(60, 64189, nil, nil, nil, 2) -- 60s on AC
 
 local targetWarningsShown = {}
 local brainLinkTargets = {}
@@ -155,13 +156,6 @@ function mod:OnCombatStart()
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:SetHeader(SanityBuff)
 		DBM.InfoFrame:Show(30, "playerdebuffstacks", SanityBuff, 2)--Sorted lowest first (highest first is default of arg not given)
-	end
-	if self.Options.ShowSaraHealth then
-		if not self.Options.HealthFrame then
-			DBM.BossHealth:Show(L.name)
-		else
-			DBM.BossHealth:AddBoss(33134, L.Sara)
-		end
 	end
 end
 
@@ -196,7 +190,7 @@ function mod:SPELL_CAST_START(args)
 		specWarnMadnessOutNow:Schedule(55) -- TO DO: implement brain room check?
 	elseif spellId == 64189 then		--Deafening Roar
 		timerNextDeafeningRoar:Start()
-		warnDeafeningRoarSoon:Schedule(53)
+		warnDeafeningRoarSoon:Schedule(55)
 		timerCastDeafeningRoar:Start()
 		specWarnDeafeningRoar:Show()
 		specWarnDeafeningRoar:Play("silencesoon")
@@ -293,20 +287,17 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnFervor:Play("targetyou")
 		end
 	elseif args:IsSpellID(63894, 64775) and self.vb.phase < 2 then	-- Shadowy Barrier of Yogg-Saron (this is happens when p2 starts, ~1s after IEEU, so correction factor is needed). Bugged on Warmane, 63894 is never applied (only removed), instead 64775 is applied to Sara
-		-- "<114.74 19:51:51> [CLEU] SPELL_AURA_APPLIED:0xF13000816E0007D4:Sara:0xF13000816E0007D4:Sara:64775:Shadowy Barrier:BUFF:nil:", -- [5432]
 		self:SetStage(2)
-		timerMaladyCD:Start(17.8)	-- (25 man NM log 2022/07/10 || S3 HM log 2022/07/21) - 18 || 18.0 ; 17.9 ; 17.8
-		timerBrainLinkCD:Start(23)	-- (25 man NM log 2022/07/10 || S3 HM log 2022/07/21) - 23 || 23.0 ; 23.0
-		timerBrainPortal:Start(59)	-- (25 man NM log 2022/07/10 || S3 HM log 2022/07/21) - 59 || 59.8 ; 59.7 ; 59.5
-		warnBrainPortalSoon:Schedule(49)
+		timerMaladyCD:Start(12)	-- 12s AC
+		timerBrainLinkCD:Start(18)	--  18s AC
+		timerBrainPortal:Start(60)	-- 60s AC
+		warnBrainPortalSoon:Schedule(50)
 		specWarnBrainPortalSoon:Schedule(56)
 		warnP2:Show()
 		warnP2:Play("ptwo")
-		if self.Options.ShowSaraHealth then
+		if DBM.BossHealth:IsShown() then
 			DBM.BossHealth:RemoveBoss(33134)
-			if not self.Options.HealthFrame then
-				DBM.BossHealth:Hide()
-			end
+			DBM.BossHealth:AddBoss(33890, L.BrainofYoggSaron)
 		end
 	elseif spellId == 64163 then	-- Lunatic Gaze phase 3 (reduces sanity) ; 64167 Lunatic Gaze is related to Laughing Skulls, which is not important
 		specWarnLunaticGaze:Show(args.sourceName)
@@ -333,13 +324,14 @@ function mod:SPELL_AURA_REMOVED(args)
 		-- "<298.03 19:54:54> [CLEU] SPELL_AURA_REMOVED:0xF150008208000F6B:Yogg-Saron:0xF150008208000F6B:Yogg-Saron:63894:Shadowy Barrier:BUFF:nil:", -- [15528]
 		self:SendSync("Phase3")			-- Sync this because you don't get it in your combat log if you are in brain room.
 	elseif spellId == 64163 then	-- Lunatic Gaze phase 3 ; 64167 Lunatic Gaze is related to Laughing Skulls, which is not important
-		timerNextLunaticGaze:Start() -- 12s interval - 4s cast = 8s for next cast
+		timerNextLunaticGaze:Start() -- AC: 13-22s from cast, minus 4s aura = 9-18s
 	elseif args:IsSpellID(63830, 63881) and self.Options.SetIconOnFearTarget then   -- Malady of the Mind (Death Coil)
 		self:SetIcon(args.destName, 0)
 	elseif spellId == 64465 then -- Shadow Beacon
 		if self.Options.SetIconOnBeacon then
 			self:ScanForMobs(args.destGUID, 2, 0, 1, nil, 6, "SetIconOnBeacon", true, nil, nil, true)
 		end
+		self.vb.beaconIcon = 8
 	end
 end
 
@@ -374,6 +366,10 @@ end]]
 function mod:OnSync(msg)
 	if msg == "Phase3" then
 		self:SetStage(3)
+		if DBM.BossHealth:IsShown() then
+			DBM.BossHealth:RemoveBoss(33890)
+			DBM.BossHealth:AddBoss(33288, L.name)
+		end
 		timerBrainPortal:Cancel()
 		warnBrainPortalSoon:Cancel()
 		timerMaladyCD:Cancel()
@@ -382,8 +378,8 @@ function mod:OnSync(msg)
 		warnP3:Show()
 		warnP3:Play("pthree")
 		warnEmpowerSoon:Schedule(40)
-		timerNextDeafeningRoar:Start(20) -- Has variance (S2 VOD || S3 VOD 2022/07/15 || S3 HM log 2022/07/21) - 21 || 22, 21.5, 20.6, 22.1, 20.0, 28, 28 || 28.1, 22.6
-		warnDeafeningRoarSoon:Schedule(15)
-		timerNextLunaticGaze:Start(12) -- S3 VOD review
+		timerNextDeafeningRoar:Start(30) -- 30s AC
+		warnDeafeningRoarSoon:Schedule(25)
+		timerNextLunaticGaze:Start(7) -- 7s AC
 	end
 end

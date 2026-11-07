@@ -3,7 +3,7 @@ local L = mod:GetLocalizedStrings()
 
 mod.statTypes = "heroic,mythic"
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(23035)
 
 mod:SetModelID(21492)
@@ -30,13 +30,13 @@ local timerScreech		  = mod:NewCastTimer(5, 40184, nil, nil, nil, 2)
 local timerScreechDebuff	= mod:NewBuffActiveTimer(6, 40184, nil, nil, nil, 3)
 local timerCyclone		  = mod:NewTargetTimer(6, 40321, nil, nil, nil, 3)
 local timerSpellBomb		= mod:NewTargetTimer(8, 40303, nil, nil, nil, 3)
-local timerScreechCD		= mod:NewCDTimer(30, 40184, nil, nil, nil, 2)--Best guess on screech CD. Might need tweaking.
+local timerScreechCD		= mod:NewCDTimer(23, 40184, nil, nil, nil, 2)--AC: 23s
 
 mod.vb.warnedbirds1 = false
 mod.vb.warnedbirds2 = false
 
 function mod:OnCombatStart()
-	timerScreechCD:Start()
+	timerScreechCD:Start(14)
 	self.vb.warnedbirds1 = false
 	self.vb.warnedbirds2 = false
 end
@@ -69,10 +69,10 @@ function mod:SPELL_AURA_REMOVED(args)
 end
 
 function mod:UNIT_HEALTH(uId)
-	if not self.vb.warnedbirds1 and self:GetUnitCreatureId(uId) == 23035 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.70 then
+	if not self.vb.warnedbirds1 and self:GetUnitCreatureId(uId) == 23035 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.66 then
 		self.vb.warnedbirds1 = true
 		warnBirds:Show()
-	elseif not self.vb.warnedbirds2 and self:GetUnitCreatureId(uId) == 23035 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.37 then
+	elseif not self.vb.warnedbirds2 and self:GetUnitCreatureId(uId) == 23035 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.33 then
 		self.vb.warnedbirds2 = true
 		warnBirds:Show()
 	end

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Saviana", "DBM-ChamberOfAspects", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20250929220131")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(39747)
 mod:SetEncounterID(891)
 mod:SetUsedIcons(8, 7, 6, 5, 4)
@@ -12,7 +12,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 74403 74404",
 	"SPELL_AURA_APPLIED 78722 74453",
 	"SPELL_AURA_REMOVED 78722",
-	"UNIT_SPELLCAST_SUCCEEDED boss1"
+	"UNIT_SPELLCAST_SUCCEEDED"
 )
 
 local warningWarnBeacon		= mod:NewTargetNoFilterAnnounce(74453, 4)--Will change to a target announce if possible. need to do encounter
@@ -24,7 +24,7 @@ local specWarnTranq			= mod:NewSpecialWarningDispel(78722, "RemoveEnrage", nil, 
 local timerBeacon			= mod:NewBuffActiveTimer(5, 74453, nil, nil, nil, 3)
 local timerConflag			= mod:NewBuffActiveTimer(5, 74456, nil, nil, nil, 3)
 local timerConflagCD		= mod:NewCDTimer(63.8, 74452, nil, nil, nil, 3) -- Using UNIT_SPELLCAST_SUCCEEDED since it only fires once. Variance depends on travel time (25N Lordaeron 2022/09/19 || 25H Lordaeron 2022/09/23) -- 63.8 || 64.3
-local timerBreath			= mod:NewCDTimer(19.3, 74403, nil, "Tank|Healer", nil, 5, nil, DBM_COMMON_L.TANK_ICON, true) -- REVIEW! ~10s variance [19.3-29.5] Added "Keep" arg (25N Lordaeron 2022/09/19 || 25H Lordaeron 2022/09/23 || 25N Lordaeron [2023-06-27]@[19:12:05]) -- 38.8, 29.5, 34.2 || 38.4, 25.7 || 38.1, 22.1
+local timerBreath			= mod:NewCDTimer(20, 74403, nil, "Tank|Healer", nil, 5, nil, DBM_COMMON_L.TANK_ICON, true) -- AC: 20-30s. Added "Keep" arg
 local timerEnrage			= mod:NewBuffActiveTimer(10, 78722, nil, "RemoveEnrage|Tank|Healer", nil, 5, nil, DBM_COMMON_L.ENRAGE_ICON..DBM_COMMON_L.TANK_ICON)
 local timerFlight			= mod:NewNextTimer(50, 34873, nil, nil, nil, 6, 54950)
 local timerLanding			= mod:NewNextTimer(8, 30202, nil, nil, nil, 6, 54950)
@@ -45,7 +45,7 @@ end
 
 local function savianaPhaseCatcher(self)
 	self:RegisterShortTermEvents(
-		"UNIT_TARGET boss1"
+		"UNIT_TARGET"
 	)
 end
 
@@ -67,15 +67,15 @@ end
 function mod:OnCombatStart(delay)
 	self:SetStage(1)
 	timerConflagCD:Start(30.1-delay) -- REVIEW! variance? (25N Lordaeron 2022/09/19 || 25H Lordaeron 2022/09/23) -- 30.1 || 30.2
-	timerBreath:Start(14-delay) -- (25N Lordaeron 2022/09/19 || 25H Lordaeron 2022/09/23 || 25N Lordaeron [2023-06-27]@[19:12:05]) - 14.0 || 14.0 || 14.0
-	timerFlight:Start(25-delay)
+	timerBreath:Start(10-delay) -- AC: 10s
+	timerFlight:Start(30-delay)
 	table.wipe(beaconTargets)
 	self.vb.beaconIcon = 8
 	if self.Options.RangeFrame then
 		DBM.RangeCheck:Show(12)
 	end
-	self:Schedule(24.5, savianaPhaseCatcher, self)
-	self:Schedule(25, savianaAirphase, self) -- Lowest 24.96
+	self:Schedule(29.5, savianaPhaseCatcher, self)
+	self:Schedule(30, savianaAirphase, self) -- AC: 30s
 end
 
 function mod:OnCombatEnd()
@@ -123,14 +123,12 @@ end
 
 function mod: UNIT_SPELLCAST_SUCCEEDED(_, spellName) -- UNIT_SPELLCAST_START/CLEU fires and stops right after, and only gets SUCCEEDED one second after, one time only, which is better to optimize some calls
 	if spellName == GetSpellInfo(74454) then -- Conflagration
-		timerConflagCD:Restart() -- This will always be prone to bad timers, since it doesn't account for travel time, which can be different!
-		timerLanding:Start()
-		self:Schedule(7, savianaPhaseCatcher, self)
-		self:Schedule(7.89, savianaLanding, self) -- Lowest 7.88
+		self:SendSync("SavianaConflag")
 	end
 end
 
 function mod:UNIT_TARGET(uId)
+	if self:GetUnitCreatureId(uId) ~= 39747 then return end
 	local unitTarget = UnitExists(uId.."target")
 	if not unitTarget and  self.vb.phase == 1 then
 		self:SendSync("SavianaAired") -- Sync airphase with raid since UNIT_TARGET:boss1 event requires boss to be target/focus, which not all members do
@@ -141,7 +139,12 @@ end
 
 function mod:OnSync(msg)
 	if not self:IsInCombat() then return end
-	if msg == "SavianaAired" and self.vb.phase == 1 then
+	if msg == "SavianaConflag" then
+		timerConflagCD:Restart() -- This will always be prone to bad timers, since it doesn't account for travel time, which can be different!
+		timerLanding:Start()
+		self:Schedule(7, savianaPhaseCatcher, self)
+		self:Schedule(7.89, savianaLanding, self) -- Lowest 7.88
+	elseif msg == "SavianaAired" and self.vb.phase == 1 then
 		self:Unschedule(savianaAirphase)
 		savianaAirphase(self)
 	elseif msg == "SavianaLanded" and self.vb.phase == 1.5 then

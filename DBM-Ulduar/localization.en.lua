@@ -106,11 +106,11 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	Steelbreaker		= "Steelbreaker",
 	RunemasterMolgeim	= "Runemaster Molgeim",
-	StormcallerBrundir	= "Stormcaller Brundir"
+	StormcallerBrundir	= "Stormcaller Brundir",
 --	YellPull1					= "Whether the world's greatest gnats or the world's greatest heroes, you're still only mortal!",
 --	YellPull2					= "Nothing short of total decimation will suffice.",
 --	YellPull3					= "You will not defeat the Assembly of Iron so easily, invaders!",
---	YellRuneOfDeath				= "Decipher this!",
+	YellRuneOfDeath				= "Decipher this!"
 --	YellRunemasterMolgeimDied	= "What have you gained from my defeat? You are no less doomed, mortals!",
 --	YellRunemasterMolgeimDied2	= "The legacy of storms shall not be undone.",
 --	YellStormcallerBrundirDied	= "The power of the storm lives on...",
@@ -133,22 +133,25 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	NextCollapsingStar		= "Next Collapsing Star"
+	NextCollapsingStar		= "Next Collapsing Star",
+	TimerCombatStart		= "Combat starts"
 })
 
 L:SetOptionLocalization({
 	NextCollapsingStar		= "Show timer for next Collapsing Star",
+	TimerCombatStart		= "Show timer for start of combat",
 	warnStarLow				= "Show special warning when Collapsing Star is low (at ~25%)"
 })
 
 L:SetMiscLocalization({
 --	HealthInfo				= "Heal for star",
---	FirstPull				= "See your world through my eyes: A universe so vast as to be immeasurable - incomprehensible even to your greatest minds.",
---	YellPull				= "Your actions are illogical. All possible results for this encounter have been calculated. The Pantheon will receive the Observer's message regardless of outcome.",
+	FirstPull				= "See your world through my eyes: A universe so vast as to be immeasurable - incomprehensible even to your greatest minds.",
+	YellPull				= "Your actions are illogical. All possible results for this encounter have been calculated. The Pantheon will receive the Observer's message regardless of outcome.",
 	YellKill				= "I have seen worlds bathed in the Makers' flames, their denizens fading without as much as a whimper. Entire planetary systems born and razed in the time that it takes your mortal hearts to beat once. Yet all throughout, my own heart devoid of emotion... of empathy. I. Have. Felt. Nothing. A million-million lives wasted. Had they all held within them your tenacity? Had they all loved life as you do?",
 	Emote_CollapsingStar	= "%s begins to Summon Collapsing Stars!",
 	Phase2					= "Behold the tools of creation!",
-	CollapsingStar			= "Collapsing Star"
+	CollapsingStar			= "Collapsing Star",
+	PullCheck				= "Time until Algalon transmits distress signal= (%d+) min."
 })
 
 ----------------
@@ -255,7 +258,7 @@ L:SetMiscLocalization({
 	YellPhase2			= "Impertinent whelps, you dare challenge me atop my pedestal? I will crush you myself!",
 	YellKill			= "Stay your arms! I yield!",
 	YellHardModeActive	= "Impossible!  Lord Thorim, I will bring your foes a frigid death!",
-	YellHardModeFailed	= "These pathetic mortals are harmless, beneath my station. Dispose of them!",
+	YellHardModeFailed	= "These pathetic mortals are harmless, beneath my station.  Dispose of them!",
 	ChargeOn			= "Lightning Charge: %s",
 	Charge				= "Lightning Charge fails (this try): %s"
 })
@@ -270,7 +273,8 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
-	WarnSimulKill		= "First add down - Resurrection in ~12 seconds"
+	WarnSimulKill		= "First add down - Resurrection in 11 seconds",
+	WarnWave			= "Wave %s: %s"
 })
 
 L:SetTimerLocalization({
@@ -279,7 +283,8 @@ L:SetTimerLocalization({
 
 L:SetOptionLocalization({
 	WarnSimulKill	= "Announce first mob down",
-	TimerSimulKill	= "Show timer for mob resurrection"
+	TimerSimulKill	= "Show timer for mob resurrection",
+	WarnWave		= "Announce $spell:62678 waves with count and group"
 })
 
 L:SetMiscLocalization({
@@ -287,6 +292,9 @@ L:SetMiscLocalization({
 	WaterSpirit			= "Ancient Water Spirit",
 	Snaplasher			= "Snaplasher",
 	StormLasher			= "Storm Lasher",
+	WaveTrio			= "Elementals",
+	WaveConservator		= "Ancient Conservator",
+	WaveLashers			= "Detonating Lashers",
 	YellKill			= "His hold on me dissipates. I can see clearly once more. Thank you, heroes.",
 	YellAdds1			= "Eonar, your servant requires aid!",
 	YellAdds2			= "The swarm of the elements shall overtake you!",
@@ -294,23 +302,6 @@ L:SetMiscLocalization({
 	TrashRespawnTimer	= "Freya trash respawn",
 	YellPullNormal		= "The Conservatory must be protected!",
 	YellPullHard		= "Elders grant me your strength!"
-})
-
-----------------------
---  Freya's Elders  --
-----------------------
-L = DBM:GetModLocalization("Freya_Elders")
-
-L:SetGeneralLocalization({
-	name = "Freya's Elders"
-})
-
-L:SetOptionLocalization({
-	TrashRespawnTimer	= "Show timer for trash respawn"
-})
-
-L:SetMiscLocalization({
-	TrashRespawnTimer	= "Freya trash respawn"
 })
 
 ---------------
@@ -434,4 +425,13 @@ L:SetMiscLocalization({
 	S3TrueFaceofDeath	= "Stage Three: True Face of Death",
 	YoggSaron			= "Yogg-Saron",
 	ImmortalGuardian	= "Immortal Guardian"
+})
+
+----------
+--  Trash  --
+----------
+L = DBM:GetModLocalization("UlduarTrash")
+
+L:SetGeneralLocalization({
+	name = "Ulduar Trash"
 })

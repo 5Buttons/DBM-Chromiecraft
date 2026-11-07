@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Sartura", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(15516)
 
 mod:SetModelID(15516)
@@ -21,7 +21,7 @@ local warnWhirlwind		= mod:NewSpellAnnounce(26083, 3)
 
 local specWarnWhirlwind	= mod:NewSpecialWarningRun(26083, false, nil, nil, 4, 2)
 
-local WhirlwindCD		= mod:NewCDTimer(20, 26083, nil, nil, nil, 2)
+local WhirlwindCD		= mod:NewCDTimer(20, 26083, nil, nil, nil, 2)--AC: 15s duration + 5-11s
 
 mod.vb.prewarn_enrage = false
 
@@ -38,6 +38,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		else
 			warnWhirlwind:Show()
 		end
+		WhirlwindCD:Start()
 	elseif args.spellId == 8269 and args:IsSrcTypeHostile() then
 		warnEnrage:Show()
 	end
@@ -45,7 +46,7 @@ end
 mod.SPELL_AURA_APPLIED = mod.SPELL_CAST_SUCCESS
 
 function mod:UNIT_HEALTH(uId)
-	if self:GetUnitCreatureId(uId) == 15516 and not self.vb.prewarn_enrage and UnitHealthMax(uId) and UnitHealthMax(uId) > 0 and (UnitHealth(uId) / UnitHealthMax(uId)) <= 0.35 then
+	if self:GetUnitCreatureId(uId) == 15516 and not self.vb.prewarn_enrage and UnitHealthMax(uId) and UnitHealthMax(uId) > 0 and (UnitHealth(uId) / UnitHealthMax(uId)) <= 0.25 then--AC: enrage at 20%
 		warnEnrageSoon:Show()
 		self.vb.prewarn_enrage = true
 	end

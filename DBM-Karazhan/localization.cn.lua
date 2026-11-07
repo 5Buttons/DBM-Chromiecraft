@@ -42,6 +42,8 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_RJ_PHASE2_YELL	= "来吧，可爱的黑颜的夜，把我的罗密欧给我！",
+	DBM_RJ_JULIANNE_POISON	= "罗密欧，我来了！我为你干了这一杯！",
+	DBM_RJ_ROMULO_DEATH	= "你杀了我……却洋洋得意。",
 	Romulo				= "罗密欧",
 	Julianne			= "朱丽叶"
 })
@@ -133,7 +135,7 @@ L:SetGeneralLocalization({
 
 L:SetMiscLocalization({
 	DBM_PRINCE_YELL_P2		= "愚蠢的家伙！时间就是吞噬你躯体的烈焰！",
-	DBM_PRINCE_YELL_P3		= "你如何抵挡这无坚不摧的力量？",
+	DBM_PRINCE_YELL_P3		= "我见过无数像你这样什么都不懂的原始人。",
 	DBM_PRINCE_YELL_INF1	= "所有的世界都向我敞开大门！",
 	DBM_PRINCE_YELL_INF2	= "你面对的不仅仅是玛克扎尔，还有我所号令的军团！"
 })
@@ -192,7 +194,9 @@ L:SetMiscLocalization({
 	DBM_OZ_YELL_ROAR		= "我不怕你们！你们想打架？那就来呀！来呀！我不用前爪都可以打败你们！",
 	DBM_OZ_YELL_STRAWMAN	= "我该把你怎么办？我完全不知道。",
 	DBM_OZ_YELL_TINHEAD		= "我真的需要一颗心。啊，用你的行吗？",
-	DBM_OZ_YELL_CRONE		= "我为你们感到可悲，小家伙们！"
+	DBM_OZ_YELL_CRONE		= "我为你们感到可悲，小家伙们！",
+	DBM_OZ_YELL_CRONE2		= "很快就会结束了！",
+	DBM_OZ_YELL_TITO		= "托托，你不会让这些家伙伤害我们的，对吧？"
 })
 
 -- Named Beasts

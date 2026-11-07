@@ -583,10 +583,6 @@ L:SetGeneralLocalization({
 	name		= "Чо'Раш Наблюдатель"
 })
 
-L:SetMiscLocalization({
-	Defeat	= "Король мертв – О НЕТ! Зови Миззла Хитрюгу! Он знает, что делать!"
-})
-
 ----------------
 -- King Gordok --
 ----------------
@@ -943,6 +939,10 @@ L = DBM:GetModLocalization("Mograine_and_Whitemane")
 
 L:SetGeneralLocalization({
 	name		= "Могрейн и Melenablanca"
+})
+
+L:SetMiscLocalization({
+	YellWhitemane	= "Могрейн погиб! Вы заплатите за это предательство! Поднимись, мой герой! Поднимись!"
 })
 
 -----------------------------

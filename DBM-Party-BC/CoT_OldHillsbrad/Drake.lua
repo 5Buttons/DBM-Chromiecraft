@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(538, "DBM-Party-BC", 11, 251)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20220518110528")
+mod:SetRevision("20261105120000")
 mod:SetCreatureID(17848)
 
 mod:SetModelID(17386)
@@ -9,7 +9,7 @@ mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_SUCCESS 31909",
-	"SPELL_AURA_APPLIED 33792",
+	"SPELL_AURA_APPLIED 33792 31911",
 	"SPELL_AURA_REMOVED 33792"
 )
 
@@ -21,7 +21,7 @@ local specWarnWhirlwind		= mod:NewSpecialWarningRun(31909, nil, nil, nil, 4, 2)
 local timerShot				= mod:NewTargetTimer(6, 33792, nil, nil, nil, 3)
 
 function mod:SPELL_CAST_SUCCESS(args)
-	if args.spellId == 31909 or args.spellId == 21910 then
+	if args.spellId == 31909 then
 		specWarnWhirlwind:Show()
 		specWarnWhirlwind:Play("justrun")
 	end
